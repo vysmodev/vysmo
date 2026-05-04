@@ -1,0 +1,52 @@
+{
+  "name": "@vysmo/animations",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Value-based tweening primitives — animate(), spring(), timeline(), interpolate(). DOM-agnostic core that drives anything a number can change: CSS transforms, WebGL uniforms, canvas draws, audio params.",
+  "license": "MIT",
+  "keywords": [
+    "animation",
+    "animate",
+    "tween",
+    "spring",
+    "timeline",
+    "interpolation",
+    "easing",
+    "headless",
+    "tree-shakable"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run && vitest run --config vitest.ssr.config.ts",
+    "test:main": "vitest run",
+    "test:ssr": "vitest run --config vitest.ssr.config.ts",
+    "test:watch": "vitest",
+    "size": "node scripts/check-bundle-size.mjs"
+  },
+  "dependencies": {
+    "@vysmo/easings": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}

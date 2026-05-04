@@ -1,0 +1,54 @@
+{
+  "name": "@vysmo/flipbook",
+  "version": "0.0.0",
+  "private": true,
+  "description": "WebGL flipbook driven by the @vysmo/transitions page-curl mesh shader. Click halves, keyboard nav, drag corners to scrub mid-flip. Drop-in component or headless API.",
+  "license": "MIT",
+  "keywords": [
+    "flipbook",
+    "page-flip",
+    "page-curl",
+    "webgl",
+    "transitions",
+    "drag-scrub",
+    "headless"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run && vitest run --config vitest.ssr.config.ts",
+    "test:browser": "vitest run",
+    "test:ssr": "vitest run --config vitest.ssr.config.ts",
+    "test:watch": "vitest",
+    "size": "node scripts/check-bundle-size.mjs"
+  },
+  "dependencies": {
+    "@vysmo/animations": "workspace:*",
+    "@vysmo/easings": "workspace:*",
+    "@vysmo/transitions": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/browser": "^3.2.4",
+    "esbuild": "^0.28.0",
+    "playwright": "^1.59.1",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}

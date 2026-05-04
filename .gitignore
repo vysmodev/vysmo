@@ -1,0 +1,34 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+dist
+**/dist
+.astro
+.vite
+.turbo
+.cache
+*.tsbuildinfo
+
+# Test / coverage
+coverage
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea
+
+# Claude Code user-local
+.claude/settings.local.json
+
+# Studio scratch buffer for the text-preset ingest script
+packages/text/scripts/_staging.ts

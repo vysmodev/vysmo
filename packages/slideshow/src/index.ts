@@ -1,0 +1,23 @@
+export { createSlideshow } from "./create.js";
+export type {
+  ArrowsOptions,
+  ArrowsPosition,
+  ArrowsStyle,
+  CaptionAlignment,
+  CaptionPosition,
+  CaptionsOptions,
+  CounterOptions,
+  CounterPosition,
+  DotsOptions,
+  DotsPosition,
+  DotsStyle,
+  GoOptions,
+  ProgressOptions,
+  ProgressPosition,
+  SlideSource,
+  SlideshowEvent,
+  SlideshowHandle,
+  SlideshowOptions,
+  SwipeOptions,
+  TransitionSelector,
+} from "./types.js";
