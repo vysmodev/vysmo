@@ -5,6 +5,8 @@ export { rough, type RoughParams } from "./rough.js";
 export { wiggle, type WiggleParams, type WiggleType } from "./wiggle.js";
 export { slow, type SlowParams } from "./slow.js";
 export { expoScale } from "./expoScale.js";
+export { gravity, type GravityParams } from "./gravity.js";
+export { breathe, type BreatheParams } from "./breathe.js";
 export {
   anticipate,
   anticipateIn,

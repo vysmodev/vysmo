@@ -6,8 +6,11 @@ import {
   bezierEaseIn,
   bezierEaseInOut,
   bezierEaseOut,
+  breathe,
   custom,
   expoScale,
+  gravity,
+  power1In,
   power2Out,
   rough,
   slow,
@@ -243,6 +246,87 @@ describe("anticipate", () => {
       hardMin = Math.min(hardMin, hard(i / 100));
     }
     expect(hardMin).toBeLessThan(softMin);
+  });
+});
+
+describe("gravity", () => {
+  it("hits endpoints exactly at all weights", () => {
+    for (const w of [0, 0.5, 1, 2, 3]) {
+      const g = gravity.with({ weight: w });
+      expect(g(0)).toBe(0);
+      expect(g(1)).toBe(1);
+    }
+  });
+  it("weight=0 is linear", () => {
+    const g = gravity.with({ weight: 0 });
+    for (let i = 1; i < 10; i++) {
+      const t = i / 10;
+      expect(g(t)).toBeCloseTo(t, 10);
+    }
+  });
+  it("weight=1 matches power1.in (quadratic)", () => {
+    const g = gravity.with({ weight: 1 });
+    for (let i = 1; i < 10; i++) {
+      const t = i / 10;
+      expect(g(t)).toBeCloseTo(power1In(t), 10);
+    }
+  });
+  it("higher weight stays below at the same t", () => {
+    const light = gravity.with({ weight: 0.5 });
+    const heavy = gravity.with({ weight: 2 });
+    expect(heavy(0.5)).toBeLessThan(light(0.5));
+  });
+  it("monotonically non-decreasing across [0, 1]", () => {
+    const g = gravity.with({ weight: 1.5 });
+    let prev = g(0);
+    for (let i = 1; i <= 100; i++) {
+      const curr = g(i / 100);
+      expect(curr).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = curr;
+    }
+  });
+});
+
+describe("breathe", () => {
+  it("starts at 0 (cosine wave shifted into [0, 1])", () => {
+    expect(breathe(0)).toBe(0);
+  });
+  it("default cycles=1 returns to 0 at t=1 (full breath cycle)", () => {
+    expect(breathe(1)).toBeCloseTo(0, 10);
+  });
+  it("cycles=0.5 reaches 1 at t=1 (half cycle / single inhale)", () => {
+    const b = breathe.with({ cycles: 0.5 });
+    expect(b(1)).toBeCloseTo(1, 10);
+  });
+  it("default cycles=1 hits peak ~1 at t=0.5 (mid-breath)", () => {
+    expect(breathe(0.5)).toBeCloseTo(1, 10);
+  });
+  it("output stays in [0, 1] for any cycles count", () => {
+    for (const c of [0.5, 1, 2, 4, 8]) {
+      const b = breathe.with({ cycles: c });
+      for (let i = 0; i <= 200; i++) {
+        const v = b(i / 200);
+        expect(v).toBeGreaterThanOrEqual(-1e-9);
+        expect(v).toBeLessThanOrEqual(1 + 1e-9);
+      }
+    }
+  });
+  it("cycles=2 has two peaks across [0, 1]", () => {
+    const b = breathe.with({ cycles: 2 });
+    let peaks = 0;
+    let prev = b(0);
+    let rising = true;
+    for (let i = 1; i <= 200; i++) {
+      const curr = b(i / 200);
+      if (rising && curr < prev) {
+        peaks++;
+        rising = false;
+      } else if (!rising && curr > prev) {
+        rising = true;
+      }
+      prev = curr;
+    }
+    expect(peaks).toBe(2);
   });
 });
 

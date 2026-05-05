@@ -1,6 +1,6 @@
 # @vysmo/easings
 
-Curated easing catalog (40+ named curves) + parametric builders (spring, bezier, wiggle, rough, anticipate) + composition modifiers (chain, reverse, mirror, yoyo, blend, slice). Pure math, zero deps. CSS export via `toCSSLinear` / `toCSSBezier`; reduced-motion helpers; GSAP-style string parser.
+22 easing families (linear, power1–4, sine, circ, expo, smooth, back, elastic, bounce, steps, bezier, spring, rough, wiggle, slow, anticipate, expoScale, gravity, breathe) + composition modifiers (chain, reverse, mirror, yoyo, blend, slice). Pure math, zero deps. CSS export via `toCSSLinear` / `toCSSBezier`; reduced-motion helpers; GSAP-style string parser.
 
 [Live curves explorer](https://vysmo.com/easings) · [Source](https://github.com/vysmodev)
 
@@ -30,33 +30,215 @@ Every export is just a `(t: number) => number` (an `EasingFn`). Use it with our 
 
 ## Catalog
 
-### Named curves (40+ functions)
+<!-- catalog:start -->
 
-**Power family** — `power1In/Out/InOut` … `power4In/Out/InOut` (with GSAP-compatible aliases `quadIn/Out/InOut`, `cubicIn/Out/InOut`, `quartIn/Out/InOut`, `quintIn/Out/InOut`).
+Every shipped easing with its variants and parameters. The catalog mirrors the playground at [vysmo.com/easings/docs#catalog](https://vysmo.com/easings/docs#catalog). Categorisation tracks the authoring shape — Core (constant curves), Parametric (curves with `.with({ ... })`), Builder (factory functions).
 
-**Trigonometric / curves** — `sineIn/Out/InOut`, `expoIn/Out/InOut`, `circIn/Out/InOut`.
+### Core
 
-**Character curves** — `backIn/Out/InOut` (parametric overshoot), `elasticIn/Out/InOut` (parametric amplitude/period), `bounceIn/Out/InOut`.
+#### `linear`
 
-**Identity** — `linear` (and its alias `none`).
+No easing — constant velocity.
 
-### Parametric builders
+**Export:** `linear`
 
-| Builder | What it does |
-|---------|--------------|
-| `spring({ stiffness, damping, mass, velocity })` | Damped harmonic spring evaluated as a closed-form curve over a fixed duration. |
-| `bezier(p1x, p1y, p2x, p2y)` | CSS-style cubic-bezier as an `EasingFn`. Convenience wrappers: `bezierEase`, `bezierEaseIn`, `bezierEaseOut`, `bezierEaseInOut`. |
-| `wiggle({ wiggles, attenuation })` | Symmetric oscillation — perfect for shake / wobble. |
-| `rough({ points, strength, taper, randomize })` | Symmetric noisy curve — handpainted feel. |
-| `anticipateIn/Out/InOut({ overshoot })` | Pull-back-then-go (or go-then-overshoot) curve. |
-| `slow({ amount, position, easing })` | Smooth dwell at any point along the curve. |
-| `expoScale(startScale, endScale, ease)` | Compensates exponential scaling so screen-space velocity feels uniform. |
-| `custom(points)` | Free-form — interpolate between arbitrary `(time, value)` control points. |
-| `steps(count, position)` | Step function (CSS-style). |
+#### `power1`
 
-Spring presets shipped: `gentleSpring`, `wobblySpring`, `stiffSpring`, `slowSpring`, `molassesSpring` — all built on `spring.with(...)`.
+Quadratic (t²). Mildest power curve.
 
-### Composition modifiers
+**Variants:** `power1In` · `power1Out` · `power1InOut`
+
+#### `power2 (cubic)`
+
+Cubic (t³). Workhorse default — CSS's ease is close to power2.out.
+
+**Variants:** `power2In` · `power2Out` · `power2InOut`
+
+#### `power3 (quart)`
+
+Quartic (t⁴). More pronounced easing.
+
+**Variants:** `power3In` · `power3Out` · `power3InOut`
+
+#### `power4 (quint)`
+
+Quintic (t⁵). Dramatic acceleration.
+
+**Variants:** `power4In` · `power4Out` · `power4InOut`
+
+#### `sine`
+
+Sinusoidal (cos/sin-based). Soft and natural.
+
+**Variants:** `sineIn` · `sineOut` · `sineInOut`
+
+#### `circ`
+
+Circular arc. Sharp at one end, flat at the other.
+
+**Variants:** `circIn` · `circOut` · `circInOut`
+
+#### `expo`
+
+Exponential (2^). Extreme — near-zero until the last moments, or vice versa.
+
+**Variants:** `expoIn` · `expoOut` · `expoInOut`
+
+#### `smooth`
+
+Hermite smoothstep (3t² - 2t³). Zero velocity at both endpoints — smoother joins than power2.inOut for chained animations.
+
+**Variants:** `smoothIn` · `smoothOut` · `smoothInOut`
+
+### Parametric
+
+#### `back`
+
+Overshoots the target then returns. Classic 'pull-back' motion.
+
+**Variants:** `backIn` · `backOut` · `backInOut`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `overshoot` | number | `1.70158` | 0 – 5, step 0.01 |
+
+#### `elastic`
+
+Spring-like oscillation. Two knobs: amplitude (peak height) and period (frequency).
+
+**Variants:** `elasticIn` · `elasticOut` · `elasticInOut`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `amplitude` | number | `1` | 0.1 – 5, step 0.01 |
+| `period` | number | `0.3` | 0.05 – 1, step 0.01 |
+
+#### `bounce`
+
+Ball-drop pattern. Four decaying bounces.
+
+**Variants:** `bounceIn` · `bounceOut` · `bounceInOut`
+
+#### `steps`
+
+Discrete staircase. CSS-compatible step positions.
+
+**Export:** `steps`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `count` | number | `5` | 1 – 30, step 1 |
+| `position` | enum | `end` | `end` · `start` · `none` |
+
+### Builder
+
+#### `bezier`
+
+CSS cubic-bezier. Paste a cubic-bezier() value from CSS or design tools.
+
+**Export:** `bezier`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `p1x` | number | `0.42` | 0 – 1, step 0.01 |
+| `p1y` | number | `0` | -2 – 2, step 0.01 |
+| `p2x` | number | `0.58` | 0 – 1, step 0.01 |
+| `p2y` | number | `1` | -2 – 2, step 0.01 |
+
+#### `spring`
+
+Physics-based spring. Stiffness × damping × mass = feel.
+
+**Export:** `spring`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `stiffness` | number | `170` | 10 – 1000, step 5 |
+| `damping` | number | `26` | 1 – 100, step 1 |
+| `mass` | number | `1` | 0.1 – 10, step 0.1 |
+| `velocity` | number | `0` | -20 – 20, step 0.5 |
+
+#### `rough`
+
+Jittery noise layered on a base curve. Great for gritty / handheld feel.
+
+**Export:** `rough`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `strength` | number | `0.15` | 0 – 0.5, step 0.01 |
+| `points` | number | `20` | 5 – 60, step 1 |
+| `taper` | enum | `both` | `none` · `in` · `out` · `both` |
+| `seed` | number | `42` | 1 – 999, step 1 |
+
+#### `wiggle`
+
+Oscillates between -1 and 1 across [0, 1]. For shake / vibration effects.
+
+**Export:** `wiggle`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `wiggles` | number | `10` | 1 – 30, step 1 |
+| `type` | enum | `easeOut` | `easeOut` · `easeInOut` · `anticipate` · `uniform` |
+
+#### `slow`
+
+Linear middle section flanked by power-eased edges. For slow-motion feel.
+
+**Export:** `slow`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `linearRatio` | number | `0.7` | 0 – 1, step 0.01 |
+| `power` | number | `0.7` | 0 – 5, step 0.1 |
+
+#### `anticipate`
+
+Character-animation wind-up: dips backward (in), overshoots past target (out), or both (inOut). Framer Motion style.
+
+**Variants:** `anticipateIn` · `anticipateOut` · `anticipateInOut`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `overshoot` | number | `1.525` | 0 – 5, step 0.01 |
+
+#### `expoScale`
+
+Maps [0, 1] for scale animations crossing large ratios (e.g. 0.1→100) so motion feels even.
+
+**Export:** `expoScale`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `startScale` | number | `1` | 0.01 – 100, step 0.1 |
+| `endScale` | number | `100` | 0.01 – 1000, step 1 |
+
+#### `gravity`
+
+Continuously parameterised power-in. weight=0 floats (linear), weight=1 ≈ Earth fall (power2.in), higher = leaden. One knob instead of picking between named power curves.
+
+**Export:** `gravity`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `weight` | number | `1` | 0 – 3, step 0.05 |
+
+#### `breathe`
+
+Continuous oscillation in [0, 1]. cycles=0.5 = single inhale (0 → 1). cycles=1 = inhale + exhale. For idle / ambient animations on opacity, scale, anything in [0, 1].
+
+**Export:** `breathe`
+
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `cycles` | number | `1` | 0.5 – 8, step 0.5 |
+
+<!-- catalog:end -->
+
+Spring presets shipped: `gentleSpring`, `wobblySpring`, `stiffSpring`, `slowSpring`, `molassesSpring` — all built on `spring.with(...)`. The power family also exposes GSAP-compatible aliases: `quadIn/Out/InOut`, `cubicIn/Out/InOut`, `quartIn/Out/InOut`, `quintIn/Out/InOut`.
+
+## Composition modifiers
 
 ```ts
 import { reverse, mirror, yoyo, chain, blend, slice, power2Out, sineInOut } from "@vysmo/easings";
@@ -71,7 +253,7 @@ slice(power2Out, 0.2, 0.8);            // use only the middle 60% of the curve
 
 All modifiers return a fresh `EasingFn` — composable, side-effect-free.
 
-### CSS export
+## CSS export
 
 ```ts
 import { toCSSLinear, toCSSBezier, toCSSKeyframes, spring } from "@vysmo/easings";
@@ -88,7 +270,7 @@ toCSSBezier(bezier(0.25, 0.1, 0.25, 1));
 toCSSKeyframes(spring.with({ stiffness: 200 }), { property: "transform", from: "scale(1)", to: "scale(1.5)" });
 ```
 
-### Reduced-motion helpers
+## Reduced-motion helpers
 
 ```ts
 import { prefersReducedMotion, respectReducedMotion, power2Out, linear } from "@vysmo/easings";
@@ -99,7 +281,7 @@ const ease = respectReducedMotion(power2Out, linear);
 if (prefersReducedMotion()) { /* skip the animation entirely */ }
 ```
 
-### GSAP-style string parser
+## GSAP-style string parser
 
 ```ts
 import { parseEasing } from "@vysmo/easings/parse";

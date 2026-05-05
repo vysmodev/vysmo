@@ -35,6 +35,9 @@ import {
   sineIn,
   sineInOut,
   sineOut,
+  smoothIn,
+  smoothInOut,
+  smoothOut,
   type EasingFn,
 } from "../index.js";
 
@@ -62,6 +65,9 @@ const ALL: ReadonlyArray<[string, EasingFn]> = [
   ["expo.in", expoIn],
   ["expo.out", expoOut],
   ["expo.inOut", expoInOut],
+  ["smooth.in", smoothIn],
+  ["smooth.out", smoothOut],
+  ["smooth.inOut", smoothInOut],
 ];
 
 describe("endpoint correctness", () => {
@@ -124,13 +130,14 @@ describe("midpoint sanity", () => {
       sineInOut,
       circInOut,
       expoInOut,
+      smoothInOut,
     ];
     for (const fn of inOutEasings) {
       expect(fn(0.5)).toBeCloseTo(0.5, 6);
     }
   });
   it("in variants stay below 0.5 at t=0.5 (except linear)", () => {
-    const inEasings: EasingFn[] = [power1In, power2In, power3In, power4In, sineIn, circIn, expoIn];
+    const inEasings: EasingFn[] = [power1In, power2In, power3In, power4In, sineIn, circIn, expoIn, smoothIn];
     for (const fn of inEasings) {
       expect(fn(0.5)).toBeLessThan(0.5);
     }
@@ -144,6 +151,7 @@ describe("midpoint sanity", () => {
       sineOut,
       circOut,
       expoOut,
+      smoothOut,
     ];
     for (const fn of outEasings) {
       expect(fn(0.5)).toBeGreaterThan(0.5);
