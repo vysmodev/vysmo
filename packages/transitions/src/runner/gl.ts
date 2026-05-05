@@ -44,6 +44,14 @@ vec4 getDisplacement(vec2 uv) { return texture(uDisplacement, uv); }
 vec4 getEnvironment(vec2 uv) { return texture(uEnvironment, uv); }
 vec4 getPrevious(vec2 uv) { return texture(uPrevious, uv); }
 
+// Reflect out-of-range UVs back into [0,1] instead of clamping to edge.
+// Use this when a shader displaces UVs (warp, flow, etc.) and you want
+// the displaced regions to sample real interior content rather than
+// streaked edge texels.
+vec2 mirrorUv(vec2 uv) {
+  return abs(mod(uv + 1.0, 2.0) - 1.0);
+}
+
 `;
 
 export const FRAGMENT_SHELL_TAIL = `

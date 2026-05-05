@@ -32,15 +32,8 @@ mat2 rotate2d(float a) {
   return mat2(c, -s, s, c);
 }
 
-// Mirror-reflect UVs that have been pushed outside [0,1]. Each out-of-range
-// pixel ends up sampling from a different in-bounds position, so heavy
-// displacement reads as mirrored continuation of the image rather than the
-// streaked edge-color rows you get from clamping. This makes the transition
-// reliable at any intensity instead of needing an artificial cap.
-vec2 mirrorUv(vec2 uv) {
-  return abs(mod(uv + 1.0, 2.0) - 1.0);
-}
-
+// Out-of-range UVs use the runner-prologue mirrorUv() so displacement
+// reads as mirrored continuation rather than streaked edge texels.
 vec4 transition(vec2 uv) {
   vec4 disp = getDisplacement(uv);
   // Centered convention: mid-gray = no displacement, range [-1, 1].

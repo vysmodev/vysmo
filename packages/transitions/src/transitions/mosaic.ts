@@ -29,14 +29,6 @@ vec2 hash22(vec2 p) {
   );
 }
 
-// Mirror-reflect UVs that have been pushed outside [0,1]. Each out-of-range
-// pixel ends up sampling from a different in-bounds position, so heavy
-// displacement reads as mirrored continuation of the image rather than the
-// streaked edge-color rows clamping produces.
-vec2 mirrorUv(vec2 uv) {
-  return abs(mod(uv + 1.0, 2.0) - 1.0);
-}
-
 vec4 transition(vec2 uv) {
   // 1×1 = full fade, 2×2 = quad-split — neither reads as "mosaic".
   // Clamp here so the transition is reliable regardless of caller input.
