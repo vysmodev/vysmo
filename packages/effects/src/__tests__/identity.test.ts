@@ -27,7 +27,7 @@ import {
   vhs,
   pixelSort,
   datamosh,
-  kaleidoscope,
+  ascii,
   dither,
   gradientMap,
   type Effect,
@@ -81,7 +81,7 @@ const CASES: readonly IdentityCase[] = [
   { effect: vhs, nullParams: { intensity: 0 } },
   { effect: pixelSort, nullParams: { intensity: 0 } },
   { effect: datamosh, nullParams: { intensity: 0 } },
-  { effect: kaleidoscope, nullParams: { segments: 1 } },
+  { effect: ascii, nullParams: { intensity: 0 } },
   { effect: dither, nullParams: { intensity: 0 } },
   { effect: gradientMap, nullParams: { intensity: 0 } },
 ];

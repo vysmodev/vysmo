@@ -17,7 +17,7 @@ export const blur = defineEffect({
   name: "blur",
   passes: 2,
   defaults: {
-    radius: 8,
+    radius: 16,
   },
   glsl: `
 uniform float uRadius;

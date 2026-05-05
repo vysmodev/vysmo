@@ -10,7 +10,7 @@ import { defineEffect } from "../define.js";
 export const chromaticAberration = defineEffect({
   name: "chromatic-aberration",
   defaults: {
-    offset: 3,
+    offset: 8,
     direction: [1, 0] as const,
   },
   glsl: `

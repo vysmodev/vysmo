@@ -25,6 +25,6 @@ export { rgbShift } from "./rgb-shift.js";
 export { vhs } from "./vhs.js";
 export { pixelSort } from "./pixel-sort.js";
 export { datamosh } from "./datamosh.js";
-export { kaleidoscope } from "./kaleidoscope.js";
+export { ascii } from "./ascii.js";
 export { dither } from "./dither.js";
 export { gradientMap } from "./gradient-map.js";

@@ -2,14 +2,16 @@ import { defineEffect } from "../define.js";
 import { GAUSSIAN_BLUR_AXIS_GLSL } from "./shared/gaussian-blur.js";
 
 /**
- * Tilt-shift — selective separable blur with a horizontal in-focus band.
- * Three passes: horizontal Gaussian of source, vertical Gaussian of pass
- * 0, then a final composite that mixes source with the blurred pass by
- * vertical distance from `focusY`.
+ * Tilt-shift — selective separable blur with an in-focus band that can
+ * be positioned anywhere and rotated to any angle, emulating a real
+ * tilt-shift lens. Three passes: horizontal Gaussian of source,
+ * vertical Gaussian of pass 0, then a final composite that mixes source
+ * with the blurred pass by perpendicular distance from the band axis.
  *
- * `focusY` is the band's centre in UV space (0 = bottom, 1 = top per the
- * runner's UV convention). `focusWidth` is the band's full height in UV
- * units; pixels inside it stay sharp, pixels outside are blurred.
+ * `focus` is the band's centre point in UV space. `angle` is the band's
+ * rotation in radians (0 = horizontal band, π/2 = vertical band).
+ * `focusWidth` is the band's full thickness perpendicular to its axis.
+ * Pixels inside the band stay sharp, pixels outside are blurred.
  *
  * At `blurRadius = 0` every pass short-circuits to source, giving a
  * pixel-pure identity.
@@ -18,12 +20,14 @@ export const tiltShift = defineEffect({
   name: "tilt-shift",
   passes: 3,
   defaults: {
-    focusY: 0.5,
+    focus: [0.5, 0.5] as const,
+    angle: 0,
     focusWidth: 0.25,
     blurRadius: 16,
   },
   glsl: `
-uniform float uFocusY;
+uniform vec2 uFocus;
+uniform float uAngle;
 uniform float uFocusWidth;
 uniform float uBlurRadius;
 
@@ -38,7 +42,12 @@ vec4 effect(vec2 uv) {
 
   vec4 src = getSource(uv);
   vec4 blurred = getPrevious(uv);
-  float dist = abs(uv.y - uFocusY);
+
+  // Perpendicular distance from this pixel to the band's axis.
+  // axis = (cos a, sin a); perp = (-sin a, cos a). Project the offset
+  // from focus onto perp.
+  vec2 perp = vec2(-sin(uAngle), cos(uAngle));
+  float dist = abs(dot(uv - uFocus, perp));
   float halfBand = max(uFocusWidth * 0.5, 0.0001);
   float t = smoothstep(halfBand, halfBand + 0.15, dist);
   return vec4(mix(src.rgb, blurred.rgb, t), src.a);

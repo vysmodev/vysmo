@@ -39,7 +39,7 @@ export {
   vhs,
   pixelSort,
   datamosh,
-  kaleidoscope,
+  ascii,
   dither,
   gradientMap,
 } from "./effects/index.js";

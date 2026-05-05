@@ -1,6 +1,6 @@
 # @vysmo/effects
 
-30 WebGL2 visual filter primitives — blur, bloom, glow, color grade, sharpen, halftone, tilt-shift, scanlines, lens distortion, oil paint, wave, swirl, motion blur, VHS, datamosh, kaleidoscope, dither, gradient map and more. One Runner, one source, one render call. Multi-pass effects (bloom, glow) auto-allocate HDR ping-pong targets.
+30 WebGL2 visual filter primitives — blur, bloom, glow, color grade, sharpen, halftone, tilt-shift, scanlines, lens distortion, oil paint, wave, swirl, motion blur, VHS, datamosh, ASCII, dither, gradient map and more. One Runner, one source, one render call. Multi-pass effects (bloom, glow) auto-allocate HDR ping-pong targets.
 
 [Live demos + parameter playground](https://vysmo.com/effects) · [Source](https://github.com/vysmodev)
 
@@ -47,7 +47,11 @@ import * as effects from "@vysmo/effects";
 
 ## Built-in effects
 
-Single-pass: `blur`, `vignette`, `grain`, `chromaticAberration`, `colorGrade`, `pixelate`, `sharpen`, `threshold`, `duotone`, `posterize`, `edgeDetect`, `halftone`, `tiltShift`, `scanlines`, `lensDistortion`, `oilPaint`, `wave`, `bulge`, `swirl`, `motionBlur`, `radialBlur`, `rgbShift`, `vhs`, `pixelSort`, `datamosh`, `kaleidoscope`, `dither`, `gradientMap`.
+Single-pass: `vignette`, `grain`, `chromaticAberration`, `colorGrade`, `pixelate`, `sharpen`, `threshold`, `duotone`, `posterize`, `edgeDetect`, `halftone`, `scanlines`, `lensDistortion`, `oilPaint`, `wave`, `bulge`, `swirl`, `motionBlur`, `radialBlur`, `rgbShift`, `vhs`, `pixelSort`, `datamosh`, `ascii`, `dither`, `gradientMap`.
+
+Two-pass (separable Gaussian): `blur`.
+
+Three-pass (separable Gaussian + composite): `tiltShift`.
 
 Multi-pass HDR (auto-allocates `RGBA16F` ping-pong framebuffers): `bloom`, `glow`.
 
