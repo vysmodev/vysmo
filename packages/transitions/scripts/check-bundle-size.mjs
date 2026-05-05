@@ -10,10 +10,10 @@ const pkgRoot = join(__dirname, "..");
 
 // Hard caps. Tune as the surface evolves; a regression should be a
 // conscious decision, not silent drift. The tree-shaken budgets are the
-// realistic case — most consumers import 1–3 transitions, not all 65.
+// realistic case — most consumers import 1–3 transitions, not all 60.
 // At ~0.4 KB/transition the full bundle is mostly catalog mass; the
 // Runner itself stays small and tree-shakes cleanly.
-const BUDGET_FULL = 30 * 1024;     // 30 KB — full bundle (Runner + 65 transitions)
+const BUDGET_FULL = 30 * 1024;     // 30 KB — full bundle (Runner + 60 transitions)
 const BUDGET_RUNNER = 6 * 1024;    // 6 KB — Runner alone (no transitions imported)
 const BUDGET_THREE = 8 * 1024;     // 8 KB — Runner + 3 typical transitions
 

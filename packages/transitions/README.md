@@ -64,478 +64,478 @@ Each transition is a `Transition<P>` — the parameter type `P` is inferred from
 
 <!-- catalog:start -->
 
-Every built-in transition with its parameters, defaults, and usable ranges. Ranges mirror the playground sliders — passing a number outside the range is allowed but typically degrades the visual.
+Every built-in transition with its parameters, defaults, and accepted values. The catalog mirrors the playground at [vysmo.com/transitions/docs#catalog](https://vysmo.com/transitions/docs#catalog).
 
 ### Light & Optics
 
-#### `filmBurn` · `film-burn`
+#### `filmBurn`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `scale` | number | `6` | 0.5 – 18 | 0.05 |
-| `edgeWidth` | number | `0.05` | 0 – 1 | 0.05 |
-| `chroma` | number | `0` | 0 – 1 | 0.01 |
-| `flameColor` | vec3 preset | `Ember [1.6, 0.7, 0.15]` | Ember · Molten · Deep red · Acid · Ice blue · Electric · Violet | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `scale` | number | `6` | 0.5 – 18, step 0.05 |
+| `edgeWidth` | number | `0.05` | 0 – 1, step 0.05 |
+| `chroma` | number | `0` | 0 – 1, step 0.01 |
+| `flameColor` | vec3 | `[1.6, 0.7, 0.15]` | `[1.6, 0.7, 0.15]` Ember · `[1.8, 0.4, 0.05]` Molten · `[1.2, 0.15, 0.1]` Deep red · `[0.5, 1.6, 0.4]` Acid · `[0.4, 1, 1.6]` Ice blue · `[1.2, 1.6, 2.5]` Electric · `[1.4, 0.6, 1.8]` Violet |
 
-#### `lightLeak` · `light-leak`
+#### `lightLeak`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `color` | vec3 preset | `Sunset [1, 0.85, 0.55]` | Sunset · Magic hour · Daylight · Cyan · Magenta | — |
-| `bandWidth` | number | `0.2` | 0 – 1 | 0.05 |
-| `intensity` | number | `1` | 0 – 3 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `color` | vec3 | `[1, 0.85, 0.55]` | `[1, 0.85, 0.55]` Sunset · `[1, 0.7, 0.85]` Magic hour · `[1, 0.96, 0.92]` Daylight · `[0.5, 1, 1.1]` Cyan · `[1.1, 0.4, 0.95]` Magenta |
+| `bandWidth` | number | `0.2` | 0 – 1, step 0.05 |
+| `intensity` | number | `1` | 0 – 3, step 0.01 |
 
-#### `heatHaze` · `heat-haze`
+#### `heatHaze`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `intensity` | number | `0.04` | 0 – 1.5 | 0.01 |
-| `frequency` | number | `14` | 0 – 56 | 1 |
-| `flow` | number | `5` | 0 – 15 | 1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `intensity` | number | `0.04` | 0 – 1.5, step 0.01 |
+| `frequency` | number | `14` | 0 – 56, step 1 |
+| `flow` | number | `5` | 0 – 15, step 1 |
 
-#### `bloomReveal` · `bloom-reveal`
+#### `bloomReveal`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scale` | number | `5` | 0.5 – 15 | 0.05 |
-| `softness` | number | `0.08` | 0 – 0.4 | 0.005 |
-| `threshold` | number | `0.55` | 0 – 1 | 0.01 |
-| `intensity` | number | `3` | 0 – 9 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scale` | number | `5` | 0.5 – 15, step 0.05 |
+| `softness` | number | `0.08` | 0 – 0.4, step 0.005 |
+| `threshold` | number | `0.55` | 0 – 1, step 0.01 |
+| `intensity` | number | `3` | 0 – 9, step 0.01 |
 
-#### `directionalBurn` · `directional-burn`
+#### `directionalBurn`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `scale` | number | `10` | 0.5 – 30 | 0.05 |
-| `edgeWidth` | number | `0.035` | 0 – 1 | 0.05 |
-| `flameColor` | vec3 preset | `Ember [1.6, 0.7, 0.15]` | Ember · Molten · Deep red · Acid · Ice blue · Electric · Violet | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `scale` | number | `10` | 0.5 – 30, step 0.05 |
+| `edgeWidth` | number | `0.035` | 0 – 1, step 0.05 |
+| `flameColor` | vec3 | `[1.6, 0.7, 0.15]` | `[1.6, 0.7, 0.15]` Ember · `[1.8, 0.4, 0.05]` Molten · `[1.2, 0.15, 0.1]` Deep red · `[0.5, 1.6, 0.4]` Acid · `[0.4, 1, 1.6]` Ice blue · `[1.2, 1.6, 2.5]` Electric · `[1.4, 0.6, 1.8]` Violet |
 
-#### `prismSplit` · `prism-split`
+#### `prismSplit`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `intensity` | number | `0.04` | 0 – 0.07 | 0.005 |
-| `softness` | number | `0.2` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `intensity` | number | `0.04` | 0 – 0.07, step 0.005 |
+| `softness` | number | `0.2` | 0 – 0.4, step 0.005 |
 
-#### `emberScatter` · `ember-scatter`
+#### `emberScatter`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `count` | number | `5` | 0 – 24 | 1 |
-| `scale` | number | `8` | 0.5 – 24 | 0.05 |
-| `edgeWidth` | number | `0.04` | 0 – 1 | 0.05 |
-| `stagger` | number | `0.35` | 0 – 1 | 0.01 |
-| `flameColor` | vec3 preset | `Ember [1.6, 0.7, 0.15]` | Ember · Molten · Deep red · Acid · Ice blue · Electric · Violet | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `count` | number | `5` | 0 – 24, step 1 |
+| `scale` | number | `8` | 0.5 – 24, step 0.05 |
+| `edgeWidth` | number | `0.04` | 0 – 1, step 0.05 |
+| `stagger` | number | `0.35` | 0 – 1, step 0.01 |
+| `flameColor` | vec3 | `[1.6, 0.7, 0.15]` | `[1.6, 0.7, 0.15]` Ember · `[1.8, 0.4, 0.05]` Molten · `[1.2, 0.15, 0.1]` Deep red · `[0.5, 1.6, 0.4]` Acid · `[0.4, 1, 1.6]` Ice blue · `[1.2, 1.6, 2.5]` Electric · `[1.4, 0.6, 1.8]` Violet |
 
-#### `godRaysReveal` · `god-rays-reveal`
+#### `godRaysReveal`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scale` | number | `5` | 0.5 – 15 | 0.05 |
-| `softness` | number | `0.08` | 0 – 0.4 | 0.005 |
-| `threshold` | number | `0.45` | 0 – 1 | 0.01 |
-| `intensity` | number | `1.6` | 0 – 4.8 | 0.01 |
-| `decay` | number | `0.92` | 0.5 – 1 | 0.005 |
-| `source` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scale` | number | `5` | 0.5 – 15, step 0.05 |
+| `softness` | number | `0.08` | 0 – 0.4, step 0.005 |
+| `threshold` | number | `0.45` | 0 – 1, step 0.01 |
+| `intensity` | number | `1.6` | 0 – 4.8, step 0.01 |
+| `decay` | number | `0.92` | 0.5 – 1, step 0.005 |
+| `source` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
 
-#### `chromaticPulse` · `chromatic-pulse`
+#### `chromaticPulse`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `intensity` | number | `0.6` | 0 – 1.8 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `intensity` | number | `0.6` | 0 – 1.8, step 0.01 |
 
 ### Fluid & Ink
 
-#### `paintBleed` · `paint-bleed`
+#### `paintBleed`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [-1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `scale` | number | `10` | 0.5 – 30 | 0.05 |
-| `softness` | number | `0.02` | 0 – 0.4 | 0.005 |
-| `noiseStrength` | number | `0.35` | 0 – 1.5 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[-1, 0]` | `[-1, 0]` Right · `[1, 0]` Left · `[0, 1]` Down · `[0, -1]` Up · `[-1, 1]` Diagonal · `[1, 1]` Anti-diag |
+| `scale` | number | `10` | 0.5 – 30, step 0.05 |
+| `softness` | number | `0.02` | 0 – 0.4, step 0.005 |
+| `noiseStrength` | number | `0.35` | 0 – 1.5, step 0.01 |
 
-#### `inkDiffuse` · `ink-diffuse`
+#### `inkDiffuse`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scale` | number | `7` | 0.5 – 21 | 0.05 |
-| `softness` | number | `0.08` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scale` | number | `7` | 0.5 – 21, step 0.05 |
+| `softness` | number | `0.08` | 0 – 0.4, step 0.005 |
 
-#### `inkBloom` · `ink-bloom`
+#### `inkBloom`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `scale` | number | `5` | 0.5 – 15 | 0.05 |
-| `edgeWidth` | number | `0.07` | 0 – 1 | 0.05 |
-| `bloomWidth` | number | `0.12` | 0 – 1 | 0.05 |
-| `inkColor` | vec3 preset | `Indigo [0.25, 0.08, 0.45]` | Indigo · Sumi · Crimson · Forest · Sapphire | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `scale` | number | `5` | 0.5 – 15, step 0.05 |
+| `edgeWidth` | number | `0.07` | 0 – 1, step 0.05 |
+| `bloomWidth` | number | `0.12` | 0 – 1, step 0.05 |
+| `inkColor` | vec3 | `[0.25, 0.08, 0.45]` | `[0.25, 0.08, 0.45]` Indigo · `[0.06, 0.06, 0.08]` Sumi · `[0.55, 0.05, 0.12]` Crimson · `[0.06, 0.32, 0.18]` Forest · `[0.05, 0.18, 0.55]` Sapphire |
 
-#### `fluidFlow` · `fluid-flow`
+#### `fluidFlow`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `strength` | number | `0.12` | 0 – 1.5 | 0.01 |
-| `scale` | number | `3` | 0.5 – 9 | 0.05 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `strength` | number | `0.12` | 0 – 1.5, step 0.01 |
+| `scale` | number | `3` | 0.5 – 9, step 0.05 |
 
-#### `liquidMorph` · `liquid-morph`
+#### `liquidMorph`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scale` | number | `3` | 0.5 – 9 | 0.05 |
-| `strength` | number | `0.1` | 0 – 1.5 | 0.01 |
-| `flow` | number | `3` | 0 – 9 | 0.1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scale` | number | `3` | 0.5 – 9, step 0.05 |
+| `strength` | number | `0.1` | 0 – 1.5, step 0.01 |
+| `flow` | number | `3` | 0 – 9, step 0.1 |
 
-#### `dripWipe` · `drip-wipe`
+#### `dripWipe`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Left [-1, 0]` | Right · Left · Down · Up | — |
-| `width` | number | `0.5` | 0 – 1.5 | 0.05 |
-| `scaleX` | number | `40` | 0.5 – 120 | 0.05 |
-| `scaleY` | number | `40` | 0.5 – 120 | 0.05 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[-1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up |
+| `width` | number | `0.5` | 0 – 1.5, step 0.05 |
+| `scaleX` | number | `40` | 0.5 – 120, step 0.05 |
+| `scaleY` | number | `40` | 0.5 – 120, step 0.05 |
 
-#### `smolderingEdge` · `smoldering-edge`
+#### `smolderingEdge`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `[1, 1]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `scale` | number | `3` | 0.5 – 9 | 0.05 |
-| `edgeWidth` | number | `0.04` | 0 – 1 | 0.05 |
-| `trailLength` | number | `0.18` | 0 – 1 | 0.01 |
-| `emberColor` | vec3 preset | `Ember [1.4, 0.5, 0.1]` | Ember · Molten · Deep red · Acid | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 1]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `scale` | number | `3` | 0.5 – 9, step 0.05 |
+| `edgeWidth` | number | `0.04` | 0 – 1, step 0.05 |
+| `trailLength` | number | `0.18` | 0 – 1, step 0.01 |
+| `emberColor` | vec3 | `[1.4, 0.5, 0.1]` | `[1.4, 0.5, 0.1]` Ember · `[1.7, 0.3, 0.05]` Molten · `[1.1, 0.12, 0.08]` Deep red · `[0.4, 1.5, 0.3]` Acid |
 
-#### `luminaMelt` · `lumina-melt`
+#### `luminaMelt`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `softness` | number | `0.15` | 0 – 0.4 | 0.005 |
-| `invert` | enum | `Bright melts first (0)` | Bright melts first (0) · Dark melts first (1) | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `softness` | number | `0.15` | 0 – 0.4, step 0.005 |
+| `invert` | enum | `0` | `0` Bright melts first · `1` Dark melts first |
 
 ### Wipes & Slides
 
-#### `dissolve` · `dissolve`
+#### `dissolve`
 
 _No params._
 
-#### `wipeDirectional` · `wipe-directional`
+#### `wipeDirectional`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `angle` | enum | `Right (0)` | Right (0) · Down (-1.5708) · Left (3.1416) · Up (1.5708) · Diagonal (-0.7854) · Anti-diag (-2.3562) | — |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `angle` | enum | `0` | `0` Right · `-1.5708` Down · `3.1416` Left · `1.5708` Up · `-0.7854` Diagonal · `-2.3562` Anti-diag |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
-#### `slide` · `slide`
+#### `slide`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Left [-1, 0]` | Right · Left · Down · Up | — |
-| `feather` | number | `0.015` | 0 – 0.4 | 0.005 |
-| `blur` | number | `0` | 0 – 0.1 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[-1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up |
+| `feather` | number | `0.015` | 0 – 0.4, step 0.005 |
+| `blur` | number | `0` | 0 – 0.1, step 0.005 |
 
-#### `push` · `push`
+#### `push`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Left [1, 0]` | Right · Left · Down · Up | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[-1, 0]` Right · `[1, 0]` Left · `[0, 1]` Down · `[0, -1]` Up |
 
-#### `split` · `split`
+#### `split`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `axis` | enum | `Horizontal (0)` | Horizontal (0) · Vertical (1) | — |
-| `mode` | enum | `Open (0)` | Open (0) · Close (1) | — |
-| `softness` | number | `0.01` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `axis` | enum | `0` | `0` Horizontal · `1` Vertical |
+| `mode` | enum | `0` | `0` Open · `1` Close |
+| `softness` | number | `0.01` | 0 – 0.4, step 0.005 |
 
-#### `clockWipe` · `clock-wipe`
+#### `clockWipe`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `startAngle` | number | `-1.5708` | -3.1416 – 3.1416 | 0.01 |
-| `direction` | enum | `Clockwise (1)` | Clockwise (1) · Counter-clockwise (-1) | — |
-| `softness` | number | `0.02` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `startAngle` | number | `-1.5708` | -3.1416 – 3.1416, step 0.01 |
+| `direction` | enum | `1` | `1` Clockwise · `-1` Counter-clockwise |
+| `softness` | number | `0.02` | 0 – 0.4, step 0.005 |
 
-#### `radialReveal` · `radial-reveal`
+#### `radialReveal`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
-#### `irisZoom` · `iris-zoom`
+#### `irisZoom`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `width` | number | `0.08` | 0 – 1 | 0.05 |
-| `scale` | number | `8` | 0.5 – 24 | 0.05 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `width` | number | `0.08` | 0 – 1, step 0.05 |
+| `scale` | number | `8` | 0.5 – 24, step 0.05 |
 
-#### `shapeReveal` · `shape-reveal`
+#### `shapeReveal`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `sides` | enum | `Hexagon (6)` | Triangle (3) · Diamond (4) · Pentagon (5) · Hexagon (6) · Octagon (8) · Dodecagon (12) · Circle (32) | — |
-| `rotation` | number | `0` | -6.2832 – 6.2832 | 0.01 |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `sides` | enum | `6` | `3` Triangle · `4` Diamond · `5` Pentagon · `6` Hexagon · `8` Octagon · `12` Dodecagon · `32` Circle |
+| `rotation` | number | `0` | -6.2832 – 6.2832, step 0.01 |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
-#### `gridReveal` · `grid-reveal`
+#### `gridReveal`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `count` | number | `8` | 3 – 24 | 1 |
-| `stagger` | number | `0.7` | 0 – 1 | 0.01 |
-| `pattern` | enum | `Radial (1)` | Sequential (0) · Radial (1) · Random (2) | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `count` | number | `8` | 3 – 24, step 1 |
+| `stagger` | number | `0.7` | 0 – 1, step 0.01 |
+| `pattern` | enum | `1` | `0` Sequential · `1` Radial · `2` Random |
 
 ### Distort & Warp
 
-#### `warpZoom` · `warp-zoom`
+#### `warpZoom`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `strength` | number | `1` | 0 – 3 | 0.01 |
-| `rotation` | number | `1` | -6.2832 – 6.2832 | 0.01 |
-| `blur` | number | `0.02` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `strength` | number | `1` | 0 – 3, step 0.01 |
+| `rotation` | number | `1` | -6.2832 – 6.2832, step 0.01 |
+| `blur` | number | `0.02` | 0 – 0.4, step 0.005 |
 
-#### `crossZoom` · `cross-zoom`
+#### `crossZoom`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `strength` | number | `1.2` | 0 – 3.6 | 0.01 |
-| `blur` | number | `0.04` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `strength` | number | `1.2` | 0 – 3.6, step 0.01 |
+| `blur` | number | `0.04` | 0 – 0.4, step 0.005 |
 
-#### `directionalWarp` · `directional-warp`
+#### `directionalWarp`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `[-1, 1]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `smoothness` | number | `0.5` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[-1, 1]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `smoothness` | number | `0.5` | 0 – 1, step 0.01 |
 
-#### `swirl` · `swirl`
+#### `swirl`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `radius` | number | `1` | 0 – 3 | 0.1 |
-| `strength` | number | `25.13` | 0 – 75.39 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `radius` | number | `1` | 0 – 3, step 0.1 |
+| `strength` | number | `25.13` | 0 – 75.39, step 0.01 |
 
-#### `flowWarp` · `flow-warp`
+#### `flowWarp`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `intensity` | number | `0.4` | 0 – 1.5 | 0.01 |
-| `angle1` | number | `0.7854` | -3.1416 – 3.1416 | 0.01 |
-| `angle2` | number | `-2.3562` | -3.1416 – 3.1416 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `intensity` | number | `0.4` | 0 – 1.5, step 0.01 |
+| `angle1` | number | `0.7854` | -3.1416 – 3.1416, step 0.01 |
+| `angle2` | number | `-2.3562` | -3.1416 – 3.1416, step 0.01 |
 
-#### `ripple` · `ripple`
+#### `ripple`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `amplitude` | number | `0.03` | 0 – 1.5 | 0.01 |
-| `frequency` | number | `6` | 0 – 24 | 1 |
-| `speed` | number | `8` | 0 – 24 | 0.05 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `amplitude` | number | `0.03` | 0 – 1.5, step 0.01 |
+| `frequency` | number | `6` | 0 – 24, step 1 |
+| `speed` | number | `8` | 0 – 24, step 0.05 |
 
-#### `rippleWave` · `ripple-wave`
+#### `rippleWave`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `amplitude` | number | `0.1` | 0 – 1.5 | 0.01 |
-| `source` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `amplitude` | number | `0.1` | 0 – 1.5, step 0.01 |
+| `source` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
 
-#### `shockwave` · `shockwave`
+#### `shockwave`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `thickness` | number | `0.15` | 0 – 1 | 0.01 |
-| `strength` | number | `0.04` | 0 – 1.5 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `thickness` | number | `0.15` | 0 – 1, step 0.01 |
+| `strength` | number | `0.04` | 0 – 1.5, step 0.01 |
 
-#### `gravityPull` · `gravity-pull`
+#### `gravityPull`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `intensity` | number | `0.15` | 0 – 1.5 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `intensity` | number | `0.15` | 0 – 1.5, step 0.01 |
 
-#### `portalDive` · `portal-dive`
+#### `portalDive`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `twist` | number | `3.1416` | -6.2832 – 6.2832 | 0.01 |
-| `depth` | number | `1` | 0 – 3 | 0.05 |
-| `reflection` | number | `0` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `twist` | number | `3.1416` | -6.2832 – 6.2832, step 0.01 |
+| `depth` | number | `1` | 0 – 3, step 0.05 |
+| `reflection` | number | `0` | 0 – 1, step 0.01 |
 
-#### `singularity` · `singularity`
+#### `singularity`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
 
-#### `wind` · `wind`
+#### `wind`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `size` | number | `0.2` | 0 – 1 | 0.01 |
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `size` | number | `0.2` | 0 – 1, step 0.01 |
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
 
-#### `linearBlur` · `linear-blur`
+#### `linearBlur`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `intensity` | number | `0.1` | 0 – 1.5 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `intensity` | number | `0.1` | 0 – 1.5, step 0.01 |
 
-#### `tangentMotionBlur` · `tangent-motion-blur`
+#### `tangentMotionBlur`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up · Diagonal · Anti-diag | — |
-| `intensity` | number | `0.08` | 0 – 1.5 | 0.01 |
-| `softness` | number | `0.2` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up · `[1, -1]` Diagonal · `[-1, -1]` Anti-diag |
+| `intensity` | number | `0.08` | 0 – 1.5, step 0.01 |
+| `softness` | number | `0.2` | 0 – 0.4, step 0.005 |
 
 ### Glitch & Noise
 
-#### `glitch` · `glitch`
+#### `glitch`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `intensity` | number | `0.6` | 0 – 1.8 | 0.01 |
-| `chroma` | number | `0.02` | 0 – 0.05 | 0.002 |
-| `blocks` | number | `30` | 0 – 90 | 1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `intensity` | number | `0.6` | 0 – 1.8, step 0.01 |
+| `chroma` | number | `0.02` | 0 – 0.05, step 0.002 |
+| `blocks` | number | `30` | 0 – 90, step 1 |
 
-#### `noiseDissolve` · `noise-dissolve`
+#### `noiseDissolve`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scale` | number | `20` | 0.5 – 60 | 0.05 |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scale` | number | `20` | 0.5 – 60, step 0.05 |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
-#### `pixelate` · `pixelate`
+#### `pixelate`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `maxBlockSize` | number | `40` | 0 – 120 | 0.05 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `maxBlockSize` | number | `40` | 0 – 120, step 0.05 |
 
-#### `mosaic` · `mosaic`
+#### `mosaic`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `count` | number | `14` | 3 – 24 | 1 |
-| `jitter` | number | `0.08` | 0 – 1 | 0.01 |
-| `stagger` | number | `0.4` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `count` | number | `14` | 3 – 24, step 1 |
+| `jitter` | number | `0.08` | 0 – 1, step 0.01 |
+| `stagger` | number | `0.4` | 0 – 1, step 0.01 |
 
-#### `filmGrain` · `film-grain`
+#### `filmGrain`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `grain` | number | `1` | 0 – 3 | 0.1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `grain` | number | `1` | 0 – 3, step 0.1 |
 
-#### `crosshatch` · `crosshatch`
+#### `crosshatch`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `threshold` | number | `3` | 3 – 30 | 0.5 |
-| `fadeEdge` | number | `0.1` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `threshold` | number | `3` | 3 – 30, step 0.5 |
+| `fadeEdge` | number | `0.1` | 0 – 1, step 0.01 |
 
 ### Cinematic
 
-#### `dreamy` · `dreamy`
+#### `dreamy`
 
 _No params._
 
-#### `dreamyZoom` · `dreamy-zoom`
+#### `dreamyZoom`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `intensity` | number | `0.5` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `intensity` | number | `0.5` | 0 – 1, step 0.01 |
 
-#### `colorPhase` · `color-phase`
+#### `colorPhase`
 
 _No params._
 
-#### `liquidChrome` · `liquid-chrome`
+#### `liquidChrome`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `shine` | number | `0.9` | 0 – 1 | 0.01 |
-| `rim` | number | `0.25` | 0 – 1 | 0.01 |
-| `wobble` | number | `0.12` | 0 – 1 | 0.01 |
-| `refraction` | number | `0.035` | 0 – 1 | 0.01 |
-| `reflection` | number | `0` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `shine` | number | `0.9` | 0 – 1, step 0.01 |
+| `rim` | number | `0.25` | 0 – 1, step 0.01 |
+| `wobble` | number | `0.12` | 0 – 1, step 0.01 |
+| `refraction` | number | `0.035` | 0 – 1, step 0.01 |
+| `reflection` | number | `0` | 0 – 1, step 0.01 |
 
 ### Geometric
 
-#### `kineticBands` · `kinetic-bands`
+#### `kineticBands`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `count` | number | `12` | 2 – 24 | 1 |
-| `stagger` | number | `0.6` | 0 – 1 | 0.01 |
-| `softness` | number | `0.02` | 0 – 0.4 | 0.005 |
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `count` | number | `12` | 2 – 24, step 1 |
+| `stagger` | number | `0.6` | 0 – 1, step 0.01 |
+| `softness` | number | `0.02` | 0 – 0.4, step 0.005 |
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up |
 
-#### `polkaDotsCurtain` · `polka-dots-curtain`
+#### `polkaDotsCurtain`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `dots` | number | `15` | 1 – 45 | 1 |
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `dots` | number | `15` | 1 – 45, step 1 |
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
-#### `waveStripes` · `wave-stripes`
+#### `waveStripes`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `direction` | vec2 preset | `Right [1, 0]` | Right · Left · Down · Up | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `direction` | vec2 | `[1, 0]` | `[1, 0]` Right · `[-1, 0]` Left · `[0, -1]` Down · `[0, 1]` Up |
 
-#### `pinwheel` · `pinwheel`
+#### `pinwheel`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `center` | vec2 preset | `Center [0.5, 0.5]` | Center · Top · Bottom · Left · Right · TL · TR | — |
-| `spokes` | number | `8` | 0 – 24 | 1 |
-| `softness` | number | `0.05` | 0 – 0.4 | 0.005 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `center` | vec2 | `[0.5, 0.5]` | `[0.5, 0.5]` Center · `[0.5, 0.85]` Top · `[0.5, 0.15]` Bottom · `[0.15, 0.5]` Left · `[0.85, 0.5]` Right · `[0.15, 0.85]` TL · `[0.85, 0.85]` TR |
+| `spokes` | number | `8` | 0 – 24, step 1 |
+| `softness` | number | `0.05` | 0 – 0.4, step 0.005 |
 
 ### 3D Mesh
 
-#### `pageCurl` · `page-curl`
+#### `pageCurl`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `tilt` | number | `0.12` | 0 – 1 | 0.01 |
-| `backColor` | vec3 preset | `Paper [0.97, 0.96, 0.94]` | Paper · Parchment · Ivory · Cool gray · Slate | — |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `tilt` | number | `0.12` | 0 – 1, step 0.01 |
+| `backColor` | vec3 | `[0.97, 0.96, 0.94]` | `[0.97, 0.96, 0.94]` Paper · `[0.93, 0.86, 0.72]` Parchment · `[0.99, 0.98, 0.92]` Ivory · `[0.86, 0.88, 0.92]` Cool gray · `[0.32, 0.34, 0.4]` Slate |
 
-#### `polygonFlip` · `polygon-flip`
+#### `polygonFlip`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `rim` | number | `0.25` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `rim` | number | `0.25` | 0 – 1, step 0.01 |
 
-#### `glassShatter` · `glass-shatter`
+#### `glassShatter`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `cells` | number | `14` | 0 – 42 | 1 |
-| `reflection` | number | `0` | 0 – 1 | 0.01 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `cells` | number | `14` | 0 – 42, step 1 |
+| `reflection` | number | `0` | 0 – 1, step 0.01 |
 
-#### `tileScatter` · `tile-scatter`
+#### `tileScatter`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `scatter` | number | `1` | 0 – 3 | 0.1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `scatter` | number | `1` | 0 – 3, step 0.1 |
 
-#### `lenticularFlip` · `lenticular-flip`
+#### `lenticularFlip`
 
-| Param | Type | Default | Range / Options | Step |
-|---|---|---|---|---|
-| `stripCount` | number | `22` | 3 – 60 | 1 |
+| Prop | Type | Default | Values |
+|---|---|---|---|
+| `stripCount` | number | `22` | 3 – 60, step 1 |
 
 <!-- catalog:end -->
 

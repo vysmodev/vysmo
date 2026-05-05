@@ -1,6 +1,6 @@
 # @vysmo/slideshow
 
-Drop-in image slideshow driven by any of the 65+ [`@vysmo/transitions`](https://www.npmjs.com/package/@vysmo/transitions). Opt-in chrome (arrows, dots, counter, progress bar, captions) themeable via CSS custom properties. Click halves, keyboard nav, swipe gestures, autoplay with pause-on-hover. Set every chrome option to `false` for pure-headless mode.
+Drop-in image slideshow driven by any of the 60 [`@vysmo/transitions`](https://www.npmjs.com/package/@vysmo/transitions). Opt-in chrome (arrows, dots, counter, progress bar, captions) themeable via CSS custom properties. Click halves, keyboard nav, swipe gestures, autoplay with pause-on-hover. Set every chrome option to `false` for pure-headless mode.
 
 [Live demo + chrome playground](https://vysmo.com/slideshow) · [Source](https://github.com/vysmodev)
 
