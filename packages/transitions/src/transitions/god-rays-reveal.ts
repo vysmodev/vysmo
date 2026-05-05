@@ -32,7 +32,7 @@ export const godRaysReveal = defineTransition({
     threshold: 0.45,
     intensity: 1.6,
     decay: 0.92,
-    source: [0.5, 0.3],
+    source: [0.5, 0.5],
   },
   glsl: `
 uniform float uScale;

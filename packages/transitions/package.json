@@ -2,7 +2,7 @@
   "name": "@vysmo/transitions",
   "version": "0.0.0",
   "private": true,
-  "description": "65 WebGL2 transition shaders, defined as plain data. Mesh-based, tree-shakable to the byte, endpoint-correct by construction. Drives canvas, image, and video sources via one Runner.",
+  "description": "60 WebGL2 transition shaders, defined as plain data. Mesh-based, tree-shakable to the byte, endpoint-correct by construction. Drives canvas, image, and video sources via one Runner.",
   "license": "MIT",
   "keywords": [
     "webgl",

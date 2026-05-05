@@ -31,13 +31,12 @@ export const pageCurl = defineTransition({
   name: "page-curl",
   mesh: { subdivisions: [128, 32], instances: 2 },
   defaults: {
-    radius: 0.5,
     tilt: 0.12,
     backColor: [0.97, 0.96, 0.94] as const,
   },
   vertex: `
-uniform float uRadius;
 uniform float uTilt;
+const float uRadius = 0.5;
 
 out float vLight;
 out float vAlpha;
@@ -97,9 +96,9 @@ void main() {
 }
 `,
   glsl: `
-uniform float uRadius;
 uniform float uTilt;
 uniform vec3 uBackColor;
+const float uRadius = 0.5;
 
 in float vLight;
 in float vAlpha;

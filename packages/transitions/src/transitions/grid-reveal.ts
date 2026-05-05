@@ -23,15 +23,18 @@ float hash21(vec2 p) {
 }
 
 vec4 transition(vec2 uv) {
-  vec2 cell = floor(uv * uCount);
+  // 1×1 is a fade and 2×2 is a quad-split — neither reads as "grid".
+  // Clamp here so the transition is reliable regardless of caller input.
+  float count = max(uCount, 3.0);
+  vec2 cell = floor(uv * count);
 
   float priority;
   if (uPattern < 0.5) {
     // Sequential left-to-right, top-to-bottom
-    priority = (cell.y * uCount + cell.x) / (uCount * uCount);
+    priority = (cell.y * count + cell.x) / (count * count);
   } else if (uPattern < 1.5) {
     // Radial from center of the grid
-    vec2 center = vec2(uCount * 0.5 - 0.5);
+    vec2 center = vec2(count * 0.5 - 0.5);
     float dist = length(cell - center);
     float maxDist = length(center);
     priority = dist / max(maxDist, 0.0001);

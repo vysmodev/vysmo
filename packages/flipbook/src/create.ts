@@ -19,7 +19,6 @@ type EventMap = {
 type Direction = "forward" | "backward";
 
 const DEFAULT_DURATION_MS = 900;
-const DEFAULT_RADIUS = 0.35;
 const DEFAULT_TILT = 0.12;
 const DEFAULT_BACK_COLOR: readonly [number, number, number] = [0.97, 0.96, 0.94];
 const DRAG_THRESHOLD_PX = 5;
@@ -47,7 +46,6 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
   }
 
   const axis: FlipbookAxis = options.axis ?? "horizontal";
-  const radius = options.radius ?? DEFAULT_RADIUS;
   const userTilt = options.tilt ?? DEFAULT_TILT;
   const backColor = options.backColor ?? DEFAULT_BACK_COLOR;
   const flipDuration = options.flipDuration ?? DEFAULT_DURATION_MS;
@@ -146,7 +144,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
       from: page,
       to: page,
       progress: 0,
-      params: { radius, tilt: baseTilt + userTilt, backColor },
+      params: { tilt: baseTilt + userTilt, backColor },
     });
   }
 
@@ -174,7 +172,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
       from: earlierPage,
       to: laterPage,
       progress: forwardProgress,
-      params: { radius, tilt: baseTilt + userTilt, backColor },
+      params: { tilt: baseTilt + userTilt, backColor },
     });
   }
 

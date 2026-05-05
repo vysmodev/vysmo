@@ -18,17 +18,33 @@ uniform float uBlur;
 
 vec4 sampleToBlurred(vec2 uv, vec2 motion, float amount) {
   if (amount < 0.001) return getToColor(clamp(uv, 0.0, 1.0));
-  const int N = 5;
+  // 8 Gaussian-weighted samples along the motion axis. Center samples
+  // dominate; trailing ones fade out so the blur reads as continuous, not
+  // as discrete ghost copies. Effective spread is capped at the call site
+  // — past ~0.05 UV the eye sees stripes regardless of sample count.
+  const int N = 8;
+  const float sigma = 0.25;
   vec4 sum = vec4(0.0);
+  float wSum = 0.0;
   for (int i = 0; i < N; i++) {
-    float t = (float(i) - 2.0) / 4.0;
-    sum += getToColor(clamp(uv + motion * amount * t, 0.0, 1.0));
+    float t = float(i) / float(N - 1) - 0.5;
+    float w = exp(-(t * t) / (2.0 * sigma * sigma));
+    sum += getToColor(clamp(uv + motion * amount * t, 0.0, 1.0)) * w;
+    wSum += w;
   }
-  return sum / float(N);
+  return sum / wSum;
+}
+
+// Snap to nearest axis-aligned unit. Slide's seam math is built around
+// axis-aligned motion; diagonals leave triangular gaps at the corners.
+// Enforced in-shader so the UI's axis-only picker matches.
+vec2 snapAxis(vec2 v) {
+  vec2 d = normalize(v);
+  return abs(d.x) > abs(d.y) ? vec2(sign(d.x), 0.0) : vec2(0.0, sign(d.y));
 }
 
 vec4 transition(vec2 uv) {
-  vec2 d = normalize(uDirection);
+  vec2 d = snapAxis(uDirection);
 
   // "to" is translated from off-screen (behind the trailing edge) into place.
   // At progress=0, to is offset by +d (fully off-screen). At progress=1, to is at origin.
@@ -47,7 +63,11 @@ vec4 transition(vec2 uv) {
   vec4 fromColor = getFromColor(uv);
 
   // To is the moving layer → velocity-scaled motion blur along motion axis.
-  float motion = 4.0 * uProgress * (1.0 - uProgress) * uBlur;
+  // uBlur is the peak spread radius in UV units, capped at 0.1: past that
+  // the discrete sample structure shows as visible stripes regardless of
+  // sample count. Hard-clamp here so the transition is reliable for any
+  // caller input.
+  float motion = 4.0 * uProgress * (1.0 - uProgress) * min(uBlur, 0.1);
   vec4 toColor = sampleToBlurred(toUv, -d, motion);
 
   return mix(fromColor, toColor, w);

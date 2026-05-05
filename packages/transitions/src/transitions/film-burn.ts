@@ -4,6 +4,10 @@ import { defineTransition } from "./define.js";
  * Cinematic film-burn reveal: an irregular hot-edged hole expands from a
  * center point, eating through `from` to reveal `to` beneath. The burn
  * front glows with a warm flame color that fades at the endpoints.
+ *
+ * Optional `chroma` param adds a radial RGB split concentrated at the
+ * advancing edge — set `flameColor` to a cool triplet (e.g. [1.2, 1.6, 2.5]
+ * "Electric") and `chroma > 0` for an electric / plasma-style vibe.
  */
 export const filmBurn = defineTransition({
   name: "film-burn",
@@ -11,12 +15,14 @@ export const filmBurn = defineTransition({
     center: [0.5, 0.5],
     scale: 6,
     edgeWidth: 0.05,
+    chroma: 0,
     flameColor: [1.6, 0.7, 0.15],
   },
   glsl: `
 uniform vec2 uCenter;
 uniform float uScale;
 uniform float uEdgeWidth;
+uniform float uChroma;
 uniform vec3 uFlameColor;
 
 float hash21(vec2 p) {
@@ -59,16 +65,37 @@ vec4 transition(vec2 uv) {
 
   // Inside the burn: show to. Outside: show from.
   float w = smoothstep(-uEdgeWidth, uEdgeWidth, -signedDist);
-  vec4 base = mix(getFromColor(uv), getToColor(uv), w);
+  float env = 4.0 * uProgress * (1.0 - uProgress);
+
+  // Optional radial chromatic aberration concentrated at the burn edge.
+  // chroma=0 → no split; sample once and mix normally. chroma>0 → split
+  // R/B along the radial direction with edge-proximity Gaussian falloff.
+  vec3 baseRGB;
+  if (uChroma > 0.0001) {
+    float edgeX = signedDist / max(uEdgeWidth * 2.0, 0.0001);
+    float edgeProximity = exp(-edgeX * edgeX * 2.0);
+    float chromaStrength = env * edgeProximity * uChroma;
+
+    vec2 toCenter = uv - uCenter;
+    float r = length(toCenter);
+    vec2 dir = r > 0.0001 ? toCenter / r : vec2(1.0, 0.0);
+    vec2 offR = clamp(uv - dir * chromaStrength, 0.0, 1.0);
+    vec2 offB = clamp(uv + dir * chromaStrength, 0.0, 1.0);
+
+    vec3 fromRGB = vec3(getFromColor(offR).r, getFromColor(uv).g, getFromColor(offB).b);
+    vec3 toRGB = vec3(getToColor(offR).r, getToColor(uv).g, getToColor(offB).b);
+    baseRGB = mix(fromRGB, toRGB, w);
+  } else {
+    baseRGB = mix(getFromColor(uv).rgb, getToColor(uv).rgb, w);
+  }
 
   // Flame glow: tight Gaussian band at the burn edge, env-gated to zero
   // at both endpoints.
   float bandX = signedDist / max(uEdgeWidth * 1.5, 0.0001);
   float flameBand = exp(-bandX * bandX * 3.0);
-  float env = 4.0 * uProgress * (1.0 - uProgress);
   vec3 flame = uFlameColor * flameBand * env;
 
-  return vec4(base.rgb + flame, base.a);
+  return vec4(baseRGB + flame, 1.0);
 }
 `,
 });

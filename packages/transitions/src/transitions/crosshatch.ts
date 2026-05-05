@@ -23,7 +23,12 @@ float rand(vec2 co) {
 }
 
 vec4 transition(vec2 uv) {
-  float dist = distance(uCenter, uv) / max(uThreshold, 0.001);
+  // Below threshold=3 the radial wave doesn't have enough range to cover
+  // the full canvas before the outer fade-edge envelope kicks in, leaving
+  // patchy unrevealed pixels mid-transition that snap to revealed at the
+  // end. Clamp here so the transition is reliable regardless of caller input.
+  float threshold = max(uThreshold, 3.0);
+  float dist = distance(uCenter, uv) / threshold;
   float r = uProgress - min(rand(vec2(uv.y, 0.0)), rand(vec2(0.0, uv.x)));
 
   float feather = 0.02;

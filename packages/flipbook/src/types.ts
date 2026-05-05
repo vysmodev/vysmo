@@ -27,11 +27,6 @@ export interface FlipbookOptions {
    */
   axis?: FlipbookAxis;
   /**
-   * Curl radius in clip-space units. Smaller values give a tighter roll;
-   * larger values give a softer arc. Default 0.35.
-   */
-  radius?: number;
-  /**
    * Hinge tilt in radians, **added on top of the axis baseline** (0 for
    * horizontal, π/2 for vertical). Tilts the curl line away from a clean
    * vertical/horizontal sweep. Default 0.12.

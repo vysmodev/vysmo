@@ -28,7 +28,6 @@ const full: FlipbookHandle = createFlipbook({
   pages: [img, canvas, "c.jpg"],
   initialPage: 1,
   axis: "vertical",
-  radius: 0.4,
   tilt: 0.1,
   backColor: [0.95, 0.95, 0.95],
   flipDuration: 1100,

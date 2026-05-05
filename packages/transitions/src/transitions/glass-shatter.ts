@@ -24,13 +24,12 @@ export const glassShatter = defineTransition({
   name: "glass-shatter",
   defaults: {
     cells: 14,
-    flipWindow: 0.12,
     reflection: 0.0,
   },
   glsl: `
 uniform float uCells;
-uniform float uFlipWindow;
 uniform float uReflection;
+const float uFlipWindow = 0.12;
 
 float hash21(vec2 p) {
   return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);

@@ -29,8 +29,19 @@ vec2 hash22(vec2 p) {
   );
 }
 
+// Mirror-reflect UVs that have been pushed outside [0,1]. Each out-of-range
+// pixel ends up sampling from a different in-bounds position, so heavy
+// displacement reads as mirrored continuation of the image rather than the
+// streaked edge-color rows clamping produces.
+vec2 mirrorUv(vec2 uv) {
+  return abs(mod(uv + 1.0, 2.0) - 1.0);
+}
+
 vec4 transition(vec2 uv) {
-  vec2 cell = floor(uv * uCount);
+  // 1×1 = full fade, 2×2 = quad-split — neither reads as "mosaic".
+  // Clamp here so the transition is reliable regardless of caller input.
+  float count = max(uCount, 3.0);
+  vec2 cell = floor(uv * count);
 
   // Random unit direction per cell.
   vec2 rawDir = hash22(cell) * 2.0 - 1.0;
@@ -44,8 +55,10 @@ vec4 transition(vec2 uv) {
   // One-way flow: from-sample slides out in dir, to-sample arrives from
   // the same dir. Same velocity + direction through the crossfade, so the
   // tile reads as one continuous movement instead of out-and-back.
-  vec2 fromUv = clamp(uv + dir * uJitter * localP, 0.0, 1.0);
-  vec2 toUv = clamp(uv + dir * uJitter * (localP - 1.0), 0.0, 1.0);
+  // Mirror-sample so out-of-range UVs reflect into in-bounds content
+  // instead of clamping into edge-color streaks.
+  vec2 fromUv = mirrorUv(uv + dir * uJitter * localP);
+  vec2 toUv = mirrorUv(uv + dir * uJitter * (localP - 1.0));
 
   return mix(getFromColor(fromUv), getToColor(toUv), localP);
 }

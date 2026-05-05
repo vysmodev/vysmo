@@ -18,11 +18,13 @@ import { defineTransition } from "./define.js";
 export const dripWipe = defineTransition({
   name: "drip-wipe",
   defaults: {
+    direction: [-1, 0],
     width: 0.5,
     scaleX: 40,
     scaleY: 40,
   },
   glsl: `
+uniform vec2 uDirection;
 uniform float uWidth;
 uniform float uScaleX;
 uniform float uScaleY;
@@ -64,16 +66,35 @@ float pnoise(vec2 P) {
   return 2.3 * mix(n_x.x, n_x.y, fxy.y);
 }
 
+// Snap to nearest axis-aligned unit. The proj normalization below assumes
+// axis-aligned d (so proj ∈ [0,1]); diagonals would push it outside [0,1]
+// and the wipe edge would never reach part of the canvas. Enforced
+// in-shader so the UI's axis-only picker matches.
+vec2 snapAxis(vec2 v) {
+  vec2 dn = normalize(v);
+  return abs(dn.x) > abs(dn.y) ? vec2(sign(dn.x), 0.0) : vec2(0.0, sign(dn.y));
+}
+
 vec4 transition(vec2 uv) {
+  vec2 d = snapAxis(uDirection);
+
+  // Project uv onto -d, centered at 0.5, so axis-aligned d gives a sweep
+  // coordinate in [0, 1]. Replaces the original's hardcoded uv.x.
+  //   d=[-1, 0] (Left)  → proj = uv.x         (default; matches old shader)
+  //   d=[ 1, 0] (Right) → proj = 1.0 - uv.x
+  //   d=[ 0,-1] (Down)  → proj = uv.y
+  //   d=[ 0, 1] (Up)    → proj = 1.0 - uv.y
+  float proj = dot(uv - vec2(0.5), -d) + 0.5;
+
   // Width envelope: 0 at endpoints, 1 at mid-transition.
   float dt = 4.0 * uProgress * (1.0 - uProgress);
   // Keep w strictly positive so smoothstep(edge0, edge1, ...) never collapses.
   float w = max(uWidth * dt, 0.001);
 
-  // Edge sweep: uv.x + shift spans well past [1 - w, 1] at both endpoints,
+  // Edge sweep: proj + shift spans well past [1 - w, 1] at both endpoints,
   // so maskvalue saturates to 0 at progress=0 and 1 at progress=1.
   float shift = mix(-w, 1.0 + w, uProgress);
-  float maskvalue = smoothstep(1.0 - w, 1.0, uv.x + shift);
+  float maskvalue = smoothstep(1.0 - w, 1.0, proj + shift);
 
   // High-frequency Perlin, remapped to [0, 1] for akella's additive form.
   float realnoise = 0.5 * (pnoise(uv * vec2(uScaleX, uScaleY)) + 1.0);

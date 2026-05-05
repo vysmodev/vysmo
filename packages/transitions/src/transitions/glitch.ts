@@ -30,8 +30,11 @@ vec4 transition(vec2 uv) {
   vec2 displacedUv = vec2(uv.x + displaceAmount, uv.y);
   vec2 clamped = clamp(displacedUv, 0.0, 1.0);
 
-  // RGB channel split scales with glitch amount.
-  float chromaOffset = glitchAmt * uChroma;
+  // RGB channel split scales with glitch amount. chroma is the per-channel
+  // UV offset multiplier — capped at 0.05; past that, R/B samples come from
+  // unrelated parts of the scene and edge-clamping creates color stripes
+  // instead of reading as glitch chromatic aberration.
+  float chromaOffset = glitchAmt * min(uChroma, 0.05);
   vec2 offR = clamp(displacedUv + vec2(chromaOffset, 0.0), 0.0, 1.0);
   vec2 offB = clamp(displacedUv - vec2(chromaOffset, 0.0), 0.0, 1.0);
 

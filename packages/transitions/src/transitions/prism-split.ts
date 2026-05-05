@@ -11,7 +11,7 @@ export const prismSplit = defineTransition({
   defaults: {
     direction: [1, 0],
     intensity: 0.04,
-    softness: 0.7,
+    softness: 0.2,
   },
   glsl: `
 uniform vec2 uDirection;
@@ -21,7 +21,11 @@ uniform float uSoftness;
 vec4 transition(vec2 uv) {
   vec2 d = normalize(uDirection);
   float env = 4.0 * uProgress * (1.0 - uProgress);
-  float split = env * uIntensity;
+  // Cap the per-channel split. Past ~0.07 the R/B samples come from
+  // unrelated parts of the scene and edge clamping turns the offsets into
+  // colored stripes — no longer reads as chromatic aberration. Hard-clamp
+  // here so the transition is reliable regardless of caller input.
+  float split = env * min(uIntensity, 0.07);
 
   vec2 offR = clamp(uv + d * split, 0.0, 1.0);
   vec2 offB = clamp(uv - d * split, 0.0, 1.0);

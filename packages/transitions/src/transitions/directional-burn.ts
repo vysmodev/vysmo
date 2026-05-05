@@ -13,7 +13,7 @@ export const directionalBurn = defineTransition({
     direction: [1, 0],
     scale: 10,
     edgeWidth: 0.035,
-    flameColor: [1.8, 1.2, 0.5],
+    flameColor: [1.6, 0.7, 0.15],
   },
   glsl: `
 uniform vec2 uDirection;

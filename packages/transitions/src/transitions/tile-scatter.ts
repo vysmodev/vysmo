@@ -23,11 +23,9 @@ export const tileScatter = defineTransition({
   mesh: { subdivisions: [20, 12], instances: 2 },
   defaults: {
     scatter: 1.0,
-    source: [0.5, 0.5] as const,
   },
   vertex: `
 uniform float uScatter;
-uniform vec2 uSource;
 
 out float vAlpha;
 flat out int vInstance;
@@ -78,10 +76,10 @@ void main() {
   vec3 local = vec3(aPosition - aCentroid, 0.0);
   vec3 rotated = rot * local;
 
-  // Translation: outward from the source point + push back in z.
-  vec2 sourceClip = uSource * 2.0 - 1.0;
-  vec2 away = aCentroid - sourceClip;
-  vec2 awayDir = length(away) > 1e-5 ? normalize(away) : vec2(0.0);
+  // Translation: outward from canvas center + push back in z. Source is
+  // hardcoded to (0.5, 0.5) → in clip space that's (0, 0), so awayDir is
+  // simply the centroid's direction from origin.
+  vec2 awayDir = length(aCentroid) > 1e-5 ? normalize(aCentroid) : vec2(0.0);
 
   vec3 translation = vec3(
     awayDir * uScatter * 0.75 * localT,

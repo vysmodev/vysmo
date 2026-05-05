@@ -20,7 +20,10 @@ uniform vec2 uCenter;
 uniform float uSoftness;
 
 vec4 transition(vec2 uv) {
-  vec2 cellPos = fract(uv * uDots);
+  // dots=0 produces degenerate cellPos math (uv*0=0, all pixels in same cell);
+  // floor at 1. Clamp here so the transition is reliable regardless of caller input.
+  float dots = max(uDots, 1.0);
+  vec2 cellPos = fract(uv * dots);
   float dotDist = distance(cellPos, vec2(0.5));
   float distToCenter = distance(uv, uCenter);
 

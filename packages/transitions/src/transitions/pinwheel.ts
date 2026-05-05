@@ -10,13 +10,11 @@ export const pinwheel = defineTransition({
   defaults: {
     center: [0.5, 0.5],
     spokes: 8,
-    rotation: 0,
     softness: 0.05,
   },
   glsl: `
 uniform vec2 uCenter;
 uniform float uSpokes;
-uniform float uRotation;
 uniform float uSoftness;
 
 const float TWO_PI = 6.2831853;
@@ -24,7 +22,7 @@ const float TWO_PI = 6.2831853;
 vec4 transition(vec2 uv) {
   // Aspect-correct so spokes remain radial on non-square canvases.
   vec2 delta = (uv - uCenter) * vec2(uResolution.x / uResolution.y, 1.0);
-  float angle = atan(delta.y, delta.x) - uRotation;
+  float angle = atan(delta.y, delta.x);
   float slice = TWO_PI / max(uSpokes, 2.0);
 
   // Position within a single spoke's angular range, 0 to slice.

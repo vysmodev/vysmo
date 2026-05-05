@@ -21,40 +21,29 @@ uniform float uMode;
 uniform float uSoftness;
 
 vec4 transition(vec2 uv) {
+  // Distance from the split axis (perpendicular to the doors' motion).
   float splitCoord = mix(uv.x, uv.y, uAxis);
-  float perpCoord = mix(uv.y, uv.x, uAxis);
-  float distFromCenter = splitCoord - 0.5;
-  float absDist = abs(distFromCenter);
-  float signDist = sign(distFromCenter);
+  float absDist = abs(splitCoord - 0.5);
 
+  // Boundary is "how far from the split center the doors extend right now".
+  // OPEN: grows from -softness to 0.5+softness (from doors retreat outward).
+  // CLOSE: shrinks from 0.5+softness to -softness (to doors close inward).
+  // Both inner and outer sample at uv directly. Each door is a position-based
+  // reveal, not a texture that slides with the door — so the softness band
+  // blends two views of the same scene location instead of two different
+  // places of from/to (which produced the "wrong content at the seam"
+  // artifact in the previous slide-with-content implementation).
   float boundary;
   vec4 innerColor;
   vec4 outerColor;
-
   if (uMode < 0.5) {
-    // OPEN: "from" doors slide outward, revealing stationary "to" in the middle.
     boundary = -uSoftness + uProgress * (0.5 + 2.0 * uSoftness);
-    float slide = uProgress * 0.5;
-    float sampleSplit = splitCoord - signDist * slide;
-    vec2 fromSampleUv = mix(
-      vec2(sampleSplit, perpCoord),
-      vec2(perpCoord, sampleSplit),
-      uAxis
-    );
     innerColor = getToColor(uv);
-    outerColor = getFromColor(clamp(fromSampleUv, 0.0, 1.0));
+    outerColor = getFromColor(uv);
   } else {
-    // CLOSE: "to" doors slide inward from edges, covering stationary "from".
     boundary = (0.5 + uSoftness) - uProgress * (0.5 + 2.0 * uSoftness);
-    float slide = (1.0 - uProgress) * 0.5;
-    float sampleSplit = splitCoord - signDist * slide;
-    vec2 toSampleUv = mix(
-      vec2(sampleSplit, perpCoord),
-      vec2(perpCoord, sampleSplit),
-      uAxis
-    );
     innerColor = getFromColor(uv);
-    outerColor = getToColor(clamp(toSampleUv, 0.0, 1.0));
+    outerColor = getToColor(uv);
   }
 
   float w = smoothstep(boundary - uSoftness, boundary + uSoftness, absDist);

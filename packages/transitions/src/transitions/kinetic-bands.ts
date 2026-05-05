@@ -14,10 +14,31 @@ uniform float uStagger;
 uniform float uSoftness;
 uniform vec2 uDirection;
 
+// Snap to nearest axis-aligned unit. Diagonals would tilt the bands away
+// from the natural horizontal stack and the boundary math would no longer
+// align with the band's own progress envelope. Enforced in-shader so the
+// UI's axis-only picker matches.
+vec2 snapAxis(vec2 v) {
+  vec2 dn = normalize(v);
+  return abs(dn.x) > abs(dn.y) ? vec2(sign(dn.x), 0.0) : vec2(0.0, sign(dn.y));
+}
+
 vec4 transition(vec2 uv) {
-  // Which horizontal band this pixel belongs to, 0..1 from top to bottom.
-  float band = floor(uv.y * uCount);
-  float bandPos = (band + 0.5) / uCount;
+  // count=1 collapses to a single full-frame slide; not "kinetic bands".
+  // Clamp here so the transition is reliable regardless of caller input.
+  float count = max(uCount, 2.0);
+
+  vec2 d = snapAxis(uDirection);
+
+  // Bands run perpendicular to the sweep direction. For a horizontal sweep
+  // (Right/Left), bands are horizontal stripes stacked vertically (indexed
+  // by uv.y). For a vertical sweep (Up/Down), bands are vertical stripes
+  // stacked horizontally (indexed by uv.x). Otherwise the bands and sweep
+  // axis are mismatched and the effect looks broken.
+  bool horizontalBands = abs(d.x) > abs(d.y);
+  float bandCoord = horizontalBands ? uv.y : uv.x;
+  float band = floor(bandCoord * count);
+  float bandPos = (band + 0.5) / count;
 
   // Each band starts at bandPos * stagger and runs for (1 - stagger) of time.
   float start = bandPos * uStagger;
@@ -26,11 +47,7 @@ vec4 transition(vec2 uv) {
 
   // Within the band, run a slide-style sweep so each band has its own
   // endpoint-correct mini-transition.
-  vec2 d = normalize(uDirection);
-  // Scale the boundary range by maxProj so diagonal directions sweep
-  // fully off-screen at endpoints (see paint-bleed.ts for the full
-  // explanation).
-  float maxProj = max((abs(d.x) + abs(d.y)) * 0.5, 0.0001);
+  float maxProj = 0.5;
   float projected = dot(uv - 0.5, -d);
   float boundary = (maxProj + uSoftness) * (1.0 - 2.0 * localProgress);
   float w = smoothstep(boundary - uSoftness, boundary + uSoftness, projected);

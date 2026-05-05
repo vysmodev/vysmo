@@ -30,14 +30,18 @@ vec4 transition(vec2 uv) {
   float maxProj = max((abs(d.x) + abs(d.y)) * 0.5, 0.0001);
   float projected = 0.5 + dot(uv - 0.5, -d) / (2.0 * maxProj);
 
+  // size is a fractional ratio in [0, 1]: how much per-row jitter the
+  // wavefront has. Values >1 break endpoint correctness because the
+  // smoothstep range no longer covers the projected coordinate at p=0 or
+  // p=1, leaving per-row stripes visible. Clamp here so the transition
+  // is reliable regardless of caller input.
+  float size = clamp(uSize, 0.0, 1.0);
+
   // Wavefront sweeps from 0 to 1 + size. Per-row random shift gives ragged edge.
   // Note: smoothstep(edge0, edge1, x) is undefined when edge0 > edge1, so
   // express the inverted form as 1 - smoothstep(low, high, x) instead.
-  // This restores endpoint correctness for any uSize in (0, ~0.95]; the
-  // previous form left visible per-row stripes on some GPUs at endpoints
-  // when uSize was high.
-  float arg = projected * (1.0 - uSize) + uSize * r - uProgress * (1.0 + uSize);
-  float m = 1.0 - smoothstep(-uSize, 0.0, arg);
+  float arg = projected * (1.0 - size) + size * r - uProgress * (1.0 + size);
+  float m = 1.0 - smoothstep(-size, 0.0, arg);
   return mix(getFromColor(uv), getToColor(uv), m);
 }
 `,

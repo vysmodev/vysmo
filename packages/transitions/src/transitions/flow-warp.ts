@@ -32,6 +32,15 @@ mat2 rotate2d(float a) {
   return mat2(c, -s, s, c);
 }
 
+// Mirror-reflect UVs that have been pushed outside [0,1]. Each out-of-range
+// pixel ends up sampling from a different in-bounds position, so heavy
+// displacement reads as mirrored continuation of the image rather than the
+// streaked edge-color rows you get from clamping. This makes the transition
+// reliable at any intensity instead of needing an artificial cap.
+vec2 mirrorUv(vec2 uv) {
+  return abs(mod(uv + 1.0, 2.0) - 1.0);
+}
+
 vec4 transition(vec2 uv) {
   vec4 disp = getDisplacement(uv);
   // Centered convention: mid-gray = no displacement, range [-1, 1].
@@ -40,8 +49,8 @@ vec4 transition(vec2 uv) {
   vec2 distorted1 = uv + rotate2d(uAngle1) * dispVec * uIntensity * uProgress;
   vec2 distorted2 = uv + rotate2d(uAngle2) * dispVec * uIntensity * (1.0 - uProgress);
 
-  vec4 t1 = getFromColor(clamp(distorted1, 0.0, 1.0));
-  vec4 t2 = getToColor(clamp(distorted2, 0.0, 1.0));
+  vec4 t1 = getFromColor(mirrorUv(distorted1));
+  vec4 t2 = getToColor(mirrorUv(distorted2));
 
   return mix(t1, t2, uProgress);
 }
