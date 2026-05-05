@@ -28,7 +28,6 @@ export {
   flipX,
   depthZoom,
   fadeDown,
-  blurOut,
   scaleOut,
   flipAway,
   pulse,

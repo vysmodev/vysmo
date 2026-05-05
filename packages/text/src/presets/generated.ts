@@ -2,7 +2,7 @@
 // Written by `scripts/ingest-generated.mjs` from `scripts/_staging.ts`.
 // Run `pnpm --filter @vysmo/text ingest` to refresh.
 //
-// 310 presets ingested.
+// 229 presets ingested.
 
 import type { Preset } from "../types.js";
 
@@ -38,17 +38,6 @@ export const tiltInSpring: Preset = {
   animations: [
     { prop: "opacity", from: 0, to: 1, duration: 350, ease: "elastic.out" },
     { prop: "rotate", from: 30, to: 0, duration: 800, ease: "elastic.out" },
-  ],
-};
-
-export const spreadXScatter: Preset = {
-  name: "enter/spread-x-scatter",
-  split: "character",
-  stagger: 15,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 300, ease: "back.out" },
-    { prop: "translateX", from: { min: -109.525, max: 109.525 }, to: 0, duration: 800, ease: "bounce.out" },
-    { prop: "scaleX", from: 1.2, to: 1, duration: 700, ease: "bounce.out" },
   ],
 };
 
@@ -180,63 +169,6 @@ export const glideScatter: Preset = {
   ],
 };
 
-export const tumbleXScatter: Preset = {
-  name: "enter/tumble-x-scatter",
-  split: "character",
-  stagger: 50,
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450, ease: "sine.out" },
-    { prop: "translateX", from: 90, to: 0, duration: 850, ease: "back.out" },
-    { prop: "rotateX", from: { min: -1078.507, max: 1078.507 }, to: 0, duration: 650, ease: "cubic.out", jitterDelay: 240, perspective: 650 },
-    { prop: "scale", from: 0.65, to: 1, duration: 800, ease: "quart.out", jitterDelay: 330, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "translateZ", from: -600, to: 0, duration: 500, ease: "quart.out", jitterDelay: 140 },
-  ],
-};
-
-export const foldInScatter: Preset = {
-  name: "enter/fold-in-scatter",
-  split: "character",
-  stagger: 55,
-  perspective: 450,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "quart.out" },
-    { prop: "translateX", from: { min: -525.814, max: 525.814 }, to: 0, duration: 850, ease: "sine.out", jitterDelay: 310 },
-    { prop: "skewX", from: -40, to: 0, duration: 650, ease: "circ.out", jitterDelay: 290, transformOrigin: { x: 0, y: 0 } },
-    { prop: "rotateX", from: { min: -1196.519, max: 1196.519 }, to: 0, duration: 750, ease: "bounce.out", jitterDelay: 220, transformOrigin: { x: 0.5, y: 0 } },
-    { prop: "rotate", from: { min: -2390.594, max: 2390.594 }, to: 0, duration: 750, ease: "circ.out", jitterDelay: 290 },
-  ],
-};
-
-export const toppleScatter: Preset = {
-  name: "enter/topple-scatter",
-  split: "word",
-  stagger: 60,
-  perspective: 400,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450, ease: "elastic.out" },
-    { prop: "scaleX", from: 4, to: 1, duration: 850, ease: "sine.out" },
-    { prop: "rotateX", from: { min: -593.114, max: 593.114 }, to: 0, duration: 850, ease: "quart.out", transformOrigin: { x: 0.5, y: 0 } },
-    { prop: "rotate", from: 720, to: 0, duration: 600, ease: "elastic.out", transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "blur", from: 12, to: 0, duration: 750, ease: "bounce.out" },
-  ],
-};
-
-export const leanInScatter: Preset = {
-  name: "enter/lean-in-scatter",
-  split: "character",
-  stagger: 35,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 500, ease: "back.out" },
-    { prop: "scale", from: { min: 0.15, max: 1.875 }, to: 1, duration: 650, ease: "elastic.out", jitterDelay: 60, transformOrigin: { x: 0.5, y: 0 } },
-    { prop: "rotate", from: { min: -1603.161, max: 1603.161 }, to: 0, duration: 750, ease: "elastic.out", jitterDelay: 200 },
-    { prop: "scaleX", from: { min: 0.3, max: 3.75 }, to: 1, duration: 650, ease: "sine.out", jitterDelay: 280 },
-  ],
-};
-
 export const growScatter: Preset = {
   name: "enter/grow-scatter",
   split: "character",
@@ -248,36 +180,6 @@ export const growScatter: Preset = {
     { prop: "scale", from: 0.35, to: 1, duration: 750, ease: "back.out" },
     { prop: "skewX", from: -15, to: 0, duration: 500, ease: "elastic.out", jitterDelay: 150 },
     { prop: "translateX", from: -150, to: 0, duration: 550, ease: "circ.out" },
-  ],
-};
-
-export const approachSpring: Preset = {
-  name: "enter/approach-spring",
-  split: "character",
-  stagger: 20,
-  perspective: 650,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 600, ease: "expo.out" },
-    { prop: "blur", from: 18, to: 0, duration: 750, ease: "elastic.out", jitterDelay: 300 },
-    { prop: "translateZ", from: -250, to: 0, duration: 500, ease: "elastic.out", jitterDelay: 190 },
-    { prop: "translateX", from: -200, to: 0, duration: 700, ease: "cubic.out", jitterDelay: 90 },
-    { prop: "translateY", from: 170, to: 0, duration: 700, ease: "quart.out", jitterDelay: 240 },
-  ],
-};
-
-export const flipUpScatter: Preset = {
-  name: "enter/flip-up-scatter",
-  split: "character",
-  stagger: 35,
-  staggerOrder: "random",
-  perspective: 200,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 400, ease: "circ.out" },
-    { prop: "blur", from: 12, to: 0, duration: 450, ease: "expo.out", jitterDelay: 200 },
-    { prop: "translateX", from: { min: -333.894, max: 333.894 }, to: 0, duration: 800, ease: "sine.out", jitterDelay: 350 },
-    { prop: "rotateX", from: -120, to: 0, duration: 600, ease: "power4.out", transformOrigin: { x: 0, y: 0.5, z: -100 }, perspective: 300 },
-    { prop: "rotate", from: { min: -721.301, max: 721.301 }, to: 0, duration: 500, ease: "sine.out", transformOrigin: { x: 1, y: 1, z: 100 } },
   ],
 };
 
@@ -335,20 +237,6 @@ export const leanInScatterCurl: Preset = {
   ],
 };
 
-export const leanInScatterLoose: Preset = {
-  name: "enter/lean-in-scatter-loose",
-  split: "character",
-  stagger: 60,
-  staggerOrder: "end",
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450, ease: "expo.out" },
-    { prop: "blur", from: { min: 3, max: 37.5 }, to: 0, duration: 700, ease: "cubic.out" },
-    { prop: "rotate", from: { min: -1200.656, max: 1200.656 }, to: 0, duration: 700, ease: "circ.out", jitterDelay: 340, transformOrigin: { x: 0, y: 0, z: -100 } },
-    { prop: "scaleX", from: 1.5, to: 1, duration: 700, ease: "bounce.out", jitterDelay: 320 },
-    { prop: "skewX", from: -40, to: 0, duration: 650, ease: "cubic.out", jitterDelay: 180 },
-  ],
-};
-
 export const settleScatter: Preset = {
   name: "enter/settle-scatter",
   split: "character",
@@ -358,53 +246,6 @@ export const settleScatter: Preset = {
     { prop: "blur", from: 10, to: 0, duration: 550, ease: "bounce.out" },
     { prop: "translateY", from: 150, to: 0, duration: 750, ease: "elastic.out", jitterDelay: 100 },
     { prop: "scale", from: { min: 0.15, max: 1.875 }, to: 1, duration: 550, ease: "cubic.out", jitterDelay: 240, transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
-  ],
-};
-
-export const swivelScatter: Preset = {
-  name: "enter/swivel-scatter",
-  split: "character",
-  stagger: 40,
-  staggerOrder: "end",
-  perspective: 150,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 350, ease: "quart.out" },
-    { prop: "blur", from: 23, to: 0, duration: 450, ease: "circ.out", jitterDelay: 160 },
-    { prop: "rotateY", from: { min: -2580.481, max: 2580.481 }, to: 0, duration: 550, ease: "bounce.out", jitterDelay: 380, transformOrigin: { x: 0, y: 0, z: -100 }, perspective: 250 },
-    { prop: "scaleY", from: { min: 0.6, max: 7.5 }, to: 1, duration: 750, ease: "elastic.out", jitterDelay: 230, transformOrigin: { x: 0.5, y: 0.5, z: -150 } },
-    { prop: "skewX", from: { min: -522.325, max: 522.325 }, to: 0, duration: 650, ease: "circ.out", jitterDelay: 210 },
-    { prop: "scaleX", from: { min: 0.5, max: 6.25 }, to: 1, duration: 550, ease: "quart.out" },
-  ],
-};
-
-export const toppleScatterCurl: Preset = {
-  name: "enter/topple-scatter-curl",
-  split: "character",
-  stagger: 45,
-  perspective: 550,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 400, ease: "back.out" },
-    { prop: "rotate", from: { min: -1537.894, max: 1537.894 }, to: 0, duration: 800, ease: "elastic.out" },
-    { prop: "translateY", from: { min: -543.696, max: 543.696 }, to: 0, duration: 700, ease: "sine.out" },
-    { prop: "rotateX", from: -420, to: 0, duration: 550, ease: "quart.out", jitterDelay: 340, transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "scaleY", from: 0.1, to: 1, duration: 600, ease: "quart.out", jitterDelay: 260, transformOrigin: { x: 0, y: 1 } },
-  ],
-};
-
-export const flipUpScatterLoose: Preset = {
-  name: "enter/flip-up-scatter-loose",
-  split: "character",
-  stagger: 35,
-  staggerOrder: "center",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "quart.out" },
-    { prop: "rotateY", from: { min: -1606.313, max: 1606.313 }, to: 0, duration: 700, ease: "elastic.out", jitterDelay: 150, transformOrigin: { x: 0.5, y: 0 }, perspective: 600 },
-    { prop: "rotateX", from: 150, to: 0, duration: 750, ease: "cubic.out", jitterDelay: 60, perspective: 300 },
-    { prop: "rotate", from: { min: -1745.325, max: 1745.325 }, to: 0, duration: 900, ease: "power4.out", jitterDelay: 250 },
   ],
 };
 
@@ -558,20 +399,6 @@ export const flipUpScatterBounce: Preset = {
   ],
 };
 
-export const toppleScatterLoose: Preset = {
-  name: "enter/topple-scatter-loose",
-  split: "character",
-  stagger: 60,
-  perspective: 200,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "expo.out" },
-    { prop: "skewX", from: { min: -64.322, max: 64.322 }, to: 0, duration: 650, ease: "bounce.out" },
-    { prop: "scaleY", from: { min: 0.8, max: 10 }, to: 1, duration: 850, ease: "back.out", jitterDelay: 160 },
-    { prop: "rotateX", from: { min: -1426.738, max: 1426.738 }, to: 0, duration: 700, ease: "cubic.out", perspective: 650 },
-  ],
-};
-
 export const foldInScatterBounce: Preset = {
   name: "enter/fold-in-scatter-bounce",
   split: "character",
@@ -644,21 +471,6 @@ export const extendXSnapWord: Preset = {
   ],
 };
 
-export const rotateYInScatter: Preset = {
-  name: "enter/rotate-y-in-scatter",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "end",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 400, ease: "power4.out" },
-    { prop: "rotateY", from: { min: -2124.367, max: 2124.367 }, to: 0, duration: 700, ease: "power4.out", jitterDelay: 110 },
-    { prop: "scaleX", from: { min: 0.8, max: 10 }, to: 1, duration: 650, ease: "elastic.out", jitterDelay: 330, transformOrigin: { x: 0.5, y: 1, z: 100 } },
-    { prop: "translateY", from: { min: -445.333, max: 445.333 }, to: 0, duration: 600, ease: "back.out", jitterDelay: 200 },
-  ],
-};
-
 export const riseYScatter: Preset = {
   name: "enter/rise-y-scatter",
   split: "word",
@@ -694,20 +506,6 @@ export const riseYScatterCurl: Preset = {
     { prop: "skewX", from: { min: -193.342, max: 193.342 }, to: 0, duration: 600, ease: "sine.out", transformOrigin: { x: 0.5, y: 0.5, z: -150 } },
     { prop: "translateX", from: -210, to: 0, duration: 750, ease: "expo.out", jitterDelay: 120 },
     { prop: "blur", from: { min: 3.2, max: 40 }, to: 0, duration: 750, ease: "circ.out", jitterDelay: 200 },
-  ],
-};
-
-export const swivelScatterCurl: Preset = {
-  name: "enter/swivel-scatter-curl",
-  split: "character",
-  stagger: 55,
-  perspective: 400,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 350, ease: "quart.out" },
-    { prop: "scaleX", from: { min: 0.6, max: 7.5 }, to: 1, duration: 550, ease: "bounce.out", transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
-    { prop: "rotateY", from: { min: -1625.68, max: 1625.68 }, to: 0, duration: 750, ease: "back.out", jitterDelay: 100, perspective: 350 },
-    { prop: "skewX", from: 45, to: 0, duration: 650, ease: "sine.out", jitterDelay: 340, transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
   ],
 };
 
@@ -753,22 +551,6 @@ export const swivelScatterDeep: Preset = {
     { prop: "rotateY", from: 420, to: 0, duration: 850, ease: "quart.out", jitterDelay: 320, transformOrigin: { x: 0.5, y: 0.5 }, perspective: 500 },
     { prop: "scaleY", from: 2, to: 1, duration: 600, ease: "sine.out", transformOrigin: { x: 0.5, y: 0, z: -100 } },
     { prop: "rotate", from: { min: -1729.634, max: 1729.634 }, to: 0, duration: 750, ease: "power4.out", jitterDelay: 150 },
-  ],
-};
-
-export const turnScatter: Preset = {
-  name: "enter/turn-scatter",
-  split: "word",
-  stagger: 20,
-  staggerOrder: "random",
-  perspective: 400,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 500, ease: "expo.out" },
-    { prop: "blur", from: { min: 2.8, max: 35 }, to: 0, duration: 750, ease: "cubic.out", jitterDelay: 210 },
-    { prop: "scaleX", from: 0.3, to: 1, duration: 800, ease: "circ.out", jitterDelay: 340 },
-    { prop: "rotateY", from: 270, to: 0, duration: 750, ease: "sine.out", jitterDelay: 280, transformOrigin: { x: 0.5, y: 1, z: 100 }, perspective: 400 },
-    { prop: "rotate", from: { min: -978.818, max: 978.818 }, to: 0, duration: 550, ease: "power4.out" },
   ],
 };
 
@@ -859,18 +641,6 @@ export const unfurlYCurl: Preset = {
     { prop: "scaleY", from: 0.2, to: 1, duration: 700, ease: "quart.out", jitterDelay: 320, transformOrigin: { x: 1, y: 0.5 } },
     { prop: "scale", from: 0.75, to: 1, duration: 800, ease: "expo.out", jitterDelay: 170, transformOrigin: { x: 0.5, y: 1, z: 100 } },
     { prop: "blur", from: 19, to: 0, duration: 600, ease: "sine.out", jitterDelay: 160 },
-  ],
-};
-
-export const extendYScatterLoose: Preset = {
-  name: "enter/extend-y-scatter-loose",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "random",
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 300, ease: "circ.out" },
-    { prop: "translateY", from: -120, to: 0, duration: 700, ease: "power4.out", jitterDelay: 280 },
-    { prop: "scaleY", from: { min: 0.04, max: 0.5 }, to: 1, duration: 600, ease: "power4.out" },
   ],
 };
 
@@ -1046,23 +816,6 @@ export const rotateYInScatterCurl: Preset = {
   ],
 };
 
-export const toppleScatterDeep: Preset = {
-  name: "enter/topple-scatter-deep",
-  split: "character",
-  stagger: 55,
-  perspective: 250,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450, ease: "back.out" },
-    { prop: "translateX", from: -290, to: 0, duration: 850, ease: "elastic.out", jitterDelay: 280 },
-    { prop: "rotateX", from: { min: -2244.341, max: 2244.341 }, to: 0, duration: 500, ease: "power4.out", jitterDelay: 420, transformOrigin: { x: 1, y: 1, z: 100 }, perspective: 200 },
-    { prop: "scale", from: { min: 0.1, max: 1.25 }, to: 1, duration: 600, ease: "back.out", jitterDelay: 170, transformOrigin: { x: 0.5, y: 0, z: -100 } },
-    { prop: "translateY", from: { min: -2021.847, max: 2021.847 }, to: 0, duration: 750, ease: "circ.out", jitterDelay: 480 },
-    { prop: "translateZ", from: -900, to: 0, duration: 850, ease: "expo.out", perspective: 100 },
-    { prop: "skewX", from: -30, to: 0, duration: 700, ease: "bounce.out", jitterDelay: 460 },
-  ],
-};
-
 export const foldInScatterSnap: Preset = {
   name: "enter/fold-in-scatter-snap",
   split: "character",
@@ -1076,22 +829,6 @@ export const foldInScatterSnap: Preset = {
     { prop: "translateX", from: 200, to: 0, duration: 700, ease: "sine.out" },
     { prop: "scaleY", from: { min: 0.6, max: 7.5 }, to: 1, duration: 550, ease: "expo.out", jitterDelay: 380, transformOrigin: { x: 0.5, y: 0, z: -100 } },
     { prop: "rotate", from: { min: -7028.788, max: 7028.788 }, to: 0, duration: 750, ease: "expo.out", jitterDelay: 190, transformOrigin: { x: 0, y: 0.5 } },
-  ],
-};
-
-export const slantScatterCurl: Preset = {
-  name: "enter/slant-scatter-curl",
-  split: "character",
-  stagger: 40,
-  perspective: 150,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 600, ease: "sine.out" },
-    { prop: "rotate", from: { min: -6543.962, max: 6543.962 }, to: 0, duration: 800, ease: "expo.out", transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "translateX", from: { min: -2271.681, max: 2271.681 }, to: 0, duration: 900, ease: "expo.out", jitterDelay: 280 },
-    { prop: "scale", from: { min: 0.09, max: 1.125 }, to: 1, duration: 500, ease: "power4.out", jitterDelay: 310, transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "blur", from: { min: 2.2, max: 27.5 }, to: 0, duration: 550, ease: "elastic.out", jitterDelay: 400 },
-    { prop: "translateY", from: { min: -1224.971, max: 1224.971 }, to: 0, duration: 800, ease: "circ.out", jitterDelay: 290 },
-    { prop: "translateZ", from: -900, to: 0, duration: 550, ease: "power4.out", jitterDelay: 280, perspective: 200 },
   ],
 };
 
@@ -1184,17 +921,6 @@ export const liftSpring: Preset = {
   animations: [
     { prop: "opacity", from: 0, to: 1, duration: 500, ease: "sine.out" },
     { prop: "translateY", from: -60, to: 0, duration: 550, ease: "elastic.out" },
-  ],
-};
-
-export const rise: Preset = {
-  name: "enter/rise",
-  split: "character",
-  stagger: 60,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 400, ease: "sine.out" },
-    { prop: "translateX", from: 30, to: 0, duration: 750, ease: "quart.out" },
-    { prop: "translateY", from: -40, to: 0, duration: 700, ease: "quart.out" },
   ],
 };
 
@@ -1361,73 +1087,6 @@ export const swirlLoose: Preset = {
   ],
 };
 
-export const flipUpScatterDeep: Preset = {
-  name: "enter/flip-up-scatter-deep",
-  split: "word",
-  stagger: 40,
-  perspective: 250,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 500, ease: "circ.out" },
-    { prop: "translateZ", from: -300, to: 0, duration: 500, ease: "expo.out", perspective: 500 },
-    { prop: "scaleX", from: { min: 0.04, max: 0.5 }, to: 1, duration: 550, ease: "back.out", jitterDelay: 330 },
-    { prop: "blur", from: { min: 1.4, max: 17.5 }, to: 0, duration: 500, ease: "bounce.out", jitterDelay: 280 },
-    { prop: "rotateY", from: 240, to: 0, duration: 600, ease: "sine.out" },
-    { prop: "rotateX", from: { min: -1645.49, max: 1645.49 }, to: 0, duration: 550, ease: "power4.out", perspective: 650 },
-    { prop: "scaleY", from: { min: 0, max: 0 }, to: 1, duration: 600, ease: "bounce.out", transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
-  ],
-};
-
-export const tipInScatterBounce: Preset = {
-  name: "enter/tip-in-scatter-bounce",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "end",
-  perspective: 500,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 600, ease: "bounce.out" },
-    { prop: "scaleY", from: 1.5, to: 1, duration: 750, ease: "back.out", jitterDelay: 230, transformOrigin: { x: 0.5, y: 1 } },
-    { prop: "blur", from: 18, to: 0, duration: 700, ease: "circ.out", jitterDelay: 100 },
-    { prop: "translateZ", from: -250, to: 0, duration: 500, ease: "sine.out", jitterDelay: 170, perspective: 500 },
-    { prop: "rotate", from: 150, to: 0, duration: 900, ease: "bounce.out", jitterDelay: 330, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "scaleX", from: { min: 0.5, max: 6.25 }, to: 1, duration: 850, ease: "cubic.out", jitterDelay: 320, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-  ],
-};
-
-export const tumbleXScatterCurl: Preset = {
-  name: "enter/tumble-x-scatter-curl",
-  split: "character",
-  stagger: 60,
-  staggerOrder: "end",
-  perspective: 400,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "expo.out" },
-    { prop: "scaleY", from: 0, to: 1, duration: 650, ease: "power4.out", jitterDelay: 210, transformOrigin: { x: 0.5, y: 1, z: 100 } },
-    { prop: "translateZ", from: -300, to: 0, duration: 800, ease: "elastic.out", jitterDelay: 200 },
-    { prop: "translateX", from: { min: -721.862, max: 721.862 }, to: 0, duration: 600, ease: "cubic.out" },
-    { prop: "skewX", from: { min: -172.43, max: 172.43 }, to: 0, duration: 650, ease: "expo.out", jitterDelay: 210 },
-    { prop: "rotateX", from: { min: -651.39, max: 651.39 }, to: 0, duration: 700, ease: "sine.out", transformOrigin: { x: 0.5, y: 0, z: -100 }, perspective: 300 },
-    { prop: "rotate", from: 330, to: 0, duration: 600, ease: "elastic.out", jitterDelay: 140 },
-  ],
-};
-
-export const foldInScatterLoose: Preset = {
-  name: "enter/fold-in-scatter-loose",
-  split: "character",
-  stagger: 15,
-  staggerOrder: "end",
-  perspective: 450,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 500, ease: "bounce.out" },
-    { prop: "translateZ", from: -250, to: 0, duration: 800, ease: "power4.out", perspective: 200 },
-    { prop: "translateX", from: { min: -886.9, max: 886.9 }, to: 0, duration: 700, ease: "expo.out" },
-    { prop: "scaleX", from: { min: 0, max: -2.5 }, to: 1, duration: 500, ease: "sine.out", jitterDelay: 320, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "rotateX", from: { min: -585.886, max: 585.886 }, to: 0, duration: 550, ease: "power4.out", jitterDelay: 310, transformOrigin: { x: 0, y: 0, z: -100 }, perspective: 500 },
-  ],
-};
-
 export const rotateYInScatterSpring: Preset = {
   name: "enter/rotate-y-in-scatter-spring",
   split: "character",
@@ -1458,20 +1117,6 @@ export const whirlScatterLoose: Preset = {
     { prop: "rotate", from: -690, to: 0, duration: 650, ease: "quart.out", transformOrigin: { x: 0.5, y: 0.5, z: 150 } },
     { prop: "scaleX", from: { min: 0.3, max: 3.75 }, to: 1, duration: 550, ease: "expo.out" },
     { prop: "scaleY", from: 0.2, to: 1, duration: 600, ease: "quart.out", transformOrigin: { x: 0, y: 0.5, z: -100 } },
-  ],
-};
-
-export const flipUpScatter2: Preset = {
-  name: "enter/flip-up-scatter-2",
-  split: "character",
-  stagger: 35,
-  perspective: 700,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "circ.out" },
-    { prop: "rotateX", from: 510, to: 0, duration: 750, ease: "circ.out", jitterDelay: 310, transformOrigin: { x: 0.5, y: 1 }, perspective: 250 },
-    { prop: "skewX", from: { min: -109.16, max: 109.16 }, to: 0, duration: 500, ease: "back.out", jitterDelay: 320 },
-    { prop: "blur", from: 17, to: 0, duration: 400, ease: "expo.out", jitterDelay: 110 },
   ],
 };
 
@@ -1520,40 +1165,6 @@ export const toppleScatterKick: Preset = {
     { prop: "scaleY", from: { min: 0.06, max: 0.75 }, to: 1, duration: 550, ease: "expo.out" },
     { prop: "rotate", from: { min: -2011.127, max: 2011.127 }, to: 0, duration: 850, ease: "quart.out", jitterDelay: 110, transformOrigin: { x: 1, y: 1 } },
     { prop: "scale", from: 0.45, to: 1, duration: 800, ease: "quart.out", jitterDelay: 160, transformOrigin: { x: 0.5, y: 0.5 } },
-  ],
-};
-
-export const toppleScatter2: Preset = {
-  name: "enter/topple-scatter-2",
-  split: "character",
-  stagger: 15,
-  perspective: 300,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 300, ease: "cubic.out" },
-    { prop: "rotateY", from: { min: -1433.938, max: 1433.938 }, to: 0, duration: 550, ease: "power4.out", jitterDelay: 190, transformOrigin: { x: 0, y: 0.5 } },
-    { prop: "skewX", from: { min: -196.12, max: 196.12 }, to: 0, duration: 500, ease: "bounce.out", jitterDelay: 140 },
-    { prop: "scaleX", from: 4, to: 1, duration: 750, ease: "bounce.out", jitterDelay: 330 },
-    { prop: "rotateX", from: 360, to: 0, duration: 750, ease: "quart.out", jitterDelay: 320 },
-    { prop: "scaleY", from: 0, to: 1, duration: 550, ease: "cubic.out", transformOrigin: { x: 0.5, y: 0 } },
-    { prop: "translateZ", from: -300, to: 0, duration: 700, ease: "quart.out" },
-  ],
-};
-
-export const tipInScatterLoose: Preset = {
-  name: "enter/tip-in-scatter-loose",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "end",
-  perspective: 300,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550, ease: "circ.out" },
-    { prop: "skewX", from: { min: -305.237, max: 305.237 }, to: 0, duration: 650, ease: "cubic.out", jitterDelay: 130, transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "rotate", from: { min: -6482.855, max: 6482.855 }, to: 0, duration: 800, ease: "quart.out", jitterDelay: 120 },
-    { prop: "translateY", from: { min: -1740.253, max: 1740.253 }, to: 0, duration: 650, ease: "cubic.out", jitterDelay: 290 },
-    { prop: "translateZ", from: -650, to: 0, duration: 600, ease: "bounce.out", perspective: 200 },
-    { prop: "scale", from: { min: 0.12, max: 1.5 }, to: 1, duration: 650, ease: "elastic.out", jitterDelay: 420, transformOrigin: { x: 0, y: 1 } },
-    { prop: "scaleY", from: { min: 0.02, max: 0.25 }, to: 1, duration: 650, ease: "bounce.out", jitterDelay: 460, transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
   ],
 };
 
@@ -1612,21 +1223,6 @@ export const shearOutBurst: Preset = {
   ],
 };
 
-export const toppleOutDeep: Preset = {
-  name: "exit/topple-out-deep",
-  split: "character",
-  stagger: 20,
-  staggerOrder: "random",
-  perspective: 1550,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "back.in" },
-    { prop: "translateZ", from: 0, to: -200, duration: 650, ease: "sine.in", perspective: 1600 },
-    { prop: "rotateX", from: 0, to: 60, duration: 400, ease: "sine.in", transformOrigin: { x: 0.5, y: 0 } },
-    { prop: "blur", from: 0, to: 7, duration: 500, ease: "sine.in" },
-  ],
-};
-
 export const compressXKick: Preset = {
   name: "exit/compress-x-kick",
   split: "character",
@@ -1636,17 +1232,6 @@ export const compressXKick: Preset = {
     { prop: "translateX", from: 0, to: 60, duration: 600, ease: "back.in", jitterDelay: 40 },
     { prop: "scaleY", from: 1, to: 0.5, duration: 450, ease: "circ.in" },
     { prop: "scaleX", from: 1, to: 1.2, duration: 400, ease: "back.in", transformOrigin: { x: 0, y: 1 } },
-  ],
-};
-
-export const tiltOutBurst: Preset = {
-  name: "exit/tilt-out-burst",
-  split: "character",
-  stagger: 50,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: -30, duration: 600, ease: "circ.in", transformOrigin: { x: 1, y: 1 } },
-    { prop: "translateY", from: 0, to: { min: -67.962, max: 67.962 }, duration: 450, ease: "sine.in" },
   ],
 };
 
@@ -1704,20 +1289,6 @@ export const flipOutCurl: Preset = {
     { prop: "scaleY", from: 1, to: 2, duration: 600, ease: "expo.in" },
     { prop: "rotateX", from: 0, to: 150, duration: 600, ease: "circ.in", transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
     { prop: "translateY", from: 0, to: 140, duration: 450, ease: "sine.in", jitterDelay: 250 },
-  ],
-};
-
-export const compressYBurst: Preset = {
-  name: "exit/compress-y-burst",
-  split: "character",
-  stagger: 30,
-  perspective: 650,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 250, ease: "power2.in" },
-    { prop: "scaleY", from: 1, to: 4, duration: 650, ease: "sine.in", transformOrigin: { x: 1, y: 1, z: 100 } },
-    { prop: "skewX", from: 0, to: { min: -150.917, max: 150.917 }, duration: 550, ease: "back.in", transformOrigin: { x: 0.5, y: 1 } },
-    { prop: "translateY", from: 0, to: { min: -1006.112, max: 1006.112 }, duration: 500, ease: "power2.in", jitterDelay: 110 },
-    { prop: "translateZ", from: 0, to: -250, duration: 450, ease: "expo.in", perspective: 600 },
   ],
 };
 
@@ -1863,35 +1434,6 @@ export const tipOutBurst: Preset = {
   ],
 };
 
-export const flipOutBurstLoose: Preset = {
-  name: "exit/flip-out-burst-loose",
-  split: "character",
-  stagger: 30,
-  perspective: 650,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 500, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: { min: -906.897, max: 906.897 }, duration: 500, ease: "back.in", jitterDelay: 170, transformOrigin: { x: 0.5, y: 1 } },
-    { prop: "rotateY", from: 0, to: { min: -413.241, max: 413.241 }, duration: 700, ease: "expo.in" },
-    { prop: "blur", from: 0, to: { min: 1.4, max: 17.5 }, duration: 550, ease: "back.in" },
-    { prop: "rotateX", from: 0, to: -480, duration: 700, ease: "circ.in", jitterDelay: 190, perspective: 600 },
-    { prop: "scaleY", from: 1, to: { min: 0.04, max: 0.5 }, duration: 450, ease: "expo.in", transformOrigin: { x: 1, y: 0.5 } },
-  ],
-};
-
-export const pinwheelOutBurst: Preset = {
-  name: "exit/pinwheel-out-burst",
-  split: "character",
-  stagger: 20,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "circ.in" },
-    { prop: "translateY", from: 0, to: -140, duration: 650, ease: "sine.in", jitterDelay: 230 },
-    { prop: "rotate", from: 0, to: -330, duration: 450, ease: "expo.in", jitterDelay: 310, transformOrigin: { x: 0.7, y: 0.3, z: 120 } },
-    { prop: "scaleX", from: 1, to: { min: 0.06, max: 0.75 }, duration: 500, ease: "sine.in", jitterDelay: 160, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "scaleY", from: 1, to: -1, duration: 650, ease: "back.in", jitterDelay: 340, transformOrigin: { x: 0, y: 0.5, z: -100 } },
-  ],
-};
-
 export const foldOutBurst: Preset = {
   name: "exit/fold-out-burst",
   split: "character",
@@ -1934,37 +1476,6 @@ export const flipOutLoose: Preset = {
     { prop: "translateX", from: 0, to: 210, duration: 700, ease: "power2.in", jitterDelay: 240 },
     { prop: "translateZ", from: 0, to: -500, duration: 550, ease: "back.in", perspective: 650 },
     { prop: "rotateX", from: 0, to: 450, duration: 500, ease: "sine.in", perspective: 350 },
-  ],
-};
-
-export const flattenXBurst: Preset = {
-  name: "exit/flatten-x-burst",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "center",
-  perspective: 100,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400, ease: "sine.in" },
-    { prop: "scaleX", from: 1, to: { min: 0.06, max: 0.75 }, duration: 600, ease: "back.in", jitterDelay: 330, transformOrigin: { x: 0, y: 0, z: -100 } },
-    { prop: "scale", from: 1, to: { min: 0.16, max: 2 }, duration: 450, ease: "expo.in", jitterDelay: 140, transformOrigin: { x: 0.5, y: 0.5, z: 150 } },
-    { prop: "blur", from: 0, to: { min: 3, max: 37.5 }, duration: 350, ease: "expo.in" },
-    { prop: "scaleY", from: 1, to: { min: 0.5, max: 6.25 }, duration: 450, ease: "back.in", jitterDelay: 340, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "translateZ", from: 0, to: -400, duration: 650, ease: "sine.in", jitterDelay: 230, perspective: 250 },
-  ],
-};
-
-export const pivotOutBurstCurl: Preset = {
-  name: "exit/pivot-out-burst-curl",
-  split: "character",
-  stagger: 40,
-  staggerOrder: "edges",
-  perspective: 100,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 500, ease: "expo.in" },
-    { prop: "translateY", from: 0, to: { min: -2488.926, max: 2488.926 }, duration: 650, ease: "power2.in", jitterDelay: 310 },
-    { prop: "rotateY", from: 0, to: { min: -2668.401, max: 2668.401 }, duration: 550, ease: "expo.in", jitterDelay: 110, perspective: 150 },
-    { prop: "rotate", from: 0, to: { min: -5049.001, max: 5049.001 }, duration: 450, ease: "expo.in", jitterDelay: 480, transformOrigin: { x: 0, y: 0, z: -100 } },
   ],
 };
 
@@ -2025,24 +1536,6 @@ export const tiltOutBurstWord: Preset = {
   ],
 };
 
-export const turnOutBurstLoose: Preset = {
-  name: "exit/turn-out-burst-loose",
-  split: "character",
-  stagger: 20,
-  staggerOrder: "random",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 500, ease: "power2.in" },
-    { prop: "rotateY", from: 0, to: { min: -1388.916, max: 1388.916 }, duration: 700, ease: "power2.in" },
-    { prop: "scaleY", from: 1, to: 1.5, duration: 400, ease: "back.in", transformOrigin: { x: 1, y: 0.5 } },
-    { prop: "rotate", from: 0, to: -90, duration: 450, ease: "back.in", transformOrigin: { x: 0, y: 1 } },
-    { prop: "translateY", from: 0, to: 180, duration: 550, ease: "circ.in" },
-    { prop: "blur", from: 0, to: { min: 1.6, max: 20 }, duration: 500, ease: "back.in", jitterDelay: 340 },
-    { prop: "translateZ", from: 0, to: -200, duration: 500, ease: "expo.in", jitterDelay: 310 },
-  ],
-};
-
 export const compressXBurst: Preset = {
   name: "exit/compress-x-burst",
   split: "character",
@@ -2066,23 +1559,6 @@ export const liftOutBurst: Preset = {
     { prop: "blur", from: 0, to: 16, duration: 300, ease: "back.in" },
     { prop: "translateY", from: 0, to: { min: -348.088, max: 348.088 }, duration: 600, ease: "sine.in" },
     { prop: "translateX", from: 0, to: { min: -417.724, max: 417.724 }, duration: 400, ease: "sine.in" },
-  ],
-};
-
-export const tiltOutBurstCurl: Preset = {
-  name: "exit/tilt-out-burst-curl",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "end",
-  perspective: 650,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 350, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: { min: -1184.427, max: 1184.427 }, duration: 600, ease: "back.in", jitterDelay: 90, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "blur", from: 0, to: 15, duration: 300, ease: "expo.in", jitterDelay: 340 },
-    { prop: "scale", from: 1, to: { min: 0.06, max: 0.75 }, duration: 550, ease: "sine.in", jitterDelay: 190 },
-    { prop: "scaleX", from: 1, to: { min: 0.8, max: 10 }, duration: 450, ease: "sine.in", jitterDelay: 200 },
-    { prop: "translateZ", from: 0, to: -350, duration: 600, ease: "back.in", jitterDelay: 210 },
-    { prop: "scaleY", from: 1, to: { min: 0, max: 0 }, duration: 600, ease: "back.in", jitterDelay: 190 },
   ],
 };
 
@@ -2113,21 +1589,6 @@ export const flattenYBurst: Preset = {
   ],
 };
 
-export const flipOutLooseDeep: Preset = {
-  name: "exit/flip-out-loose-deep",
-  split: "character",
-  stagger: 45,
-  perspective: 350,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "expo.in" },
-    { prop: "rotateX", from: 0, to: -120, duration: 450, ease: "sine.in", jitterDelay: 50, perspective: 450 },
-    { prop: "rotate", from: 0, to: -420, duration: 550, ease: "back.in", jitterDelay: 50 },
-    { prop: "translateZ", from: 0, to: -400, duration: 550, ease: "back.in", jitterDelay: 130 },
-    { prop: "translateX", from: 0, to: -220, duration: 450, ease: "circ.in", jitterDelay: 320 },
-  ],
-};
-
 export const compressXBurstCurl: Preset = {
   name: "exit/compress-x-burst-curl",
   split: "character",
@@ -2155,23 +1616,6 @@ export const tipOutBurstLoose: Preset = {
   ],
 };
 
-export const turnOutBurstCurl: Preset = {
-  name: "exit/turn-out-burst-curl",
-  split: "character",
-  stagger: 50,
-  perspective: 700,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 350, ease: "sine.in" },
-    { prop: "rotateY", from: 0, to: -300, duration: 650, ease: "circ.in", perspective: 350 },
-    { prop: "translateX", from: 0, to: -110, duration: 700, ease: "back.in", jitterDelay: 290 },
-    { prop: "scale", from: 1, to: { min: 0.14, max: 1.75 }, duration: 400, ease: "back.in", jitterDelay: 70, transformOrigin: { x: 0.3, y: 0.7, z: -120 } },
-    { prop: "blur", from: 0, to: { min: 1.4, max: 17.5 }, duration: 350, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: { min: -1995.835, max: 1995.835 }, duration: 550, ease: "circ.in", jitterDelay: 320 },
-    { prop: "scaleX", from: 1, to: { min: 0.4, max: 5 }, duration: 700, ease: "back.in", jitterDelay: 80 },
-  ],
-};
-
 export const swivelOutBurstCurl: Preset = {
   name: "exit/swivel-out-burst-curl",
   split: "character",
@@ -2184,36 +1628,6 @@ export const swivelOutBurstCurl: Preset = {
     { prop: "translateZ", from: 0, to: -500, duration: 500, ease: "back.in", jitterDelay: 330 },
     { prop: "scale", from: 1, to: 0.6, duration: 500, ease: "expo.in", transformOrigin: { x: 1, y: 0 } },
     { prop: "rotateY", from: 0, to: 180, duration: 700, ease: "expo.in", jitterDelay: 310, transformOrigin: { x: 0.5, y: 0.5, z: 150 } },
-  ],
-};
-
-export const foldOutCurl: Preset = {
-  name: "exit/fold-out-curl",
-  split: "character",
-  stagger: 25,
-  perspective: 600,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 250, ease: "sine.in" },
-    { prop: "scale", from: 1, to: 0.25, duration: 700, ease: "circ.in", jitterDelay: 80 },
-    { prop: "rotateX", from: 0, to: 240, duration: 650, ease: "sine.in", jitterDelay: 160, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "translateZ", from: 0, to: -350, duration: 650, ease: "circ.in", perspective: 400 },
-    { prop: "scaleX", from: 1, to: 2.5, duration: 550, ease: "expo.in", transformOrigin: { x: 1, y: 0.5 } },
-    { prop: "scaleY", from: 1, to: 2.5, duration: 600, ease: "sine.in", jitterDelay: 130, transformOrigin: { x: 0, y: 0.5, z: -100 } },
-    { prop: "translateY", from: 0, to: -210, duration: 650, ease: "power2.in", jitterDelay: 140 },
-  ],
-};
-
-export const tiltOutLoose: Preset = {
-  name: "exit/tilt-out-loose",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "random",
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "circ.in" },
-    { prop: "scaleY", from: 1, to: 0.6, duration: 500, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: -60, duration: 400, ease: "power2.in" },
-    { prop: "translateY", from: 0, to: -40, duration: 650, ease: "sine.in", jitterDelay: 70 },
   ],
 };
 
@@ -2327,22 +1741,6 @@ export const twirlOutBurst: Preset = {
   ],
 };
 
-export const flipOutBurstCurl: Preset = {
-  name: "exit/flip-out-burst-curl",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "end",
-  perspective: 350,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "circ.in" },
-    { prop: "rotate", from: 0, to: { min: -2649.21, max: 2649.21 }, duration: 550, ease: "circ.in", jitterDelay: 220, transformOrigin: { x: 1, y: 1, z: 100 } },
-    { prop: "rotateX", from: 0, to: { min: -814.973, max: 814.973 }, duration: 700, ease: "expo.in", jitterDelay: 230 },
-    { prop: "translateZ", from: 0, to: -250, duration: 650, ease: "expo.in" },
-    { prop: "translateY", from: 0, to: 140, duration: 600, ease: "back.in", jitterDelay: 260 },
-  ],
-};
-
 export const pinwheelOut: Preset = {
   name: "exit/pinwheel-out",
   split: "character",
@@ -2400,18 +1798,6 @@ export const compressXBurstKick: Preset = {
   ],
 };
 
-export const squashXBurstWord: Preset = {
-  name: "exit/squash-x-burst-word",
-  split: "word",
-  stagger: 55,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "expo.in" },
-    { prop: "blur", from: 0, to: { min: 1.6, max: 20 }, duration: 550, ease: "sine.in", jitterDelay: 320 },
-    { prop: "scaleX", from: 1, to: 3, duration: 450, ease: "circ.in" },
-    { prop: "translateX", from: 0, to: -160, duration: 550, ease: "power2.in", jitterDelay: 300 },
-  ],
-};
-
 export const turnOutBurst2: Preset = {
   name: "exit/turn-out-burst-2",
   split: "character",
@@ -2462,18 +1848,6 @@ export const flattenXBurstLoose: Preset = {
     { prop: "skewX", from: 0, to: { min: -98.309, max: 98.309 }, duration: 500, ease: "back.in" },
     { prop: "blur", from: 0, to: { min: 2, max: 25 }, duration: 500, ease: "power2.in" },
     { prop: "scaleX", from: 1, to: 0.1, duration: 600, ease: "power2.in", jitterDelay: 160, transformOrigin: { x: 1, y: 0 } },
-  ],
-};
-
-export const pinwheelOutBurstWord: Preset = {
-  name: "exit/pinwheel-out-burst-word",
-  split: "word",
-  stagger: 45,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 500, ease: "back.in" },
-    { prop: "scale", from: 1, to: 0.65, duration: 500, ease: "power2.in", jitterDelay: 230, transformOrigin: { x: 0.5, y: 0.5, z: 150 } },
-    { prop: "blur", from: 0, to: { min: 2.4, max: 30 }, duration: 500, ease: "power2.in", jitterDelay: 320 },
-    { prop: "rotate", from: 0, to: 450, duration: 450, ease: "sine.in", jitterDelay: 110, transformOrigin: { x: 0.5, y: 0, z: -100 } },
   ],
 };
 
@@ -2539,24 +1913,8 @@ export const turnOutBurstSwarm: Preset = {
   ],
 };
 
-export const foldOutBurstSnap: Preset = {
-  name: "exit/fold-out-burst-snap",
-  split: "character",
-  stagger: 45,
-  staggerOrder: "end",
-  perspective: 300,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "sine.in" },
-    { prop: "rotateX", from: 0, to: -210, duration: 450, ease: "expo.in", transformOrigin: { x: 1, y: 1, z: 100 }, perspective: 650 },
-    { prop: "scaleY", from: 1, to: 4, duration: 450, ease: "expo.in" },
-    { prop: "skewX", from: 0, to: 25, duration: 300, ease: "sine.in", transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "scaleX", from: 1, to: { min: 0, max: -2.5 }, duration: 600, ease: "expo.in" },
-  ],
-};
-
 export const tiltOutBurst2: Preset = {
-  name: "exit/tilt-out-burst-2",
+  name: "exit/tilt-out-burst",
   split: "word",
   stagger: 45,
   perspective: 200,
@@ -2599,22 +1957,6 @@ export const implodeBurst: Preset = {
     { prop: "translateX", from: 0, to: -100, duration: 400, ease: "expo.in", jitterDelay: 60 },
     { prop: "scale", from: 1, to: { min: 0.1, max: 1.25 }, duration: 500, ease: "back.in" },
     { prop: "translateZ", from: 0, to: -450, duration: 500, ease: "back.in" },
-  ],
-};
-
-export const toppleOutBurstLoose: Preset = {
-  name: "exit/topple-out-burst-loose",
-  split: "character",
-  stagger: 50,
-  staggerOrder: "end",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 250, ease: "expo.in" },
-    { prop: "rotate", from: 0, to: -510, duration: 450, ease: "power2.in", transformOrigin: { x: 0.5, y: 1 } },
-    { prop: "translateX", from: 0, to: { min: -930.637, max: 930.637 }, duration: 450, ease: "expo.in", jitterDelay: 120 },
-    { prop: "rotateX", from: 0, to: 300, duration: 400, ease: "circ.in", jitterDelay: 170, transformOrigin: { x: 0.5, y: 0.5, z: 150 }, perspective: 650 },
-    { prop: "scaleY", from: 1, to: 0.3, duration: 400, ease: "back.in", transformOrigin: { x: 1, y: 1 } },
   ],
 };
 
@@ -2664,21 +2006,6 @@ export const foldOutBurstLoose: Preset = {
   ],
 };
 
-export const compressYBurstSnap: Preset = {
-  name: "exit/compress-y-burst-snap",
-  split: "character",
-  stagger: 25,
-  staggerOrder: "random",
-  perspective: 500,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 350, ease: "circ.in" },
-    { prop: "scaleY", from: 1, to: { min: 0, max: -2.5 }, duration: 600, ease: "expo.in", transformOrigin: { x: 0, y: 1 } },
-    { prop: "skewX", from: 0, to: 20, duration: 350, ease: "sine.in" },
-    { prop: "translateZ", from: 0, to: -550, duration: 650, ease: "expo.in" },
-    { prop: "blur", from: 0, to: { min: 3, max: 37.5 }, duration: 450, ease: "circ.in", jitterDelay: 100 },
-  ],
-};
-
 export const collapseBurst: Preset = {
   name: "exit/collapse-burst",
   split: "word",
@@ -2689,52 +2016,6 @@ export const collapseBurst: Preset = {
     { prop: "translateX", from: 0, to: { min: -470.244, max: 470.244 }, duration: 600, ease: "expo.in", jitterDelay: 190 },
     { prop: "scale", from: 1, to: { min: 0.06, max: 0.75 }, duration: 500, ease: "circ.in", jitterDelay: 310 },
     { prop: "translateY", from: 0, to: -130, duration: 600, ease: "back.in" },
-  ],
-};
-
-export const swivelOutBurstDeep: Preset = {
-  name: "exit/swivel-out-burst-deep",
-  split: "character",
-  stagger: 25,
-  perspective: 450,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "sine.in" },
-    { prop: "scale", from: 1, to: 0.5, duration: 700, ease: "sine.in", jitterDelay: 180, transformOrigin: { x: 0.5, y: 0.5, z: -150 } },
-    { prop: "translateY", from: 0, to: 150, duration: 550, ease: "sine.in" },
-    { prop: "translateX", from: 0, to: { min: -959.295, max: 959.295 }, duration: 700, ease: "back.in" },
-    { prop: "translateZ", from: 0, to: -500, duration: 500, ease: "sine.in", perspective: 550 },
-    { prop: "rotateY", from: 0, to: 300, duration: 650, ease: "circ.in", jitterDelay: 240 },
-  ],
-};
-
-export const squashXBurstKick: Preset = {
-  name: "exit/squash-x-burst-kick",
-  split: "character",
-  stagger: 35,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450, ease: "back.in" },
-    { prop: "scaleX", from: 1, to: 4, duration: 500, ease: "back.in", jitterDelay: 70, transformOrigin: { x: 1, y: 0.5 } },
-    { prop: "skewX", from: 0, to: { min: -148.366, max: 148.366 }, duration: 350, ease: "expo.in", transformOrigin: { x: 0.5, y: 0, z: -100 } },
-    { prop: "scale", from: 1, to: { min: 0.15, max: 1.875 }, duration: 450, ease: "back.in", transformOrigin: { x: 0, y: 0.5 } },
-  ],
-};
-
-export const toppleOutBurstDeep: Preset = {
-  name: "exit/topple-out-burst-deep",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "end",
-  perspective: 250,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 350, ease: "power2.in" },
-    { prop: "scaleY", from: 1, to: 2, duration: 550, ease: "sine.in", transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "scale", from: 1, to: 0.5, duration: 650, ease: "power2.in" },
-    { prop: "rotateY", from: 0, to: { min: -287.775, max: 287.775 }, duration: 550, ease: "sine.in", jitterDelay: 300, transformOrigin: { x: 0.5, y: 0.5, z: -80 } },
-    { prop: "scaleX", from: 1, to: 0.1, duration: 500, ease: "back.in", jitterDelay: 80, transformOrigin: { x: 0, y: 1 } },
-    { prop: "rotateX", from: 0, to: -540, duration: 450, ease: "expo.in", transformOrigin: { x: 0.5, y: 0.5 }, perspective: 400 },
-    { prop: "rotate", from: 0, to: 360, duration: 700, ease: "power2.in", jitterDelay: 120, transformOrigin: { x: 0, y: 0, z: -100 } },
   ],
 };
 
@@ -2749,21 +2030,6 @@ export const compressYBurstCurl: Preset = {
     { prop: "translateX", from: 0, to: { min: -498.7, max: 498.7 }, duration: 700, ease: "expo.in" },
     { prop: "scaleY", from: 1, to: { min: 0, max: 0 }, duration: 600, ease: "sine.in", transformOrigin: { x: 1, y: 0.5, z: 100 } },
     { prop: "translateZ", from: 0, to: -450, duration: 450, ease: "power2.in", jitterDelay: 270, perspective: 450 },
-  ],
-};
-
-export const pivotOutBurstTrail: Preset = {
-  name: "exit/pivot-out-burst-trail",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "end",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "power2.in" },
-    { prop: "rotateY", from: 0, to: { min: -1866.426, max: 1866.426 }, duration: 600, ease: "power2.in" },
-    { prop: "skewX", from: 0, to: { min: -112.557, max: 112.557 }, duration: 400, ease: "sine.in", jitterDelay: 210, transformOrigin: { x: 0, y: 0.5 } },
-    { prop: "rotate", from: 0, to: -360, duration: 500, ease: "sine.in", jitterDelay: 220 },
   ],
 };
 
@@ -2857,46 +2123,6 @@ export const tiltOutBurstDeep: Preset = {
   ],
 };
 
-export const flattenXBurstWord: Preset = {
-  name: "exit/flatten-x-burst-word",
-  split: "word",
-  stagger: 50,
-  staggerOrder: "center",
-  perspective: 350,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 350, ease: "sine.in" },
-    { prop: "scaleY", from: 1, to: 0, duration: 600, ease: "power2.in", jitterDelay: 420, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "translateY", from: 0, to: 350, duration: 600, ease: "expo.in", jitterDelay: 180 },
-    { prop: "translateZ", from: 0, to: -650, duration: 400, ease: "back.in", jitterDelay: 140, perspective: 200 },
-    { prop: "scaleX", from: 1, to: { min: 0.04, max: 0.5 }, duration: 500, ease: "circ.in", jitterDelay: 340, transformOrigin: { x: 1, y: 0.5, z: 100 } },
-    { prop: "blur", from: 0, to: { min: 5.8, max: 72.5 }, duration: 350, ease: "sine.in" },
-    { prop: "skewX", from: 0, to: { min: -371.071, max: 371.071 }, duration: 550, ease: "power2.in", jitterDelay: 210 },
-  ],
-};
-
-export const tiltOutOutward: Preset = {
-  name: "exit/tilt-out-outward",
-  split: "character",
-  stagger: 25,
-  staggerOrder: "center",
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400, ease: "power2.in" },
-    { prop: "translateY", from: 0, to: 50, duration: 450, ease: "sine.in" },
-    { prop: "rotate", from: 0, to: -30, duration: 450, ease: "circ.in" },
-  ],
-};
-
-export const liftOutBurstKick: Preset = {
-  name: "exit/lift-out-burst-kick",
-  split: "character",
-  stagger: 35,
-  staggerOrder: "end",
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "expo.in" },
-    { prop: "translateY", from: 0, to: { min: -106.029, max: 106.029 }, duration: 500, ease: "back.in" },
-  ],
-};
-
 export const swipeOutSnap: Preset = {
   name: "exit/swipe-out-snap",
   split: "character",
@@ -2905,22 +2131,6 @@ export const swipeOutSnap: Preset = {
   animations: [
     { prop: "opacity", from: 1, to: 0, duration: 400, ease: "sine.in" },
     { prop: "translateX", from: 0, to: 30, duration: 450, ease: "expo.in" },
-  ],
-};
-
-export const foldOutBurstKick: Preset = {
-  name: "exit/fold-out-burst-kick",
-  split: "character",
-  stagger: 40,
-  perspective: 200,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300, ease: "expo.in" },
-    { prop: "translateX", from: 0, to: { min: -495.202, max: 495.202 }, duration: 600, ease: "back.in", jitterDelay: 80 },
-    { prop: "blur", from: 0, to: { min: 2.4, max: 30 }, duration: 400, ease: "sine.in", jitterDelay: 280 },
-    { prop: "skewX", from: 0, to: -25, duration: 600, ease: "sine.in", jitterDelay: 90, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "rotateX", from: 0, to: 240, duration: 500, ease: "back.in", jitterDelay: 300 },
-    { prop: "translateY", from: 0, to: 210, duration: 550, ease: "power2.in" },
   ],
 };
 
@@ -2987,26 +2197,6 @@ export const tiltOutBurstKick: Preset = {
   ],
 };
 
-export const pinwheelLoose: Preset = {
-  name: "emphasis/pinwheel-loose",
-  split: "character",
-  stagger: 55,
-  animations: [
-    { prop: "rotate", from: 0, to: 360, duration: 600, ease: "sine.inOut", jitterDelay: 40 },
-  ],
-};
-
-export const turn: Preset = {
-  name: "emphasis/turn",
-  split: "character",
-  stagger: 50,
-  perspective: 900,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateY", from: 0, to: 360, duration: 750, ease: "cubic.out" },
-  ],
-};
-
 export const wiggleOutward: Preset = {
   name: "emphasis/wiggle-outward",
   split: "character",
@@ -3018,28 +2208,6 @@ export const wiggleOutward: Preset = {
   ],
 };
 
-export const beatCurl: Preset = {
-  name: "emphasis/beat-curl",
-  split: "character",
-  stagger: 35,
-  animations: [
-    { prop: "scale", from: 1, to: 1.18, duration: 150, ease: "cubic.out", jitterDelay: 150, transformOrigin: { x: 0.5, y: 0.5, z: 80 } },
-    { prop: "scale", from: 1.18, to: 1, duration: 250, delay: 150, ease: "cubic.out", jitterDelay: 150 },
-  ],
-};
-
-export const foldTapLoose: Preset = {
-  name: "emphasis/fold-tap-loose",
-  split: "word",
-  stagger: 20,
-  perspective: 700,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateX", from: 0, to: 25, duration: 150, ease: "sine.inOut", jitterDelay: 100 },
-    { prop: "rotateX", from: 25, to: 0, duration: 250, delay: 150, ease: "sine.inOut", jitterDelay: 310, transformOrigin: { x: 1, y: 0.5 }, perspective: 250 },
-  ],
-};
-
 export const leanLoose: Preset = {
   name: "emphasis/lean-loose",
   split: "character",
@@ -3047,17 +2215,6 @@ export const leanLoose: Preset = {
   animations: [
     { prop: "rotate", from: 0, to: 15, duration: 175, ease: "cubic.out", jitterDelay: 130 },
     { prop: "rotate", from: 15, to: 0, duration: 225, delay: 175, ease: "cubic.out", jitterDelay: 180 },
-  ],
-};
-
-export const shakeXLoose: Preset = {
-  name: "emphasis/shake-x-loose",
-  split: "word",
-  stagger: 40,
-  staggerOrder: "random",
-  animations: [
-    { prop: "translateX", from: 0, to: 8, duration: 225, ease: "sine.inOut", jitterDelay: 310 },
-    { prop: "translateX", from: 8, to: 0, duration: 200, delay: 225, ease: "sine.inOut", jitterDelay: 290 },
   ],
 };
 
@@ -3158,17 +2315,6 @@ export const pumpTrail: Preset = {
   ],
 };
 
-export const turnCurl: Preset = {
-  name: "emphasis/turn-curl",
-  split: "character",
-  stagger: 30,
-  perspective: 200,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateY", from: 0, to: 360, duration: 700, ease: "sine.inOut", transformOrigin: { x: 0.3, y: 0.7, z: -120 }, perspective: 100 },
-  ],
-};
-
 export const twirlCurl: Preset = {
   name: "emphasis/twirl-curl",
   split: "character",
@@ -3187,28 +2333,6 @@ export const joltYTrail: Preset = {
   animations: [
     { prop: "translateY", from: 0, to: 14, duration: 200, ease: "sine.inOut" },
     { prop: "translateY", from: 14, to: 0, duration: 325, delay: 200, ease: "sine.inOut" },
-  ],
-};
-
-export const pinwheelCurlWord: Preset = {
-  name: "emphasis/pinwheel-curl-word",
-  split: "word",
-  stagger: 45,
-  staggerOrder: "end",
-  animations: [
-    { prop: "rotate", from: 0, to: 360, duration: 800, ease: "sine.inOut", jitterDelay: 250, transformOrigin: { x: 0.5, y: 0, z: -100 } },
-  ],
-};
-
-export const foldTapCurlLoose: Preset = {
-  name: "emphasis/fold-tap-curl-loose",
-  split: "character",
-  stagger: 15,
-  perspective: 250,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateX", from: 0, to: 43.75, duration: 275, ease: "cubic.out", jitterDelay: 250, transformOrigin: { x: 0.5, y: 0.5, z: -150 }, perspective: 100 },
-    { prop: "rotateX", from: 43.75, to: 0, duration: 225, delay: 275, ease: "cubic.out", jitterDelay: 350, transformOrigin: { x: 0, y: 0.5, z: -100 }, perspective: 100 },
   ],
 };
 
@@ -3242,30 +2366,6 @@ export const carouselInward: Preset = {
   ],
 };
 
-export const nodCurl: Preset = {
-  name: "emphasis/nod-curl",
-  split: "word",
-  stagger: 50,
-  perspective: 100,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateX", from: 0, to: -43.75, duration: 225, ease: "sine.inOut", jitterDelay: 150, transformOrigin: { x: 0.5, y: 0.5, z: 150 }, perspective: 100 },
-    { prop: "rotateX", from: -43.75, to: 0, duration: 200, delay: 225, ease: "sine.inOut", jitterDelay: 390, transformOrigin: { x: 0.5, y: 0, z: -100 }, perspective: 150 },
-  ],
-};
-
-export const tipCurlWord: Preset = {
-  name: "emphasis/tip-curl-word",
-  split: "word",
-  stagger: 35,
-  perspective: 100,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "rotateX", from: 0, to: 43.75, duration: 275, ease: "cubic.out", transformOrigin: { x: 1, y: 1, z: 100 }, perspective: 400 },
-    { prop: "rotateX", from: 43.75, to: 0, duration: 350, delay: 275, ease: "cubic.out", transformOrigin: { x: 0.5, y: 0.5, z: -80 }, perspective: 350 },
-  ],
-};
-
 export const joltYTrail2: Preset = {
   name: "emphasis/jolt-y-trail-2",
   split: "character",
@@ -3274,16 +2374,6 @@ export const joltYTrail2: Preset = {
   animations: [
     { prop: "translateY", from: 0, to: -8, duration: 200, ease: "sine.inOut" },
     { prop: "translateY", from: -8, to: 0, duration: 225, delay: 200, ease: "sine.inOut" },
-  ],
-};
-
-export const wiggleLoose: Preset = {
-  name: "emphasis/wiggle-loose",
-  split: "word",
-  stagger: 50,
-  animations: [
-    { prop: "translateX", from: 0, to: 8, duration: 175, ease: "sine.inOut" },
-    { prop: "translateX", from: 8, to: 0, duration: 225, delay: 175, ease: "sine.inOut", jitterDelay: 310 },
   ],
 };
 
@@ -3337,22 +2427,6 @@ export const tumbleScatterTunnelWord: Preset = {
   ],
 };
 
-export const dropScatter: Preset = {
-  name: "enter/drop-scatter",
-  split: "character",
-  stagger: 60,
-  staggerOrder: "edges",
-  perspective: 650,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450 },
-    { prop: "blur", from: 18, to: 0, duration: 800 },
-    { prop: "translateY", from: { min: -273.231, max: 273.231 }, to: 0, duration: 850, jitterDelay: 170 },
-    { prop: "scale", from: 0.6, to: 1, duration: 650, jitterDelay: 320, transformOrigin: { x: 0.5, y: 0, z: -100 } },
-    { prop: "scaleY", from: { min: 0.06, max: 0.75 }, to: 1, duration: 850 },
-    { prop: "translateZ", from: -400, to: 0, duration: 600 },
-  ],
-};
-
 export const twirlScatter2: Preset = {
   name: "enter/twirl-scatter-2",
   split: "character",
@@ -3365,21 +2439,6 @@ export const twirlScatter2: Preset = {
     { prop: "scaleY", from: { min: 0.04, max: 0.5 }, to: 1, duration: 900, jitterDelay: 90 },
     { prop: "rotate", from: -720, to: 0, duration: 750, jitterDelay: 90 },
     { prop: "rotateX", from: { min: -702.872, max: 702.872 }, to: 0, duration: 800, perspective: 500 },
-  ],
-};
-
-export const whirlScatterWord: Preset = {
-  name: "enter/whirl-scatter-word",
-  split: "word",
-  stagger: 20,
-  perspective: 400,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 600 },
-    { prop: "rotateX", from: { min: -673.484, max: 673.484 }, to: 0, duration: 700, transformOrigin: { x: 0, y: 0.5 }, perspective: 250 },
-    { prop: "scaleY", from: { min: 0.02, max: 0.25 }, to: 1, duration: 850, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "rotate", from: { min: -2454.643, max: 2454.643 }, to: 0, duration: 850, jitterDelay: 120 },
-    { prop: "blur", from: { min: 3.4, max: 42.5 }, to: 0, duration: 700 },
   ],
 };
 
@@ -3424,32 +2483,6 @@ export const whirlScatter2: Preset = {
     { prop: "opacity", from: 0, to: 1, duration: 350 },
     { prop: "translateZ", from: -400, to: 0, duration: 850 },
     { prop: "rotate", from: { min: -2796.689, max: 2796.689 }, to: 0, duration: 800, transformOrigin: { x: 0.5, y: 1 } },
-  ],
-};
-
-export const driftLoose: Preset = {
-  name: "enter/drift-loose",
-  split: "character",
-  stagger: 50,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450 },
-    { prop: "translateX", from: 140, to: 0, duration: 850, jitterDelay: 330 },
-    { prop: "blur", from: 13, to: 0, duration: 750, jitterDelay: 280 },
-  ],
-};
-
-export const spinTunnelWord: Preset = {
-  name: "enter/spin-tunnel-word",
-  split: "word",
-  stagger: 55,
-  perspective: 250,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450 },
-    { prop: "translateZ", from: -550, to: 0, duration: 800, perspective: 200 },
-    { prop: "translateY", from: 170, to: 0, duration: 750, jitterDelay: 100 },
-    { prop: "rotateX", from: -360, to: 0, duration: 700, perspective: 450 },
-    { prop: "rotateY", from: 390, to: 0, duration: 650, jitterDelay: 140, transformOrigin: { x: 0, y: 0.5 } },
   ],
 };
 
@@ -3523,44 +2556,6 @@ export const twirlScatter3: Preset = {
     { prop: "scale", from: 0.45, to: 1, duration: 800 },
     { prop: "blur", from: { min: 3, max: 37.5 }, to: 0, duration: 700 },
     { prop: "skewX", from: 35, to: 0, duration: 450, transformOrigin: { x: 0.5, y: 1 } },
-  ],
-};
-
-export const dropScatter2: Preset = {
-  name: "enter/drop-scatter-2",
-  split: "character",
-  stagger: 20,
-  staggerOrder: "edges",
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 450 },
-    { prop: "translateY", from: 200, to: 0, duration: 550, jitterDelay: 60 },
-    { prop: "scaleY", from: { min: 0.06, max: 0.75 }, to: 1, duration: 700, transformOrigin: { x: 0, y: 0 } },
-  ],
-};
-
-export const riseScatterWord: Preset = {
-  name: "enter/rise-scatter-word",
-  split: "word",
-  stagger: 50,
-  staggerOrder: "edges",
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 550 },
-    { prop: "translateY", from: -200, to: 0, duration: 600 },
-    { prop: "scaleX", from: 1.5, to: 1, duration: 750 },
-    { prop: "blur", from: 13, to: 0, duration: 600, jitterDelay: 350 },
-    { prop: "scale", from: { min: 0.12, max: 1.5 }, to: 1, duration: 500, transformOrigin: { x: 1, y: 1 } },
-  ],
-};
-
-export const hazeLooseWord: Preset = {
-  name: "enter/haze-loose-word",
-  split: "word",
-  stagger: 40,
-  animations: [
-    { prop: "opacity", from: 0, to: 1, duration: 350 },
-    { prop: "scale", from: 0.7, to: 1, duration: 550, transformOrigin: { x: 0.5, y: 0.5, z: -150 } },
-    { prop: "scaleY", from: -1, to: 1, duration: 550, jitterDelay: 320, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "blur", from: 16, to: 0, duration: 650, jitterDelay: 220 },
   ],
 };
 
@@ -3775,7 +2770,7 @@ export const hazeScatterSpring: Preset = {
 };
 
 export const whirlScatterWord2: Preset = {
-  name: "enter/whirl-scatter-word-2",
+  name: "enter/whirl-scatter-word",
   split: "word",
   stagger: 40,
   animations: [
@@ -3814,34 +2809,6 @@ export const twirlLoose: Preset = {
   ],
 };
 
-export const whirlScatter7: Preset = {
-  name: "exit/whirl-scatter",
-  split: "word",
-  stagger: 45,
-  staggerOrder: "end",
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400 },
-    { prop: "scaleX", from: 1, to: 1.5, duration: 450, jitterDelay: 230 },
-    { prop: "rotate", from: 0, to: { min: -2447.429, max: 2447.429 }, duration: 550 },
-  ],
-};
-
-export const spinScatter2: Preset = {
-  name: "exit/spin-scatter",
-  split: "character",
-  stagger: 55,
-  staggerOrder: "end",
-  perspective: 500,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 250 },
-    { prop: "translateX", from: 0, to: { min: -383.722, max: 383.722 }, duration: 450 },
-    { prop: "scaleX", from: 1, to: 2, duration: 650, transformOrigin: { x: 0.5, y: 0, z: -100 } },
-    { prop: "rotateY", from: 0, to: { min: -581.038, max: 581.038 }, duration: 650, jitterDelay: 120, transformOrigin: { x: 0.5, y: 0.5, z: 150 }, perspective: 700 },
-    { prop: "rotateX", from: 0, to: 300, duration: 600, perspective: 550 },
-  ],
-};
-
 export const twirlScatterTunnel: Preset = {
   name: "exit/twirl-scatter-tunnel",
   split: "character",
@@ -3852,63 +2819,6 @@ export const twirlScatterTunnel: Preset = {
     { prop: "rotate", from: 0, to: 690, duration: 600 },
     { prop: "translateZ", from: 0, to: -550, duration: 450, perspective: 600 },
     { prop: "scale", from: 1, to: { min: 0.07, max: 0.875 }, duration: 650, jitterDelay: 220, transformOrigin: { x: 0.5, y: 1 } },
-  ],
-};
-
-export const fogScatterTunnel: Preset = {
-  name: "exit/fog-scatter-tunnel",
-  split: "character",
-  stagger: 45,
-  staggerOrder: "end",
-  perspective: 300,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400 },
-    { prop: "scaleX", from: 1, to: { min: 0.02, max: 0.25 }, duration: 400, transformOrigin: { x: 0.5, y: 0.5 } },
-    { prop: "blur", from: 0, to: { min: 3.2, max: 40 }, duration: 450 },
-    { prop: "rotateY", from: 0, to: -240, duration: 500, transformOrigin: { x: 0.5, y: 1, z: 100 } },
-  ],
-};
-
-export const whirlScatter22: Preset = {
-  name: "exit/whirl-scatter-2",
-  split: "character",
-  stagger: 55,
-  perspective: 450,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400 },
-    { prop: "rotate", from: 0, to: { min: -1611.839, max: 1611.839 }, duration: 600, transformOrigin: { x: 1, y: 0 } },
-    { prop: "translateZ", from: 0, to: -550, duration: 400 },
-    { prop: "translateY", from: 0, to: { min: -622.945, max: 622.945 }, duration: 450 },
-    { prop: "scaleX", from: 1, to: { min: 0.8, max: 10 }, duration: 600, jitterDelay: 290 },
-  ],
-};
-
-export const slide: Preset = {
-  name: "exit/slide",
-  split: "character",
-  stagger: 60,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450 },
-    { prop: "translateX", from: 0, to: 140, duration: 700 },
-    { prop: "scaleY", from: 1, to: 0.1, duration: 450 },
-    { prop: "skewX", from: 0, to: -40, duration: 500 },
-    { prop: "scale", from: 1, to: 0.8, duration: 500 },
-  ],
-};
-
-export const spinScatterTunnel: Preset = {
-  name: "exit/spin-scatter-tunnel",
-  split: "word",
-  stagger: 35,
-  perspective: 350,
-  transformOrigin: { x: 0.5, y: 0.5 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300 },
-    { prop: "skewX", from: 0, to: { min: -90.9, max: 90.9 }, duration: 550, jitterDelay: 130, transformOrigin: { x: 0.5, y: 0.5, z: -150 } },
-    { prop: "scaleY", from: 1, to: 2.5, duration: 500, jitterDelay: 280, transformOrigin: { x: 1, y: 0 } },
-    { prop: "rotateY", from: 0, to: { min: -1954.56, max: 1954.56 }, duration: 650, jitterDelay: 330 },
-    { prop: "translateY", from: 0, to: 120, duration: 550 },
   ],
 };
 
@@ -3928,21 +2838,6 @@ export const whirlScatterTunnel: Preset = {
   ],
 };
 
-export const riseScatter: Preset = {
-  name: "exit/rise-scatter",
-  split: "character",
-  stagger: 55,
-  perspective: 400,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400 },
-    { prop: "translateZ", from: 0, to: -850, duration: 450, jitterDelay: 200, perspective: 350 },
-    { prop: "scaleX", from: 1, to: { min: 0.3, max: 3.75 }, duration: 650, jitterDelay: 210, transformOrigin: { x: 0.5, y: 1, z: 100 } },
-    { prop: "translateY", from: 0, to: { min: -1520.202, max: 1520.202 }, duration: 600, jitterDelay: 310 },
-    { prop: "blur", from: 0, to: { min: 3.8, max: 47.5 }, duration: 600, jitterDelay: 200 },
-    { prop: "scale", from: 1, to: { min: 0.14, max: 1.75 }, duration: 500, transformOrigin: { x: 1, y: 0.5 } },
-  ],
-};
-
 export const slideScatter2: Preset = {
   name: "exit/slide-scatter",
   split: "character",
@@ -3959,35 +2854,8 @@ export const slideScatter2: Preset = {
   ],
 };
 
-export const slantScatter2: Preset = {
-  name: "exit/slant-scatter",
-  split: "word",
-  stagger: 25,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 450 },
-    { prop: "skewX", from: 0, to: { min: -343.906, max: 343.906 }, duration: 550, transformOrigin: { x: 0.3, y: 0.7, z: -120 } },
-    { prop: "scaleY", from: 1, to: { min: 0.8, max: 10 }, duration: 450, transformOrigin: { x: 0, y: 0, z: -100 } },
-    { prop: "scaleX", from: 1, to: 2.5, duration: 650, transformOrigin: { x: 0.5, y: 1, z: 100 } },
-  ],
-};
-
-export const whirlScatterTunnel2: Preset = {
-  name: "exit/whirl-scatter-tunnel-2",
-  split: "character",
-  stagger: 45,
-  perspective: 150,
-  transformOrigin: { x: 0.5, y: 1 },
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 300 },
-    { prop: "translateY", from: 0, to: { min: -1828.464, max: 1828.464 }, duration: 700, jitterDelay: 240 },
-    { prop: "skewX", from: 0, to: { min: -452.157, max: 452.157 }, duration: 450, jitterDelay: 280, transformOrigin: { x: 0.5, y: 0.5, z: 150 } },
-    { prop: "rotate", from: 0, to: { min: -3962.384, max: 3962.384 }, duration: 500 },
-    { prop: "rotateX", from: 0, to: { min: -2162.765, max: 2162.765 }, duration: 550, transformOrigin: { x: 0, y: 0, z: -100 }, perspective: 150 },
-  ],
-};
-
 export const whirlScatterTunnel3: Preset = {
-  name: "exit/whirl-scatter-tunnel-3",
+  name: "exit/whirl-scatter-tunnel-2",
   split: "character",
   stagger: 35,
   staggerOrder: "edges",
@@ -4040,7 +2908,7 @@ export const fogScatter2: Preset = {
 };
 
 export const riseScatter2: Preset = {
-  name: "exit/rise-scatter-2",
+  name: "exit/rise-scatter",
   split: "word",
   stagger: 15,
   staggerOrder: "end",
@@ -4055,7 +2923,7 @@ export const riseScatter2: Preset = {
 };
 
 export const riseScatter3: Preset = {
-  name: "exit/rise-scatter-3",
+  name: "exit/rise-scatter-2",
   split: "character",
   stagger: 50,
   staggerOrder: "end",
@@ -4098,7 +2966,7 @@ export const topple2: Preset = {
 };
 
 export const whirlScatter32: Preset = {
-  name: "exit/whirl-scatter-3",
+  name: "exit/whirl-scatter",
   split: "character",
   stagger: 45,
   staggerOrder: "edges",
@@ -4169,15 +3037,6 @@ export const pivot2: Preset = {
   ],
 };
 
-export const pivot3: Preset = {
-  name: "emphasis/pivot-3",
-  split: "word",
-  stagger: 50,
-  animations: [
-    { prop: "rotate", from: 0, to: 360, duration: 500, ease: "power2.inOut" },
-  ],
-};
-
 export const pivotBounce: Preset = {
   name: "emphasis/pivot-bounce",
   split: "character",
@@ -4210,7 +3069,7 @@ export const swivelSnapDepth: Preset = {
 };
 
 export const pivot4: Preset = {
-  name: "emphasis/pivot-4",
+  name: "emphasis/pivot-3",
   split: "character",
   stagger: 50,
   animations: [
@@ -4227,7 +3086,6 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/extend-y-scatter", preset: extendYScatter },
   { name: "enter/extend-x-snap", preset: extendXSnap },
   { name: "enter/tilt-in-spring", preset: tiltInSpring },
-  { name: "enter/spread-x-scatter", preset: spreadXScatter },
   { name: "enter/lean-in-spring", preset: leanInSpring },
   { name: "enter/expand-snap", preset: expandSnap },
   { name: "enter/flip-up-spring", preset: flipUpSpring },
@@ -4239,22 +3097,12 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/slide-bounce", preset: slideBounce },
   { name: "enter/stretch-x-scatter", preset: stretchXScatter },
   { name: "enter/glide-scatter", preset: glideScatter },
-  { name: "enter/tumble-x-scatter", preset: tumbleXScatter },
-  { name: "enter/fold-in-scatter", preset: foldInScatter },
-  { name: "enter/topple-scatter", preset: toppleScatter },
-  { name: "enter/lean-in-scatter", preset: leanInScatter },
   { name: "enter/grow-scatter", preset: growScatter },
-  { name: "enter/approach-spring", preset: approachSpring },
-  { name: "enter/flip-up-scatter", preset: flipUpScatter },
   { name: "enter/unfurl-y-scatter", preset: unfurlYScatter },
   { name: "enter/pivot-curl", preset: pivotCurl },
   { name: "enter/stretch-y-scatter", preset: stretchYScatter },
   { name: "enter/lean-in-scatter-curl", preset: leanInScatterCurl },
-  { name: "enter/lean-in-scatter-loose", preset: leanInScatterLoose },
   { name: "enter/settle-scatter", preset: settleScatter },
-  { name: "enter/swivel-scatter", preset: swivelScatter },
-  { name: "enter/topple-scatter-curl", preset: toppleScatterCurl },
-  { name: "enter/flip-up-scatter-loose", preset: flipUpScatterLoose },
   { name: "enter/expand-scatter", preset: expandScatter },
   { name: "enter/slant-scatter", preset: slantScatter },
   { name: "enter/extend-x-curl", preset: extendXCurl },
@@ -4266,28 +3114,23 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/unfurl-x-scatter", preset: unfurlXScatter },
   { name: "enter/bloom-scatter", preset: bloomScatter },
   { name: "enter/flip-up-scatter-bounce", preset: flipUpScatterBounce },
-  { name: "enter/topple-scatter-loose", preset: toppleScatterLoose },
   { name: "enter/fold-in-scatter-bounce", preset: foldInScatterBounce },
   { name: "enter/swivel-scatter-loose", preset: swivelScatterLoose },
   { name: "enter/swirl-scatter", preset: swirlScatter },
   { name: "enter/twirl-scatter", preset: twirlScatter },
   { name: "enter/extend-x-snap-word", preset: extendXSnapWord },
-  { name: "enter/rotate-y-in-scatter", preset: rotateYInScatter },
   { name: "enter/rise-y-scatter", preset: riseYScatter },
   { name: "enter/lean-scatter", preset: leanScatter },
   { name: "enter/rise-y-scatter-curl", preset: riseYScatterCurl },
-  { name: "enter/swivel-scatter-curl", preset: swivelScatterCurl },
   { name: "enter/whirl-scatter", preset: whirlScatter },
   { name: "enter/pinwheel-scatter", preset: pinwheelScatter },
   { name: "enter/swivel-scatter-deep", preset: swivelScatterDeep },
-  { name: "enter/turn-scatter", preset: turnScatter },
   { name: "enter/fold-in-curl", preset: foldInCurl },
   { name: "enter/turn-scatter-curl", preset: turnScatterCurl },
   { name: "enter/fold-in-scatter-curl", preset: foldInScatterCurl },
   { name: "enter/flip-up-scatter-word", preset: flipUpScatterWord },
   { name: "enter/tilt-in-scatter-word", preset: tiltInScatterWord },
   { name: "enter/unfurl-y-curl", preset: unfurlYCurl },
-  { name: "enter/extend-y-scatter-loose", preset: extendYScatterLoose },
   { name: "enter/extend-y-scatter-word", preset: extendYScatterWord },
   { name: "enter/topple", preset: topple },
   { name: "enter/blur-rise-snap", preset: blurRiseSnap },
@@ -4302,9 +3145,7 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/grow-spring", preset: growSpring },
   { name: "enter/extend-y-scatter-curl", preset: extendYScatterCurl },
   { name: "enter/rotate-y-in-scatter-curl", preset: rotateYInScatterCurl },
-  { name: "enter/topple-scatter-deep", preset: toppleScatterDeep },
   { name: "enter/fold-in-scatter-snap", preset: foldInScatterSnap },
-  { name: "enter/slant-scatter-curl", preset: slantScatterCurl },
   { name: "enter/slant-scatter-spring", preset: slantScatterSpring },
   { name: "enter/rise-y-scatter-loose", preset: riseYScatterLoose },
   { name: "enter/tilt-in-scatter-curl", preset: tiltInScatterCurl },
@@ -4312,7 +3153,6 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/twirl-scatter-curl", preset: twirlScatterCurl },
   { name: "enter/tip-in-scatter", preset: tipInScatter },
   { name: "enter/lift-spring", preset: liftSpring },
-  { name: "enter/rise", preset: rise },
   { name: "enter/stretch-x-bounce", preset: stretchXBounce },
   { name: "enter/unfurl-x-kick", preset: unfurlXKick },
   { name: "enter/rotate-y-in-inward", preset: rotateYInInward },
@@ -4325,31 +3165,21 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/whirl-scatter-curl", preset: whirlScatterCurl },
   { name: "enter/tip-in-scatter-curl", preset: tipInScatterCurl },
   { name: "enter/swirl-loose", preset: swirlLoose },
-  { name: "enter/flip-up-scatter-deep", preset: flipUpScatterDeep },
-  { name: "enter/tip-in-scatter-bounce", preset: tipInScatterBounce },
-  { name: "enter/tumble-x-scatter-curl", preset: tumbleXScatterCurl },
-  { name: "enter/fold-in-scatter-loose", preset: foldInScatterLoose },
   { name: "enter/rotate-y-in-scatter-spring", preset: rotateYInScatterSpring },
   { name: "enter/whirl-scatter-loose", preset: whirlScatterLoose },
-  { name: "enter/flip-up-scatter-2", preset: flipUpScatter2 },
   { name: "enter/tip-in-scatter-snap", preset: tipInScatterSnap },
   { name: "enter/swivel-scatter-inward", preset: swivelScatterInward },
   { name: "enter/topple-scatter-kick", preset: toppleScatterKick },
-  { name: "enter/topple-scatter-2", preset: toppleScatter2 },
-  { name: "enter/tip-in-scatter-loose", preset: tipInScatterLoose },
   { name: "exit/collapse-snap", preset: collapseSnap },
   { name: "exit/lean-out-snap", preset: leanOutSnap },
   { name: "exit/exit-x-burst", preset: exitXBurst },
   { name: "exit/mist-out", preset: mistOut },
   { name: "exit/shear-out-burst", preset: shearOutBurst },
-  { name: "exit/topple-out-deep", preset: toppleOutDeep },
   { name: "exit/compress-x-kick", preset: compressXKick },
-  { name: "exit/tilt-out-burst", preset: tiltOutBurst },
   { name: "exit/rise-out-burst", preset: riseOutBurst },
   { name: "exit/flip-out-burst", preset: flipOutBurst },
   { name: "exit/pivot-out-burst", preset: pivotOutBurst },
   { name: "exit/flip-out-curl", preset: flipOutCurl },
-  { name: "exit/compress-y-burst", preset: compressYBurst },
   { name: "exit/turn-out-burst", preset: turnOutBurst },
   { name: "exit/squash-x-burst", preset: squashXBurst },
   { name: "exit/swivel-out-burst", preset: swivelOutBurst },
@@ -4360,30 +3190,20 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "exit/topple-out-burst-curl", preset: toppleOutBurstCurl },
   { name: "exit/squash-x-burst-curl", preset: squashXBurstCurl },
   { name: "exit/tip-out-burst", preset: tipOutBurst },
-  { name: "exit/flip-out-burst-loose", preset: flipOutBurstLoose },
-  { name: "exit/pinwheel-out-burst", preset: pinwheelOutBurst },
   { name: "exit/fold-out-burst", preset: foldOutBurst },
   { name: "exit/fold-out-burst-curl", preset: foldOutBurstCurl },
   { name: "exit/flip-out-loose", preset: flipOutLoose },
-  { name: "exit/flatten-x-burst", preset: flattenXBurst },
-  { name: "exit/pivot-out-burst-curl", preset: pivotOutBurstCurl },
   { name: "exit/tip-out-burst-curl", preset: tipOutBurstCurl },
   { name: "exit/topple-out-burst-snap", preset: toppleOutBurstSnap },
   { name: "exit/fold-out-burst-2", preset: foldOutBurst2 },
   { name: "exit/tilt-out-burst-word", preset: tiltOutBurstWord },
-  { name: "exit/turn-out-burst-loose", preset: turnOutBurstLoose },
   { name: "exit/compress-x-burst", preset: compressXBurst },
   { name: "exit/lift-out-burst", preset: liftOutBurst },
-  { name: "exit/tilt-out-burst-curl", preset: tiltOutBurstCurl },
   { name: "exit/swivel-out-curl", preset: swivelOutCurl },
   { name: "exit/flatten-y-burst", preset: flattenYBurst },
-  { name: "exit/flip-out-loose-deep", preset: flipOutLooseDeep },
   { name: "exit/compress-x-burst-curl", preset: compressXBurstCurl },
   { name: "exit/tip-out-burst-loose", preset: tipOutBurstLoose },
-  { name: "exit/turn-out-burst-curl", preset: turnOutBurstCurl },
   { name: "exit/swivel-out-burst-curl", preset: swivelOutBurstCurl },
-  { name: "exit/fold-out-curl", preset: foldOutCurl },
-  { name: "exit/tilt-out-loose", preset: tiltOutLoose },
   { name: "exit/lean-out-burst", preset: leanOutBurst },
   { name: "exit/lean-out-burst-word", preset: leanOutBurstWord },
   { name: "exit/lean-out-burst-curl", preset: leanOutBurstCurl },
@@ -4392,58 +3212,39 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "exit/rise-out-kick", preset: riseOutKick },
   { name: "exit/swivel-out-kick", preset: swivelOutKick },
   { name: "exit/twirl-out-burst", preset: twirlOutBurst },
-  { name: "exit/flip-out-burst-curl", preset: flipOutBurstCurl },
   { name: "exit/pinwheel-out", preset: pinwheelOut },
   { name: "exit/turn-out-burst-snap", preset: turnOutBurstSnap },
   { name: "exit/swirl-out-burst", preset: swirlOutBurst },
   { name: "exit/compress-x-burst-kick", preset: compressXBurstKick },
-  { name: "exit/squash-x-burst-word", preset: squashXBurstWord },
   { name: "exit/turn-out-burst-2", preset: turnOutBurst2 },
   { name: "exit/flatten-x-loose", preset: flattenXLoose },
   { name: "exit/pivot-out-burst-loose", preset: pivotOutBurstLoose },
   { name: "exit/flatten-x-burst-loose", preset: flattenXBurstLoose },
-  { name: "exit/pinwheel-out-burst-word", preset: pinwheelOutBurstWord },
   { name: "exit/turn-out-burst-deep", preset: turnOutBurstDeep },
   { name: "exit/lean-out-burst-swarm", preset: leanOutBurstSwarm },
   { name: "exit/topple-out-burst-kick", preset: toppleOutBurstKick },
   { name: "exit/turn-out-burst-swarm", preset: turnOutBurstSwarm },
-  { name: "exit/fold-out-burst-snap", preset: foldOutBurstSnap },
-  { name: "exit/tilt-out-burst-2", preset: tiltOutBurst2 },
+  { name: "exit/tilt-out-burst", preset: tiltOutBurst2 },
   { name: "exit/swivel-out-burst-loose", preset: swivelOutBurstLoose },
   { name: "exit/implode-burst", preset: implodeBurst },
-  { name: "exit/topple-out-burst-loose", preset: toppleOutBurstLoose },
   { name: "exit/swivel-out-loose", preset: swivelOutLoose },
   { name: "exit/compress-x-burst-loose", preset: compressXBurstLoose },
   { name: "exit/fold-out-burst-loose", preset: foldOutBurstLoose },
-  { name: "exit/compress-y-burst-snap", preset: compressYBurstSnap },
   { name: "exit/collapse-burst", preset: collapseBurst },
-  { name: "exit/swivel-out-burst-deep", preset: swivelOutBurstDeep },
-  { name: "exit/squash-x-burst-kick", preset: squashXBurstKick },
-  { name: "exit/topple-out-burst-deep", preset: toppleOutBurstDeep },
   { name: "exit/compress-y-burst-curl", preset: compressYBurstCurl },
-  { name: "exit/pivot-out-burst-trail", preset: pivotOutBurstTrail },
   { name: "exit/twirl-out-burst-loose", preset: twirlOutBurstLoose },
   { name: "exit/flatten-y-curl", preset: flattenYCurl },
   { name: "exit/tip-out-burst-inward", preset: tipOutBurstInward },
   { name: "exit/flatten-x-burst-deep", preset: flattenXBurstDeep },
   { name: "exit/swivel-out-burst-snap", preset: swivelOutBurstSnap },
   { name: "exit/tilt-out-burst-deep", preset: tiltOutBurstDeep },
-  { name: "exit/flatten-x-burst-word", preset: flattenXBurstWord },
-  { name: "exit/tilt-out-outward", preset: tiltOutOutward },
-  { name: "exit/lift-out-burst-kick", preset: liftOutBurstKick },
   { name: "exit/swipe-out-snap", preset: swipeOutSnap },
-  { name: "exit/fold-out-burst-kick", preset: foldOutBurstKick },
   { name: "exit/turn-out-burst-trail", preset: turnOutBurstTrail },
   { name: "exit/topple-out-burst-2", preset: toppleOutBurst2 },
   { name: "exit/flatten-x-curl", preset: flattenXCurl },
   { name: "exit/tilt-out-burst-kick", preset: tiltOutBurstKick },
-  { name: "emphasis/pinwheel-loose", preset: pinwheelLoose },
-  { name: "emphasis/turn", preset: turn },
   { name: "emphasis/wiggle-outward", preset: wiggleOutward },
-  { name: "emphasis/beat-curl", preset: beatCurl },
-  { name: "emphasis/fold-tap-loose", preset: foldTapLoose },
   { name: "emphasis/lean-loose", preset: leanLoose },
-  { name: "emphasis/shake-x-loose", preset: shakeXLoose },
   { name: "emphasis/pinwheel-curl", preset: pinwheelCurl },
   { name: "emphasis/bob", preset: bob },
   { name: "emphasis/whirl-loose", preset: whirlLoose },
@@ -4453,38 +3254,25 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "emphasis/tip-curl", preset: tipCurl },
   { name: "emphasis/swivel-curl", preset: swivelCurl },
   { name: "emphasis/pump-trail", preset: pumpTrail },
-  { name: "emphasis/turn-curl", preset: turnCurl },
   { name: "emphasis/twirl-curl", preset: twirlCurl },
   { name: "emphasis/jolt-y-trail", preset: joltYTrail },
-  { name: "emphasis/pinwheel-curl-word", preset: pinwheelCurlWord },
-  { name: "emphasis/fold-tap-curl-loose", preset: foldTapCurlLoose },
   { name: "emphasis/sway-curl", preset: swayCurl },
   { name: "emphasis/twirl-curl-inward", preset: twirlCurlInward },
   { name: "emphasis/carousel-inward", preset: carouselInward },
-  { name: "emphasis/nod-curl", preset: nodCurl },
-  { name: "emphasis/tip-curl-word", preset: tipCurlWord },
   { name: "emphasis/jolt-y-trail-2", preset: joltYTrail2 },
-  { name: "emphasis/wiggle-loose", preset: wiggleLoose },
   { name: "emphasis/tip-deep", preset: tipDeep },
   { name: "emphasis/tap-x-loose", preset: tapXLoose },
   { name: "emphasis/rock-inward", preset: rockInward },
   { name: "enter/tumble-scatter-tunnel-word", preset: tumbleScatterTunnelWord },
-  { name: "enter/drop-scatter", preset: dropScatter },
   { name: "enter/twirl-scatter-2", preset: twirlScatter2 },
-  { name: "enter/whirl-scatter-word", preset: whirlScatterWord },
   { name: "enter/pivot-scatter-2", preset: pivotScatter2 },
   { name: "enter/tumble-scatter", preset: tumbleScatter },
   { name: "enter/whirl-scatter-2", preset: whirlScatter2 },
-  { name: "enter/drift-loose", preset: driftLoose },
-  { name: "enter/spin-tunnel-word", preset: spinTunnelWord },
   { name: "enter/whirl-scatter-3", preset: whirlScatter3 },
   { name: "enter/spin-scatter", preset: spinScatter },
   { name: "enter/whirl-scatter-4", preset: whirlScatter4 },
   { name: "enter/haze-scatter", preset: hazeScatter },
   { name: "enter/twirl-scatter-3", preset: twirlScatter3 },
-  { name: "enter/drop-scatter-2", preset: dropScatter2 },
-  { name: "enter/rise-scatter-word", preset: riseScatterWord },
-  { name: "enter/haze-loose-word", preset: hazeLooseWord },
   { name: "enter/twirl-scatter-4", preset: twirlScatter4 },
   { name: "enter/whirl-scatter-5", preset: whirlScatter5 },
   { name: "enter/tumble-scatter-2", preset: tumbleScatter2 },
@@ -4500,38 +3288,28 @@ export const ALL_GENERATED: readonly { name: string; preset: Preset }[] = [
   { name: "enter/haze-scatter-3", preset: hazeScatter3 },
   { name: "enter/haze-snap", preset: hazeSnap },
   { name: "enter/haze-scatter-spring", preset: hazeScatterSpring },
-  { name: "enter/whirl-scatter-word-2", preset: whirlScatterWord2 },
+  { name: "enter/whirl-scatter-word", preset: whirlScatterWord2 },
   { name: "enter/slant-scatter-word", preset: slantScatterWord },
   { name: "exit/twirl-loose", preset: twirlLoose },
-  { name: "exit/whirl-scatter", preset: whirlScatter7 },
-  { name: "exit/spin-scatter", preset: spinScatter2 },
   { name: "exit/twirl-scatter-tunnel", preset: twirlScatterTunnel },
-  { name: "exit/fog-scatter-tunnel", preset: fogScatterTunnel },
-  { name: "exit/whirl-scatter-2", preset: whirlScatter22 },
-  { name: "exit/slide", preset: slide },
-  { name: "exit/spin-scatter-tunnel", preset: spinScatterTunnel },
   { name: "exit/whirl-scatter-tunnel", preset: whirlScatterTunnel },
-  { name: "exit/rise-scatter", preset: riseScatter },
   { name: "exit/slide-scatter", preset: slideScatter2 },
-  { name: "exit/slant-scatter", preset: slantScatter2 },
-  { name: "exit/whirl-scatter-tunnel-2", preset: whirlScatterTunnel2 },
-  { name: "exit/whirl-scatter-tunnel-3", preset: whirlScatterTunnel3 },
+  { name: "exit/whirl-scatter-tunnel-2", preset: whirlScatterTunnel3 },
   { name: "exit/pivot-scatter-tunnel", preset: pivotScatterTunnel },
   { name: "exit/fog-scatter", preset: fogScatter },
   { name: "exit/fog-scatter-2", preset: fogScatter2 },
-  { name: "exit/rise-scatter-2", preset: riseScatter2 },
-  { name: "exit/rise-scatter-3", preset: riseScatter3 },
+  { name: "exit/rise-scatter", preset: riseScatter2 },
+  { name: "exit/rise-scatter-2", preset: riseScatter3 },
   { name: "exit/twirl", preset: twirl },
   { name: "exit/topple", preset: topple2 },
-  { name: "exit/whirl-scatter-3", preset: whirlScatter32 },
+  { name: "exit/whirl-scatter", preset: whirlScatter32 },
   { name: "exit/slide-loose", preset: slideLoose },
   { name: "exit/slide-scatter-2", preset: slideScatter22 },
   { name: "exit/twirl-2", preset: twirl2 },
   { name: "emphasis/pivot", preset: pivot },
   { name: "emphasis/pivot-2", preset: pivot2 },
-  { name: "emphasis/pivot-3", preset: pivot3 },
   { name: "emphasis/pivot-bounce", preset: pivotBounce },
   { name: "emphasis/pivot-snap", preset: pivotSnap },
   { name: "emphasis/swivel-snap-depth", preset: swivelSnapDepth },
-  { name: "emphasis/pivot-4", preset: pivot4 },
+  { name: "emphasis/pivot-3", preset: pivot4 },
 ];

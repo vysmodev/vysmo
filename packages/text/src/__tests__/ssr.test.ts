@@ -26,11 +26,11 @@ describe("SSR safety", () => {
     const { HANDCURATED_NAMES } = await import("../presets/index.js");
     expect(fadeUp.name).toBe("enter/fade-up");
     expect(fadeUp.animations.length).toBeGreaterThan(0);
-    // Hand-curated catalog has the 15 starter entries; the registry
+    // Hand-curated catalog has the 14 starter entries; the registry
     // returned by listPresets() may be larger if the Studio has
     // ingested generated presets.
-    expect(HANDCURATED_NAMES).toHaveLength(15);
-    expect(listPresets().length).toBeGreaterThanOrEqual(15);
+    expect(HANDCURATED_NAMES).toHaveLength(14);
+    expect(listPresets().length).toBeGreaterThanOrEqual(14);
     const emphasis = resolvePreset("emphasis/pulse");
     expect(emphasis.animations[0]!.prop).toBe("scale");
   });

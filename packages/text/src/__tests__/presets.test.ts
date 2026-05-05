@@ -6,13 +6,13 @@ import type { PresetName } from "../types.js";
 const ALL = listPresets();
 
 describe("preset catalog", () => {
-  it("exposes 15 hand-curated starter presets — 6 enter, 4 exit, 5 emphasis", () => {
+  it("exposes 14 hand-curated starter presets — 6 enter, 3 exit, 5 emphasis", () => {
     // Asserts the seed catalog only — `listPresets()` also includes any
     // entries authored via the Studio's random generator and ingested
     // into `presets/generated.ts`, which grows independently.
-    expect(HANDCURATED_NAMES).toHaveLength(15);
+    expect(HANDCURATED_NAMES).toHaveLength(14);
     expect(HANDCURATED_NAMES.filter((n) => n.startsWith("enter/"))).toHaveLength(6);
-    expect(HANDCURATED_NAMES.filter((n) => n.startsWith("exit/"))).toHaveLength(4);
+    expect(HANDCURATED_NAMES.filter((n) => n.startsWith("exit/"))).toHaveLength(3);
     expect(HANDCURATED_NAMES.filter((n) => n.startsWith("emphasis/"))).toHaveLength(5);
   });
 

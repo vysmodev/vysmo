@@ -1,6 +1,6 @@
 import type { Preset, PresetName } from "../types.js";
 import { blurIn, depthZoom, elasticRise, fadeUp, flipX, scaleIn } from "./enter.js";
-import { blurOut, fadeDown, flipAway, scaleOut } from "./exit.js";
+import { fadeDown, flipAway, scaleOut } from "./exit.js";
 import { coinFlip, pulse, shake, spin, wobble } from "./emphasis.js";
 import { ALL_GENERATED } from "./generated.js";
 
@@ -12,7 +12,6 @@ const HANDCURATED: Record<string, Preset> = {
   "enter/flip-x": flipX,
   "enter/depth-zoom": depthZoom,
   "exit/fade-down": fadeDown,
-  "exit/blur-out": blurOut,
   "exit/scale-out": scaleOut,
   "exit/flip-away": flipAway,
   "emphasis/pulse": pulse,
@@ -53,7 +52,6 @@ export {
   flipX,
   depthZoom,
   fadeDown,
-  blurOut,
   scaleOut,
   flipAway,
   pulse,

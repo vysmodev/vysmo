@@ -226,7 +226,6 @@ export type HandcuratedPresetName =
   | "enter/flip-x"
   | "enter/depth-zoom"
   | "exit/fade-down"
-  | "exit/blur-out"
   | "exit/scale-out"
   | "exit/flip-away"
   | "emphasis/pulse"

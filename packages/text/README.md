@@ -84,7 +84,7 @@ type TextAnimationSpec = {
 };
 ```
 
-Every field is JSON-serializable (no function references, no CSS strings) — presets travel cleanly through localStorage, network, AI agent output, and a future canvas/Skia runtime that consumes the same data shape.
+Every field is JSON-serializable (no function references, no CSS strings) — presets travel cleanly through localStorage, network, and AI agent output.
 
 ## Splitting
 
@@ -157,7 +157,7 @@ For bulk authoring, the [Studio](https://vysmo.com/text/studio) generates random
 
 ## Characteristics
 
-- **DOM-only today.** A canvas / Skia runtime is planned for the future; the preset format above is already shaped to drive both.
+- **DOM-only.** Renders into the DOM via the standard split + animate flow; the preset shape is plain JSON, so any consumer that interprets `TextAnimationSpec` can drive it.
 - **SSR-safe at module load.** `splitText` throws a readable error if called without a DOM; the module imports cleanly in Node (preset data is reachable; `evaluateSpecs` runs pure-math without DOM).
 - **Zero runtime dependencies** except `@vysmo/animations` and `@vysmo/easings` (both transitive).
 - **Bundle size:** ~26 KB gzipped — dominated by the preset catalog. The runtime is ~3 KB; the rest is data. Tree-shaking the catalog is currently blocked because `animateText` imports `resolvePreset` unconditionally so callers can pass `preset: "name"`.

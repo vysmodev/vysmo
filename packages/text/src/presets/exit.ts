@@ -10,16 +10,6 @@ export const fadeDown: Preset = {
   ],
 };
 
-export const blurOut: Preset = {
-  name: "exit/blur-out",
-  split: "word",
-  stagger: 40,
-  animations: [
-    { prop: "opacity", from: 1, to: 0, duration: 400, ease: "sine.in" },
-    { prop: "blur", from: 0, to: 8, duration: 400, ease: "sine.in" },
-  ],
-};
-
 export const scaleOut: Preset = {
   name: "exit/scale-out",
   split: "character",
