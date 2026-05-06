@@ -90,6 +90,10 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   let destroyed = false;
   let autoplayTimer: ReturnType<typeof setTimeout> | null = null;
   let pendingTween: { stop: () => void } | null = null;
+  // Target slide of the in-flight transition. When a new go()/next()/prev()
+  // arrives while a transition is running, we commit this index as the new
+  // `current` so the new transition starts from the in-flight target.
+  let pendingTo: number | null = null;
   let resolvedSlides: ResolvedSlide[] = [];
 
   // Progress-bar animation state.
@@ -204,12 +208,34 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   }
 
   async function playTransition(from: number, to: number): Promise<void> {
-    if (isTransitioning) return;
+    // If a transition is already in flight, interrupt it: commit the
+    // in-flight target as the new `current` and run a fresh transition
+    // from there to the requested target. Lets users hit arrows / dots
+    // mid-transition and have the slideshow respond immediately.
+    if (isTransitioning && pendingTween && pendingTo !== null) {
+      pendingTween.stop();
+      pendingTween = null;
+      const previous = current;
+      const committed = pendingTo;
+      pendingTo = null;
+      current = committed;
+      isTransitioning = false;
+      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+      dotsMount?.update(current);
+      counterMount?.update(current, resolvedSlides.length);
+      captionsMount?.update(current);
+      emit("change", current, previous);
+      emit("transitionend", previous, current);
+      from = current;
+      if (from === to) return;
+    }
+
     const fromSlide = resolvedSlides[from];
     const toSlide = resolvedSlides[to];
     if (!fromSlide || !toSlide) return;
 
     isTransitioning = true;
+    pendingTo = to;
     const transition = selectTransition(from, to);
     emit("transitionstart", from, to);
     clearAutoplayTimer();
@@ -235,10 +261,12 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     } catch {
       isTransitioning = false;
       pendingTween = null;
+      pendingTo = null;
       return;
     }
 
     pendingTween = null;
+    pendingTo = null;
     const previous = current;
     current = to;
     isTransitioning = false;
