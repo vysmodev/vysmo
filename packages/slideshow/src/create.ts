@@ -180,7 +180,14 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
 
   syncCanvasSize();
 
-  const runner = new Runner({ canvas });
+  // `preserveDrawingBuffer: true` lets us capture the canvas mid-render
+  // via Canvas2D `drawImage` so we can do smooth in-flight transition
+  // hand-offs (see `playTransition` interrupt path). Slight GPU memory
+  // cost; negligible for slideshow-sized canvases.
+  const runner = new Runner({
+    canvas,
+    contextAttributes: { preserveDrawingBuffer: true },
+  });
 
   // --- Slide loading ----------------------------------------------------
 
@@ -208,31 +215,39 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   }
 
   async function playTransition(from: number, to: number): Promise<void> {
-    // If a transition is already in flight, interrupt it: commit the
-    // in-flight target as the new `current` and run a fresh transition
-    // from there to the requested target. Lets users hit arrows / dots
-    // mid-transition and have the slideshow respond immediately.
-    if (isTransitioning && pendingTween && pendingTo !== null) {
+    // If a transition is already in flight, interrupt it smoothly:
+    // capture the current canvas pixels into an offscreen 2D canvas
+    // and use that snapshot as the "from" for the new transition. The
+    // user sees the in-flight state morph directly into the new
+    // target — no visible snap, no double-jump.
+    let actualFromSlide: ResolvedSlide | null = null;
+    if (isTransitioning && pendingTween) {
       pendingTween.stop();
       pendingTween = null;
-      const previous = current;
-      const committed = pendingTo;
+      const snapshot = document.createElement("canvas");
+      snapshot.width = canvas.width || 1;
+      snapshot.height = canvas.height || 1;
+      const sctx = snapshot.getContext("2d");
+      if (sctx) {
+        try {
+          sctx.drawImage(canvas, 0, 0);
+          actualFromSlide = snapshot;
+        } catch {
+          actualFromSlide = null;
+        }
+      }
       pendingTo = null;
-      current = committed;
       isTransitioning = false;
-      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
-      dotsMount?.update(current);
-      counterMount?.update(current, resolvedSlides.length);
-      captionsMount?.update(current);
-      emit("change", current, previous);
-      emit("transitionend", previous, current);
-      from = current;
-      if (from === to) return;
     }
 
-    const fromSlide = resolvedSlides[from];
+    if (!actualFromSlide) {
+      const slide = resolvedSlides[from];
+      if (!slide) return;
+      actualFromSlide = slide;
+    }
+
     const toSlide = resolvedSlides[to];
-    if (!fromSlide || !toSlide) return;
+    if (!toSlide) return;
 
     isTransitioning = true;
     pendingTo = to;
@@ -248,7 +263,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
       ...(options.ease ? { ease: options.ease } : {}),
       onUpdate: (progress) => {
         runner.render(transition, {
-          from: fromSlide,
+          from: actualFromSlide!,
           to: toSlide,
           progress: progress as number,
         });
