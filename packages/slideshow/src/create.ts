@@ -1,4 +1,4 @@
-import { animate } from "@vysmo/animations";
+import { animate, type AnimationHandle } from "@vysmo/animations";
 import { Runner, dissolve, type Transition, type UniformParams } from "@vysmo/transitions";
 import {
   createArrows,
@@ -89,11 +89,19 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   let isTransitioning = false;
   let destroyed = false;
   let autoplayTimer: ReturnType<typeof setTimeout> | null = null;
-  let pendingTween: { stop: () => void } | null = null;
-  // Target slide of the in-flight transition. When a new go()/next()/prev()
-  // arrives while a transition is running, we commit this index as the new
-  // `current` so the new transition starts from the in-flight target.
+  let pendingTween: AnimationHandle<number> | null = null;
+  // Target slide of the in-flight transition. Read by next()/prev() so
+  // rapid clicks during a transition advance from the in-flight target,
+  // not from the stale `current`.
   let pendingTo: number | null = null;
+  // Snapshot of what the in-flight transition is rendering, so an
+  // interrupting call can drive the same transition to completion at
+  // its original visual progress before kicking off the next one.
+  let pendingTransitionState: {
+    transition: Transition<UniformParams>;
+    fromSlide: ResolvedSlide;
+    toIndex: number;
+  } | null = null;
   let resolvedSlides: ResolvedSlide[] = [];
 
   // Progress-bar animation state.
@@ -180,14 +188,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
 
   syncCanvasSize();
 
-  // `preserveDrawingBuffer: true` lets us capture the canvas mid-render
-  // via Canvas2D `drawImage` so we can do smooth in-flight transition
-  // hand-offs (see `playTransition` interrupt path). Slight GPU memory
-  // cost; negligible for slideshow-sized canvases.
-  const runner = new Runner({
-    canvas,
-    contextAttributes: { preserveDrawingBuffer: true },
-  });
+  const runner = new Runner({ canvas });
 
   // --- Slide loading ----------------------------------------------------
 
@@ -214,45 +215,94 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     });
   }
 
+  // When a navigation arrives mid-transition, sprint the in-flight
+  // transition to completion over this many ms before starting the new
+  // one. Short enough to feel responsive, long enough that every "from"
+  // frame for the next transition is a real, fully-rendered slide
+  // (instead of a frozen mid-state, which can look broken).
+  const INTERRUPT_SPRINT_MS = 80;
+
   async function playTransition(from: number, to: number): Promise<void> {
-    // If a transition is already in flight, interrupt it smoothly:
-    // capture the current canvas pixels into an offscreen 2D canvas
-    // and use that snapshot as the "from" for the new transition. The
-    // user sees the in-flight state morph directly into the new
-    // target — no visible snap, no double-jump.
-    let actualFromSlide: ResolvedSlide | null = null;
-    if (isTransitioning && pendingTween) {
+    // Interrupt path: drive the in-flight transition to its target over
+    // ~80ms, commit it, then proceed to the new target. The user sees
+    // a brief "snap to the slide we were heading to, then transition
+    // to the new one" — no half-rendered handoff frame.
+    if (isTransitioning && pendingTween && pendingTransitionState) {
+      const startProgress = pendingTween.value as number;
+      const {
+        transition: inflightTransition,
+        fromSlide: inflightFromSlide,
+        toIndex: inflightTo,
+      } = pendingTransitionState;
+      const inflightToSlide = resolvedSlides[inflightTo];
+
+      // stop() rejects the old finished promise (so the previous
+      // playTransition awaiter unwinds cleanly) and synchronously
+      // re-renders progress 0 — i.e. the from slide. We immediately
+      // overdraw with the captured visual progress to hide that flash.
       pendingTween.stop();
       pendingTween = null;
-      const snapshot = document.createElement("canvas");
-      snapshot.width = canvas.width || 1;
-      snapshot.height = canvas.height || 1;
-      const sctx = snapshot.getContext("2d");
-      if (sctx) {
+      if (inflightToSlide) {
+        runner.render(inflightTransition, {
+          from: inflightFromSlide,
+          to: inflightToSlide,
+          progress: startProgress,
+        });
+
+        const sprint = animate({
+          from: startProgress,
+          to: 1,
+          duration: INTERRUPT_SPRINT_MS,
+          onUpdate: (progress) => {
+            runner.render(inflightTransition, {
+              from: inflightFromSlide,
+              to: inflightToSlide,
+              progress: progress as number,
+            });
+          },
+        });
+        pendingTween = sprint;
         try {
-          sctx.drawImage(canvas, 0, 0);
-          actualFromSlide = snapshot;
+          await sprint.finished;
         } catch {
-          actualFromSlide = null;
+          // Re-interrupted during the sprint — the new caller now
+          // owns isTransitioning / pendingTo / pendingTransitionState.
+          return;
         }
+        pendingTween = null;
       }
-      pendingTo = null;
+
+      // Commit the in-flight transition as completed.
+      const previous = current;
+      current = inflightTo;
       isTransitioning = false;
+      pendingTo = null;
+      pendingTransitionState = null;
+      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+      dotsMount?.update(current);
+      counterMount?.update(current, resolvedSlides.length);
+      captionsMount?.update(current);
+      emit("change", current, previous);
+      emit("transitionend", from, inflightTo);
     }
 
-    if (!actualFromSlide) {
-      const slide = resolvedSlides[from];
-      if (!slide) return;
-      actualFromSlide = slide;
+    // After a possible interrupt `current` may have moved — if it now
+    // matches the requested target there's nothing left to do.
+    if (to === current) {
+      if (isPlaying) scheduleAutoplay();
+      return;
     }
 
+    const fromIdx = current;
+    const fromSlide = resolvedSlides[fromIdx];
     const toSlide = resolvedSlides[to];
-    if (!toSlide) return;
+    if (!fromSlide || !toSlide) return;
 
     isTransitioning = true;
     pendingTo = to;
-    const transition = selectTransition(from, to);
-    emit("transitionstart", from, to);
+    const transition = selectTransition(fromIdx, to);
+    pendingTransitionState = { transition, fromSlide, toIndex: to };
+    emit("transitionstart", fromIdx, to);
     clearAutoplayTimer();
     stopProgressAnimation();
 
@@ -263,25 +313,26 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
       ...(options.ease ? { ease: options.ease } : {}),
       onUpdate: (progress) => {
         runner.render(transition, {
-          from: actualFromSlide!,
+          from: fromSlide,
           to: toSlide,
           progress: progress as number,
         });
       },
     });
-    pendingTween = { stop: () => tween.stop() };
+    pendingTween = tween;
 
     try {
       await tween.finished;
     } catch {
-      isTransitioning = false;
-      pendingTween = null;
-      pendingTo = null;
+      // Either we were interrupted (the interrupt path took over and
+      // will handle commit/cleanup) or stopped during destroy. Either
+      // way, do not commit here.
       return;
     }
 
     pendingTween = null;
     pendingTo = null;
+    pendingTransitionState = null;
     const previous = current;
     current = to;
     isTransitioning = false;
@@ -290,7 +341,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     counterMount?.update(current, resolvedSlides.length);
     captionsMount?.update(current);
     emit("change", current, previous);
-    emit("transitionend", from, to);
+    emit("transitionend", fromIdx, to);
     if (isPlaying) scheduleAutoplay();
   }
 
@@ -315,9 +366,16 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     await playTransition(current, target);
   }
 
+  // During a transition, `current` is still the previous slide — base
+  // navigation on `pendingTo` so rapid Next/Prev clicks advance from
+  // the slide we're heading to, not the one we're leaving.
+  function navBase(): number {
+    return pendingTo ?? current;
+  }
+
   function next(): Promise<void> {
     const length = resolvedSlides.length || options.slides.length;
-    const target = current + 1;
+    const target = navBase() + 1;
     if (target >= length) {
       if (!loop) return Promise.resolve();
       return go(0);
@@ -327,7 +385,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
 
   function prev(): Promise<void> {
     const length = resolvedSlides.length || options.slides.length;
-    const target = current - 1;
+    const target = navBase() - 1;
     if (target < 0) {
       if (!loop) return Promise.resolve();
       return go(length - 1);
