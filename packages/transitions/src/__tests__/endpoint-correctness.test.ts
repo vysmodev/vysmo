@@ -1,64 +1,16 @@
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import {
-  bloomReveal,
-  chromaticPulse,
-  clockWipe,
-  colorPhase,
-  crosshatch,
-  crossZoom,
+  ALL_TRANSITIONS,
+  Runner,
   directionalBurn,
   directionalWarp,
-  dissolve,
-  dreamy,
-  dreamyZoom,
-  dripWipe,
-  emberScatter,
-  filmBurn,
-  filmGrain,
   flowWarp,
-  fluidFlow,
-  glassShatter,
-  glitch,
-  godRaysReveal,
-  gravityPull,
-  gridReveal,
-  heatHaze,
-  inkBloom,
-  inkDiffuse,
-  irisZoom,
   kineticBands,
-  lenticularFlip,
   lightLeak,
-  linearBlur,
-  liquidChrome,
-  liquidMorph,
-  luminaMelt,
-  mosaic,
-  noiseDissolve,
-  pageCurl,
   paintBleed,
-  pinwheel,
-  pixelate,
-  polygonFlip,
-  polkaDotsCurtain,
-  portalDive,
-  prismSplit,
-  push,
-  radialReveal,
-  ripple,
-  rippleWave,
-  Runner,
-  shapeReveal,
-  shockwave,
-  singularity,
   slide,
   smolderingEdge,
-  split,
-  swirl,
   tangentMotionBlur,
-  tileScatter,
-  warpZoom,
-  waveStripes,
   wind,
   wipeDirectional,
   type Transition,
@@ -121,68 +73,10 @@ function assertAllPixelsMatch(
   }
 }
 
-const TRANSITIONS: Array<[string, Transition<UniformParams>]> = [
-  ["dissolve", dissolve as Transition<UniformParams>],
-  ["wipeDirectional", wipeDirectional as Transition<UniformParams>],
-  ["slide", slide as Transition<UniformParams>],
-  ["radialReveal", radialReveal as Transition<UniformParams>],
-  ["crossZoom", crossZoom as Transition<UniformParams>],
-  ["glitch", glitch as Transition<UniformParams>],
-  ["noiseDissolve", noiseDissolve as Transition<UniformParams>],
-  ["clockWipe", clockWipe as Transition<UniformParams>],
-  ["ripple", ripple as Transition<UniformParams>],
-  ["pixelate", pixelate as Transition<UniformParams>],
-  ["kineticBands", kineticBands as Transition<UniformParams>],
-  ["lightLeak", lightLeak as Transition<UniformParams>],
-  ["liquidMorph", liquidMorph as Transition<UniformParams>],
-  ["gridReveal", gridReveal as Transition<UniformParams>],
-  ["warpZoom", warpZoom as Transition<UniformParams>],
-  ["chromaticPulse", chromaticPulse as Transition<UniformParams>],
-  ["push", push as Transition<UniformParams>],
-  ["shapeReveal", shapeReveal as Transition<UniformParams>],
-  ["paintBleed", paintBleed as Transition<UniformParams>],
-  ["shockwave", shockwave as Transition<UniformParams>],
-  ["swirl", swirl as Transition<UniformParams>],
-  ["split", split as Transition<UniformParams>],
-  ["directionalWarp", directionalWarp as Transition<UniformParams>],
-  ["wind", wind as Transition<UniformParams>],
-  ["linearBlur", linearBlur as Transition<UniformParams>],
-  ["luminaMelt", luminaMelt as Transition<UniformParams>],
-  ["pinwheel", pinwheel as Transition<UniformParams>],
-  ["dreamy", dreamy as Transition<UniformParams>],
-  ["tangentMotionBlur", tangentMotionBlur as Transition<UniformParams>],
-  ["colorPhase", colorPhase as Transition<UniformParams>],
-  ["filmBurn", filmBurn as Transition<UniformParams>],
-  ["mosaic", mosaic as Transition<UniformParams>],
-  ["emberScatter", emberScatter as Transition<UniformParams>],
-  ["directionalBurn", directionalBurn as Transition<UniformParams>],
-  ["inkBloom", inkBloom as Transition<UniformParams>],
-  ["smolderingEdge", smolderingEdge as Transition<UniformParams>],
-  ["polkaDotsCurtain", polkaDotsCurtain as Transition<UniformParams>],
-  ["crosshatch", crosshatch as Transition<UniformParams>],
-  ["dreamyZoom", dreamyZoom as Transition<UniformParams>],
-  ["heatHaze", heatHaze as Transition<UniformParams>],
-  ["prismSplit", prismSplit as Transition<UniformParams>],
-  ["irisZoom", irisZoom as Transition<UniformParams>],
-  ["gravityPull", gravityPull as Transition<UniformParams>],
-  ["waveStripes", waveStripes as Transition<UniformParams>],
-  ["flowWarp", flowWarp as Transition<UniformParams>],
-  ["dripWipe", dripWipe as Transition<UniformParams>],
-  ["portalDive", portalDive as Transition<UniformParams>],
-  ["liquidChrome", liquidChrome as Transition<UniformParams>],
-  ["glassShatter", glassShatter as Transition<UniformParams>],
-  ["inkDiffuse", inkDiffuse as Transition<UniformParams>],
-  ["bloomReveal", bloomReveal as Transition<UniformParams>],
-  ["godRaysReveal", godRaysReveal as Transition<UniformParams>],
-  ["fluidFlow", fluidFlow as Transition<UniformParams>],
-  ["lenticularFlip", lenticularFlip as Transition<UniformParams>],
-  ["filmGrain", filmGrain as Transition<UniformParams>],
-  ["singularity", singularity as Transition<UniformParams>],
-  ["polygonFlip", polygonFlip as Transition<UniformParams>],
-  ["pageCurl", pageCurl as Transition<UniformParams>],
-  ["rippleWave", rippleWave as Transition<UniformParams>],
-  ["tileScatter", tileScatter as Transition<UniformParams>],
-];
+// Source of truth for the catalog: ALL_TRANSITIONS from the package.
+// Adding a new transition to the package's index automatically picks it
+// up here.
+const TRANSITIONS = ALL_TRANSITIONS;
 
 describe("endpoint correctness — every transition must be pixel-pure from/to at progress 0/1", () => {
   let runner: Runner;
@@ -205,13 +99,13 @@ describe("endpoint correctness — every transition must be pixel-pure from/to a
     runner.dispose();
   });
 
-  for (const [name, transition] of TRANSITIONS) {
-    it(`${name} at progress=0 is pure "from"`, () => {
+  for (const transition of TRANSITIONS) {
+    it(`${transition.name} at progress=0 is pure "from"`, () => {
       runner.render(transition, { from, to, progress: 0 });
       assertAllPixelsMatch(readPixels(runner), [255, 0, 0]);
     });
 
-    it(`${name} at progress=1 is pure "to"`, () => {
+    it(`${transition.name} at progress=1 is pure "to"`, () => {
       runner.render(transition, { from, to, progress: 1 });
       assertAllPixelsMatch(readPixels(runner), [0, 0, 255]);
     });

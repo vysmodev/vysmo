@@ -22,7 +22,7 @@ describe("SSR safety", () => {
   it("effects are plain data objects — constructible without GL", async () => {
     const { blur, defineEffect } = await import("../index.js");
     expect(blur.name).toBe("blur");
-    expect(blur.defaults.radius).toBe(8);
+    expect(blur.defaults.radius).toBe(16);
     expect(blur.passes).toBe(2);
 
     const custom = defineEffect({

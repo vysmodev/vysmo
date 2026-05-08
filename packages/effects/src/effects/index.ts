@@ -28,3 +28,4 @@ export { datamosh } from "./datamosh.js";
 export { ascii } from "./ascii.js";
 export { dither } from "./dither.js";
 export { gradientMap } from "./gradient-map.js";
+export { ALL_EFFECTS } from "./all.js";

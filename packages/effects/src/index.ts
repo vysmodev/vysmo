@@ -42,4 +42,5 @@ export {
   ascii,
   dither,
   gradientMap,
+  ALL_EFFECTS,
 } from "./effects/index.js";

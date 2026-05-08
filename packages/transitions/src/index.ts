@@ -62,6 +62,7 @@ export {
   rippleWave,
   tileScatter,
   defineTransition,
+  ALL_TRANSITIONS,
 } from "./transitions/index.js";
 export type { DefineTransitionSpec } from "./transitions/index.js";
 export type {
