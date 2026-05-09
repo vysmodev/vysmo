@@ -1,0 +1,55 @@
+{
+  "name": "@vysmo/flipbook-react",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React bindings for @vysmo/flipbook — a <Flipbook> component that mounts a real WebGL flipbook with drag-scrub, keyboard nav, and autoplay; useFlipbook hook for imperative control (next/prev/goTo/seek).",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "flipbook",
+    "page-flip",
+    "page-curl",
+    "webgl",
+    "vysmo"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run && vitest run --config vitest.ssr.config.ts",
+    "test:browser": "vitest run",
+    "test:ssr": "vitest run --config vitest.ssr.config.ts",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@vysmo/flipbook": "workspace:*",
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/browser": "^3.2.4",
+    "@vysmo/flipbook": "workspace:*",
+    "playwright": "^1.59.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}
