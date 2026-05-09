@@ -13,6 +13,9 @@ dist
 
 # Test / coverage
 coverage
+# Vitest browser failure screenshots — ephemeral artifacts from failing
+# runs; not source-of-truth for visual regression here.
+**/__screenshots__/
 
 # Logs
 *.log
