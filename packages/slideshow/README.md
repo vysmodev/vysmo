@@ -55,11 +55,15 @@ Every chrome element is opt-in and individually configurable:
 ```ts
 createSlideshow({
   // ...
-  arrows: { position: "outside", style: "minimal" }, // or `true` for defaults, `false` to disable
-  dots: { position: "bottom", style: "lines" },
+  arrows: { position: "outside-edges", style: "minimal" }, // or `true` for defaults, `false` to disable
+  dots: { position: "bottom-center", style: "lines" },
   counter: { position: "top-right" },
   progress: { position: "top" },
-  captions: { position: "bottom-overlay", alignment: "center" },
+  captions: {
+    texts: ["First slide", "Second slide", "Third slide"],
+    position: "bottom",
+    alignment: "center",
+  },
 });
 ```
 
