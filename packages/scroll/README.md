@@ -26,7 +26,7 @@ import { createScrollProgress } from "@vysmo/scroll";
 
 const handle = createScrollProgress({
   element: document.querySelector(".hero")!,
-  onChange: (p) => console.log(p), // 0..1 as the element sweeps the viewport
+  onProgress: (p) => console.log(p), // 0..1 as the element sweeps the viewport
 });
 
 // later
@@ -45,7 +45,7 @@ const canvas = document.querySelector("canvas")!;
 const runner = new Runner({ canvas });
 
 createScrollTransition({
-  element: document.querySelector(".scroll-section")!,
+  section: document.querySelector(".scroll-section")!,
   runner,
   transition: crossZoom,
   from: imageA,
@@ -63,7 +63,7 @@ import { createScrollEffect } from "@vysmo/scroll";
 const runner = new Runner({ canvas });
 
 createScrollEffect({
-  element: document.querySelector(".hero")!,
+  section: document.querySelector(".hero")!,
   runner,
   effect: blur,
   source: image,

@@ -12,21 +12,36 @@ pnpm add @vysmo/easings
 
 ## Quick start
 
+In JavaScript — pass any easing as the `ease` option:
+
 ```ts
 import { animate } from "@vysmo/animations";
-import { power2Out, spring, bezier } from "@vysmo/easings";
+import { power2Out } from "@vysmo/easings";
 
-// Catalog curve
-animate({ from: 0, to: 100, duration: 600, ease: power2Out, onUpdate });
-
-// Parametric spring (returns an EasingFn)
-animate({ from: 0, to: 100, duration: 800, ease: spring.with({ stiffness: 200, damping: 15 }), onUpdate });
-
-// Custom cubic-bezier
-animate({ from: 0, to: 100, duration: 600, ease: bezier(0.25, 0.1, 0.25, 1), onUpdate });
+animate({
+  from: 0,
+  to: 1,
+  duration: 600,
+  ease: power2Out,
+  onUpdate: (v) => element.style.opacity = String(v),
+});
 ```
 
-Every export is just a `(t: number) => number` (an `EasingFn`). Use it with our `animate()`, your own rAF loop, or anything that takes an easing function.
+In CSS — bake any easing into a `linear()` string:
+
+```ts
+import { toCSSLinear } from "@vysmo/easings/css";
+import { spring } from "@vysmo/easings";
+
+const ease = spring.with({ stiffness: 220, damping: 18 });
+
+document.documentElement.style.setProperty(
+  "--ease-pop",
+  toCSSLinear(ease, 32),
+);
+```
+
+Every export is just a `(t: number) => number` (an `EasingFn`). Use with `animate()`, your own rAF loop, baked to CSS, or anything that takes an easing function. Parametric easings like `spring.with({ ... })` and `bezier(0.25, 0.1, 0.25, 1)` return the same shape — see the catalog below for every option.
 
 ## Catalog
 

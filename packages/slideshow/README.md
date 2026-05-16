@@ -16,19 +16,18 @@ pnpm add @vysmo/slideshow @vysmo/transitions @vysmo/animations @vysmo/easings
 
 ```ts
 import { createSlideshow } from "@vysmo/slideshow";
-import { crossZoom } from "@vysmo/transitions";
+import { paintBleed } from "@vysmo/transitions";
 
 const show = createSlideshow({
-  container: document.querySelector("#hero")!,
-  slides: [
-    { src: "/a.jpg", caption: "Mountains" },
-    { src: "/b.jpg", caption: "Lake" },
-    { src: "/c.jpg", caption: "Forest" },
-  ],
-  transition: crossZoom,
-  autoplay: 4000,
-  arrows: true,
-  dots: true,
+  container: document.querySelector("#stage")!,
+  slides: ["/01.jpg", "/02.jpg", "/03.jpg"],
+  transition: paintBleed,
+  transitionDuration: 900,
+  autoplayDelay: 4000,
+});
+
+show.on("change", (current) => {
+  console.log("now showing slide", current);
 });
 ```
 
@@ -86,7 +85,7 @@ All chrome elements are themeable via CSS custom properties:
 - **Click halves** — left half = previous, right half = next.
 - **Keyboard** — Arrow Left/Right, Home, End.
 - **Swipe** — Touch + mouse drag, optional momentum.
-- **Autoplay** — `autoplay: 4000` (ms) starts the cycle; pauses on hover by default; `pause()` / `play()` to control programmatically.
+- **Autoplay** — `autoplayDelay: 4000` (ms) starts the cycle; pauses while the tab is hidden by default; `pause()` / `play()` to control programmatically.
 
 All four can be turned off independently.
 

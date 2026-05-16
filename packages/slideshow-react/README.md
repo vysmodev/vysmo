@@ -23,6 +23,7 @@ export function Hero() {
     <Slideshow
       slides={["/01.jpg", "/02.jpg", "/03.jpg"]}
       transition={paintBleed}
+      transitionDuration={900}
       autoplayDelay={4000}
       arrows
       dots

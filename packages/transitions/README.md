@@ -7,38 +7,44 @@
 ## Install
 
 ```bash
-pnpm add @vysmo/transitions
+pnpm add @vysmo/transitions @vysmo/animations
 ```
 
-For the runner you also need a way to drive the `progress` value from `0` to `1` over time. Anything works — `requestAnimationFrame`, [`@vysmo/animations`](https://www.npmjs.com/package/@vysmo/animations), [`@vysmo/scroll`](https://www.npmjs.com/package/@vysmo/scroll), Motion, GSAP — the library doesn't care.
+The runner doesn't drive time — you do. The Quick start uses [`@vysmo/animations`](https://www.npmjs.com/package/@vysmo/animations) for a four-line tween from `0` to `1`, but the runner doesn't care: any rAF loop, [`@vysmo/scroll`](https://www.npmjs.com/package/@vysmo/scroll) handler, Motion / GSAP timeline, or scrubbed input works.
 
 ## Quick start
 
-```ts
-import { Runner, crossZoom } from "@vysmo/transitions";
+End-to-end: load two images, drive a transition between them. The runner is thin enough that this is genuinely all you need.
 
-const canvas = document.querySelector("canvas")!;
+```ts
+import { Runner, paintBleed } from "@vysmo/transitions";
+import { animate } from "@vysmo/animations";
+
+const canvas = document.querySelector<HTMLCanvasElement>("canvas")!;
 const runner = new Runner({ canvas });
 
-const from = new Image();
-from.src = "/a.jpg";
-const to = new Image();
-to.src = "/b.jpg";
+// Two images you want to crossfade between.
+const fromImg = new Image();
+const toImg = new Image();
+fromImg.src = "/photo-a.jpg";
+toImg.src = "/photo-b.jpg";
 
-await Promise.all([from.decode(), to.decode()]);
+await Promise.all([fromImg.decode(), toImg.decode()]);
 
-// Hand-rolled rAF driver — replace with @vysmo/animations or any
-// tween library if you prefer:
-const start = performance.now();
-const tick = (now: number) => {
-  const p = Math.min(1, (now - start) / 1200);
-  runner.render(crossZoom, { from, to, progress: p });
-  if (p < 1) requestAnimationFrame(tick);
-};
-requestAnimationFrame(tick);
+// Animate progress 0 → 1 and render every frame.
+animate({
+  from: 0,
+  to: 1,
+  duration: 1200,
+  onUpdate: (p) => runner.render(paintBleed, {
+    from: fromImg,
+    to: toImg,
+    progress: p,
+  }),
+});
 ```
 
-That's the entire shape. `runner.render()` is one draw call per frame, regardless of the transition.
+`runner.render()` is one draw call per frame, regardless of the transition.
 
 ## Tree-shake by what you import
 

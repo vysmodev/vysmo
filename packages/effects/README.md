@@ -12,20 +12,59 @@ pnpm add @vysmo/effects
 
 ## Quick start
 
+Single-pass effect:
+
 ```ts
 import { Runner, blur } from "@vysmo/effects";
 
-const canvas = document.querySelector("canvas")!;
 const runner = new Runner({ canvas });
-
-const image = new Image();
-image.src = "/photo.jpg";
+const image = document.querySelector("img")!;
 await image.decode();
 
-runner.render(blur, { source: image, params: { radius: 12 } });
+runner.render(blur, {
+  source: image,
+  params: { radius: 12 },
+});
 ```
 
-That's the entire shape. `runner.render()` is one draw call (or one pass per multi-pass effect like bloom). Re-render with new params or sources whenever you want a new frame.
+Multi-pass HDR effect — same shape, no extra setup:
+
+```ts
+import { Runner, bloom } from "@vysmo/effects";
+
+const runner = new Runner({ canvas });
+const image = document.querySelector("img")!;
+await image.decode();
+
+// Bloom auto-allocates ping-pong RGBA16F targets internally
+// so highlights survive the bright-pass / blur / composite chain.
+runner.render(bloom, {
+  source: image,
+  params: { intensity: 1.2, threshold: 0.7 },
+});
+```
+
+Author your own — same `defineX` pattern as `@vysmo/transitions`:
+
+```ts
+import { defineEffect, Runner } from "@vysmo/effects";
+
+const tint = defineEffect({
+  name: "tint",
+  defaults: { strength: 0.5, color: [1, 0.4, 0.8] as const },
+  glsl: `
+uniform float uStrength;
+uniform vec3 uColor;
+vec4 effect(vec2 uv) {
+  vec4 src = getSource(uv);
+  return vec4(mix(src.rgb, uColor, uStrength), src.a);
+}`,
+});
+
+new Runner({ canvas }).render(tint, { source: image });
+```
+
+`runner.render()` is one draw call (or one pass per multi-pass effect like bloom). Re-render with new params or sources whenever you want a new frame.
 
 ## Tree-shake by what you import
 
