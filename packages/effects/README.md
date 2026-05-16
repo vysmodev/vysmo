@@ -416,7 +416,7 @@ export const sepia = defineEffect({
   defaults: { strength: 1 },
   glsl: `
     vec4 effect(vec2 uv) {
-      vec4 c = getSourceColor(uv);
+      vec4 c = getSource(uv);
       vec3 sepia = vec3(
         dot(c.rgb, vec3(0.393, 0.769, 0.189)),
         dot(c.rgb, vec3(0.349, 0.686, 0.168)),
@@ -430,7 +430,7 @@ export const sepia = defineEffect({
 runner.render(sepia, { source: image, params: { strength: 0.6 } });
 ```
 
-The Runner wraps the GLSL with the standard header (`#version 300 es`, precision, `uSource` / `uResolution`, `getSourceColor` helper) and maps each `defaults` key to a `u<PascalCase>` uniform.
+The Runner wraps the GLSL with the standard header (`#version 300 es`, precision, `uSource` / `uResolution`, `getSource` helper) and maps each `defaults` key to a `u<PascalCase>` uniform.
 
 For multi-pass effects, set `passes > 1` and read prior passes with `getPrevious(uv)`. For HDR intermediates, set `hdr: true` (requires `EXT_color_buffer_float`; falls back silently when unavailable).
 

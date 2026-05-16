@@ -30,7 +30,7 @@ const handle = createScrollProgress({
 });
 
 // later
-handle.dispose();
+handle.destroy();
 ```
 
 `progress` runs from `0` (element's top edge at the viewport's bottom) to `1` (element's bottom edge at the viewport's top). Pass `ease: (t) => …` to remap — anything from `@vysmo/easings` works.

@@ -77,7 +77,7 @@ function ScrollFlipbook({ pages, section }) {
   useEffect(() => {
     if (!flipbook) return;
     const sub = createScrollProgress({
-      target: section,
+      element: section,
       onProgress: (p) => flipbook.seek(p),
     });
     return () => sub.destroy();
