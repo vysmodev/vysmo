@@ -1,7 +1,6 @@
 {
   "name": "@vysmo/slideshow-react",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "React bindings for @vysmo/slideshow — a <Slideshow> component that drives any of the 60 WebGL transitions between slides, with opt-in arrows / dots / counter / progress / captions; useSlideshow hook for imperative control.",
   "license": "MIT",
   "keywords": [
@@ -52,5 +51,15 @@
     "react-dom": "^19.2.5",
     "typescript": "^5.6.3",
     "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
   }
 }

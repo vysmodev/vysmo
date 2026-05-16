@@ -1,7 +1,6 @@
 {
   "name": "@vysmo/easings",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Curated easing catalog (40+ named curves) + parametric builders (spring, bezier, wiggle, rough, anticipate) + composition modifiers (chain, reverse, mirror, yoyo, blend, slice). Pure math, zero deps. CSS export via toCSSLinear / toCSSBezier; reduced-motion helpers; GSAP-style string parser.",
   "license": "MIT",
   "keywords": [
@@ -60,5 +59,27 @@
     "tinybench": "^6.0.0",
     "typescript": "^5.6.3",
     "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./css": {
+        "types": "./dist/css.d.ts",
+        "import": "./dist/css.js"
+      },
+      "./parse": {
+        "types": "./dist/parse.d.ts",
+        "import": "./dist/parse.js"
+      },
+      "./reduced-motion": {
+        "types": "./dist/reduced-motion.d.ts",
+        "import": "./dist/reduced-motion.js"
+      }
+    }
   }
 }
