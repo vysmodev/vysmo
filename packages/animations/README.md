@@ -64,9 +64,9 @@ Runs a damped harmonic oscillator each frame; `finished` resolves when the mass 
 import { timeline } from "@vysmo/animations";
 
 const tl = timeline()
-  .add({ from: 0, to: 100, duration: 400, onUpdate: tweenA })
-  .add({ from: 0, to: 50,  duration: 600, onUpdate: tweenB }, "<")     // parallel
-  .add({ from: 0, to: 1,   duration: 200, onUpdate: tweenC }, ">+100") // 100ms after prev ends
+  .add({ from: 0, to: 100, duration: 400, onUpdate: (v) => (element.style.translate = `${v}px 0`) })
+  .add({ from: 0, to: 1,   duration: 600, onUpdate: (v) => (element.style.opacity = String(v)) }, "<")     // parallel
+  .add({ from: 0, to: 1.5, duration: 200, onUpdate: (v) => (element.style.scale = String(v)) }, ">+100") // 100ms after prev ends
   .play();
 
 await tl.finished;

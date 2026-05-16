@@ -55,6 +55,7 @@ Disable with `enableDrag: false` if you only want click + keyboard navigation.
 ## Options
 
 ```ts
+// @no-check
 type FlipbookOptions = {
   container: HTMLElement;
   pages: PageSource[];

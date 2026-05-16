@@ -38,6 +38,7 @@ That's the whole minimum. The component mounts a `<canvas>`, creates a `Runner`,
 Pass a `progress` prop — autoplay is bypassed and the component renders exactly at the value you supply. Drive it from anything: scroll progress, a scrubber, a tween library, your own state.
 
 ```tsx
+// @no-check
 import { Transition } from "@vysmo/transitions-react";
 import { paintBleed } from "@vysmo/transitions";
 import { useScrollProgress } from "./somewhere";

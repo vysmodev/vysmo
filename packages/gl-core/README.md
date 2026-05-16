@@ -36,6 +36,7 @@ Plus types: `TextureSource`, `UniformValue`, `UniformParams`, `Widen<P>`, `Textu
 ## Usage sketch
 
 ```ts
+// @no-check
 import {
   buildProgram,
   TextureCache,

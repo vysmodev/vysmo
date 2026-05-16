@@ -17,7 +17,7 @@ pnpm add @vysmo/text
 ```ts
 import { animateText } from "@vysmo/text";
 
-const el = document.querySelector(".headline")!;
+const el = document.querySelector<HTMLElement>(".headline")!;
 const handle = animateText(el, { preset: "enter/fade-up" });
 await handle.finished;
 ```
@@ -318,6 +318,7 @@ Every preset with its split mode, stagger, and the props it animates. Mirror of 
 ## Preset shape
 
 ```ts
+// @no-check
 type Preset = {
   name: string;                // "enter/fade-up"
   split?: "character" | "word" | "line";

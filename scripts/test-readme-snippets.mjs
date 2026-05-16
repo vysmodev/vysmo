@@ -216,6 +216,25 @@ declare const AnimateText: any;
 declare const Slideshow: any;
 declare const Flipbook: any;
 declare const Transition: any;
+
+// Package-level identifiers that fragment-style snippets reference
+// without restating the import. Same rationale: README chapters
+// after the Quick start often show only the relevant API call,
+// assuming the reader knows where it came from.
+declare const animateText: any;
+declare const createSlideshow: any;
+declare const createFlipbook: any;
+declare const createScrollProgress: any;
+declare const createScrollTransition: any;
+declare const createScrollEffect: any;
+declare const bezier: any;
+declare const pageCurl: any;
+declare const dissolve: any;
+declare const crossZoom: any;
+declare const paintBleed: any;
+declare const blur: any;
+declare const bloom: any;
+declare const splitText: any;
 `;
 
 // ---------------------------------------------------------------------
@@ -225,6 +244,11 @@ declare const Transition: any;
 const TSCONFIG = {
   compilerOptions: {
     strict: true,
+    // noImplicitAny intentionally OFF: README snippets are illustrative
+    // and routinely omit param types on callbacks (e.g.
+    // `(from, to) => ...`). We're checking @vysmo API surface — caller
+    // type discipline isn't this tool's concern.
+    noImplicitAny: false,
     noEmit: true,
     noUnusedLocals: false,
     noUnusedParameters: false,
@@ -237,8 +261,13 @@ const TSCONFIG = {
     lib: ["DOM", "DOM.Iterable", "ES2022"],
     baseUrl: ".",
     paths: {
-      "@vysmo/*": ["../packages/*/src"],
+      // Default to each package's src entry, then enumerate every
+      // subpath export the @vysmo/* packages actually expose so README
+      // imports of `@vysmo/easings/css` etc. resolve to the right file.
       "@vysmo/easings/css": ["../packages/easings/src/css"],
+      "@vysmo/easings/parse": ["../packages/easings/src/parse"],
+      "@vysmo/easings/reduced-motion": ["../packages/easings/src/reduced-motion"],
+      "@vysmo/*": ["../packages/*/src"],
     },
   },
   include: ["./*.ts", "./*.tsx", "./_ambient.d.ts"],

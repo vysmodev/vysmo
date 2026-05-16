@@ -256,14 +256,23 @@ Spring presets shipped: `gentleSpring`, `wobblySpring`, `stiffSpring`, `slowSpri
 ## Composition modifiers
 
 ```ts
-import { reverse, mirror, yoyo, chain, blend, slice, power2Out, sineInOut } from "@vysmo/easings";
+import {
+  reverse, mirror, yoyo, chain, blend, slice,
+  power2Out, sineInOut, bounceOut,
+} from "@vysmo/easings";
 
-reverse(power2Out);                    // play it backwards
-mirror(power2Out);                     // half forward, half reversed
-yoyo(sineInOut, { count: 3 });         // oscillate N times
-chain(power2Out, sineInOut, bounceOut); // sequence three easings
-blend(power2Out, sineInOut, 0.5);      // 50/50 mix at every t
-slice(power2Out, 0.2, 0.8);            // use only the middle 60% of the curve
+reverse(power2Out);                  // play it backwards
+mirror(power2Out);                   // half forward, half reversed
+yoyo(sineInOut);                     // out then back — one full oscillation
+blend(power2Out, sineInOut, 0.5);    // 50/50 mix at every t
+slice(power2Out, 0.2, 0.8);          // use only the middle 60% of the curve
+
+// chain takes an array of segments; each segment owns its own ease + duration.
+chain([
+  { ease: power2Out, duration: 0.4 },
+  { ease: sineInOut, duration: 0.4 },
+  { ease: bounceOut, duration: 0.2 },
+]);
 ```
 
 All modifiers return a fresh `EasingFn` — composable, side-effect-free.
@@ -273,16 +282,23 @@ All modifiers return a fresh `EasingFn` — composable, side-effect-free.
 ```ts
 import { toCSSLinear, toCSSBezier, toCSSKeyframes, spring } from "@vysmo/easings";
 
-// CSS `linear()` function — sample any EasingFn into a CSS-compatible curve
-const css = toCSSLinear(spring.with({ stiffness: 100, damping: 10 }), { samples: 24 });
+// CSS `linear()` function — sample any EasingFn into a CSS-compatible curve.
+// Second arg is the sample count (positional; default 40).
+const css = toCSSLinear(spring.with({ stiffness: 100, damping: 10 }), 24);
 // → "linear(0, 0.0123 4.17%, …)"
 
-// Cubic-bezier easings export back to CSS exactly:
-toCSSBezier(bezier(0.25, 0.1, 0.25, 1));
+// Cubic-bezier control points → CSS cubic-bezier() exactly.
+toCSSBezier(0.25, 0.1, 0.25, 1);
 // → "cubic-bezier(0.25, 0.1, 0.25, 1)"
 
-// Sample as @keyframes percentages for full-fidelity CSS animations
-toCSSKeyframes(spring.with({ stiffness: 200 }), { property: "transform", from: "scale(1)", to: "scale(1.5)" });
+// Sample as @keyframes percentages for full-fidelity CSS animations.
+// Signature: (name, property, valueForProgress, ease, samples?)
+toCSSKeyframes(
+  "pop",
+  "transform",
+  (p) => `scale(${1 + p * 0.5})`,
+  spring.with({ stiffness: 200 }),
+);
 ```
 
 ## Reduced-motion helpers

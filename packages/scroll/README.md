@@ -80,7 +80,7 @@ import { scrollPlateau, scrollRange, scrollZones, smoothstep } from "@vysmo/scro
 
 scrollRange(0.2, 0.8);          // remap [0.2, 0.8] → [0, 1]; clamp outside
 scrollPlateau(0.4, 0.6);        // 0..1 with a flat 1.0 plateau between [0.4, 0.6]
-scrollZones([0, 0.3, 0.6, 1]);  // multi-segment phases
+scrollZones(0.2, 0.8);          // inverse of plateau — peaks at the edges, 0 in the middle
 smoothstep;                     // t² (3 - 2t) — common easing for scroll
 ```
 
