@@ -2,6 +2,8 @@
 
 Value-based tweening primitives — `animate()`, `spring()`, `timeline()`, `interpolate()`. DOM-agnostic core that drives anything a number can change: CSS transforms, WebGL uniforms, canvas draws, audio params.
 
+[The Vysmo ecosystem](https://vysmo.com) · [Source](https://github.com/vysmodev)
+
 > **Most users don't import this directly.** It's the runtime under
 > [`@vysmo/text`](https://www.npmjs.com/package/@vysmo/text),
 > [`@vysmo/flipbook`](https://www.npmjs.com/package/@vysmo/flipbook),

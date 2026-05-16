@@ -2,6 +2,8 @@
 
 Minimal WebGL2 plumbing — shader compile / link, uniform dispatch, texture cache, ping-pong framebuffer pool. The shared infra under [`@vysmo/transitions`](https://www.npmjs.com/package/@vysmo/transitions) and [`@vysmo/effects`](https://www.npmjs.com/package/@vysmo/effects).
 
+[The Vysmo ecosystem](https://vysmo.com) · [Source](https://github.com/vysmodev)
+
 > **Most users don't import this directly.** It's the WebGL plumbing the
 > two consumer packages stand on. If you want transitions or effects,
 > install one of those — `gl-core` arrives transitively and you never
