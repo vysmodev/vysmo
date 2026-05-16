@@ -550,9 +550,11 @@ _No params._
 Each transition exports its own `defaults` object. Override per render:
 
 ```ts
+import { pixelate } from "@vysmo/transitions";
+
 runner.render(pixelate, {
   from, to, progress,
-  params: { steps: 60, brightness: 1.4 }, // typed from pixelate.defaults
+  params: { maxBlockSize: 60 }, // typed from pixelate.defaults
 });
 ```
 

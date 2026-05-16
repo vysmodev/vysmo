@@ -399,10 +399,10 @@ animateText(el, { ...spec, respectReducedMotion: true }); // default true — no
 ## Deterministic playback
 
 ```ts
-import { animateText, createTestScheduler } from "@vysmo/text";
-import { createTestScheduler as makeSched } from "@vysmo/animations";
+import { animateText } from "@vysmo/text";
+import { createTestScheduler } from "@vysmo/animations";
 
-const sched = makeSched();
+const sched = createTestScheduler();
 const handle = animateText(el, { ...spec, scheduler: sched });
 sched.tick(0);
 sched.tick(500); // … etc

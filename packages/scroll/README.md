@@ -67,7 +67,7 @@ createScrollEffect({
   runner,
   effect: blur,
   source: image,
-  params: (progress) => ({ radius: progress * 20 }), // unblur as user scrolls down
+  paramsAt: (progress) => ({ radius: progress * 20 }), // unblur as user scrolls down
 });
 ```
 

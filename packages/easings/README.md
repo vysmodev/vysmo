@@ -322,7 +322,7 @@ export const easeWithDefaults = defineEasing("my-ease", (t) => 1 - Math.pow(1 - 
 export const customSpring = defineParametricEasing(
   "my-spring",
   { stiffness: 100 },
-  ({ stiffness }) => (t) => /* ... */ t,
+  ({ stiffness }) => (t) => 1 - Math.pow(1 - t, stiffness / 50),
 );
 ```
 
