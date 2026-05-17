@@ -142,6 +142,31 @@ export interface SlideshowOptions {
   captions?: false | CaptionsOptions;
   /** Accessible label exposed via `aria-label`. Default `"Slideshow"`. */
   ariaLabel?: string;
+  /**
+   * Lazy-load mode. When `true`, only the current slide and its
+   * neighbours (see `preloadWindow`) are fetched + uploaded to the GPU;
+   * out-of-window slides are evicted from the texture cache via the
+   * runner's LRU policy. Default `false` — all slides are eagerly
+   * resolved and held in memory (preserves the v0.1 behavior).
+   *
+   * Use this for galleries with more than a handful of slides, or when
+   * driving the slideshow from a Next.js / Astro page where the
+   * homepage shouldn't block on dozens of image decodes. Works with
+   * URL string sources; `HTMLImageElement` / `HTMLCanvasElement`
+   * sources passed in still load up front (they're already in memory
+   * by definition).
+   */
+  lazy?: boolean;
+  /**
+   * In `lazy: true` mode, how many slides on each side of the current
+   * index to keep resident on the GPU. Default 1 — the current slide
+   * plus immediate prev/next are always loaded ahead of user navigation.
+   * Higher values trade GPU memory for fewer load stalls on rapid
+   * navigation.
+   *
+   * Ignored when `lazy` is false.
+   */
+  preloadWindow?: number;
 }
 
 export interface GoOptions {

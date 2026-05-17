@@ -1,5 +1,5 @@
 import { FramebufferPool, TextureCache } from "@vysmo/gl-core";
-import type { TextureSource } from "@vysmo/gl-core";
+import type { TextureCacheOptions, TextureSource } from "@vysmo/gl-core";
 import type {
   RenderArgs,
   Transition,
@@ -61,6 +61,15 @@ export interface RunnerOptions {
    * `webglcontextrestored` event. After this, `render()` works again.
    */
   onContextRestored?: () => void;
+  /**
+   * Options forwarded to the internal `TextureCache`. Most callers can
+   * ignore this; pass `{ maxUrlEntries: N }` if you're driving the
+   * runner from a lazy-loading consumer (e.g. a slideshow with hundreds
+   * of slides) to keep GPU memory bounded — least-recently-used URL
+   * textures are evicted when the cache size exceeds N. DOM-source
+   * textures are not subject to LRU.
+   */
+  textureCache?: TextureCacheOptions;
 }
 
 /**
@@ -86,6 +95,7 @@ export class Runner {
   readonly gl: WebGL2RenderingContext;
   private canvas: HTMLCanvasElement | OffscreenCanvas;
   private textures: TextureCache;
+  private readonly textureCacheOptions: TextureCacheOptions | undefined;
   private programs = new WeakMap<Transition<UniformParams>, CompiledTransition>();
   private vao: WebGLVertexArrayObject;
   private defaultDisplacement: WebGLTexture;
@@ -107,7 +117,7 @@ export class Runner {
     this.contextLost = false;
     const vao = this.gl.createVertexArray();
     if (vao) this.vao = vao;
-    this.textures = new TextureCache(this.gl);
+    this.textures = new TextureCache(this.gl, this.textureCacheOptions);
     this.defaultDisplacement = this.createDefaultDisplacement();
     this.defaultEnvironment = this.createDefaultEnvironment();
     this.defaultPrevious = this.createDefaultPrevious();
@@ -135,7 +145,8 @@ export class Runner {
       );
     }
     this.gl = gl;
-    this.textures = new TextureCache(gl);
+    this.textureCacheOptions = options.textureCache;
+    this.textures = new TextureCache(gl, options.textureCache);
     this.fbPool = new FramebufferPool(gl);
 
     const vao = gl.createVertexArray();

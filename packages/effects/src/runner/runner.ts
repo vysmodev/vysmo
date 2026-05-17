@@ -4,6 +4,7 @@ import {
   buildProgram,
   paramKeyToUniformName,
   setUniform,
+  type TextureCacheOptions,
   type TextureSource,
   type UniformParams,
   type UniformValue,
@@ -37,6 +38,14 @@ export interface RunnerOptions {
    * `webglcontextrestored` event. `render()` works again afterwards.
    */
   onContextRestored?: () => void;
+  /**
+   * Options forwarded to the internal `TextureCache`. The effects
+   * Runner defaults to `{ minFilter: LINEAR, generateMipmaps: false }`
+   * (effects sample neighbours, not LOD); passing your own options
+   * merges with those defaults. Pass `{ maxUrlEntries: N }` to bound
+   * URL-keyed GPU texture memory under lazy-loading consumers.
+   */
+  textureCache?: TextureCacheOptions;
 }
 
 /**
@@ -64,6 +73,7 @@ export class Runner {
   readonly gl: WebGL2RenderingContext;
   private canvas: HTMLCanvasElement | OffscreenCanvas;
   private textures: TextureCache;
+  private readonly textureCacheOptions: TextureCacheOptions;
   private programs = new WeakMap<Effect<UniformParams>, CompiledEffect>();
   private vao: WebGLVertexArrayObject;
   private defaultPrevious: WebGLTexture;
@@ -82,10 +92,7 @@ export class Runner {
     this.contextLost = false;
     const vao = this.gl.createVertexArray();
     if (vao) this.vao = vao;
-    this.textures = new TextureCache(this.gl, {
-      minFilter: this.gl.LINEAR,
-      generateMipmaps: false,
-    });
+    this.textures = new TextureCache(this.gl, this.textureCacheOptions);
     this.defaultPrevious = createSolidTexture(this.gl, 0, 0, 0);
     this.fbPool.resetContextState();
     this.onContextRestored?.();
@@ -110,10 +117,14 @@ export class Runner {
       );
     }
     this.gl = gl;
-    this.textures = new TextureCache(gl, {
+    // Effects default to LINEAR + no mipmaps (effects sample neighbours,
+    // not LOD); merge any caller-provided options on top.
+    this.textureCacheOptions = {
       minFilter: gl.LINEAR,
       generateMipmaps: false,
-    });
+      ...options.textureCache,
+    };
+    this.textures = new TextureCache(gl, this.textureCacheOptions);
     this.fbPool = new FramebufferPool(gl);
 
     const vao = gl.createVertexArray();

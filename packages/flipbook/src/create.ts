@@ -10,6 +10,9 @@ import type {
   FlipbookOptions,
 } from "./types.js";
 
+/** What can be passed to `runner.render()` after resolution. */
+type RenderPage = string | HTMLImageElement | HTMLCanvasElement;
+
 type EventMap = {
   change: (current: number, previous: number) => void;
   flipstart: (from: number, to: number) => void;
@@ -56,6 +59,9 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
   const dragCommitThreshold = clamp01(options.dragCommitThreshold ?? DEFAULT_DRAG_COMMIT);
   const keyboardNav = options.keyboardNavigation ?? true;
   const ariaLabel = options.ariaLabel ?? "Flipbook";
+  const lazy = options.lazy === true;
+  const preloadWindow = Math.max(0, Math.floor(options.preloadWindow ?? 1));
+  const pageCount = options.pages.length;
 
   // Autoplay config: false/undefined → off, true → default interval,
   // { intervalMs } → custom interval. Resolved into a normalized shape.
@@ -128,18 +134,104 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
 
   syncCanvasSize();
 
-  const runner = new Runner({ canvas });
-
-  const ready = resolveAll(options.pages).then((resolved) => {
-    resolvedPages = resolved;
-    if (!destroyed) renderIdle();
+  // Lazy mode: bound the runner's URL-keyed texture cache to roughly
+  // the size of our preload window. +2 cushion handles the "drag-scrubbing
+  // across an edge of the window" moment where both the new neighbour
+  // and the pre-existing edge are momentarily resident.
+  const runner = new Runner({
+    canvas,
+    ...(lazy
+      ? { textureCache: { maxUrlEntries: 2 * preloadWindow + 1 + 2 } }
+      : {}),
   });
+
+  // --- Page loading -----------------------------------------------------
+  //
+  // Eager (default): every page decoded up front; `resolvedPages[i]` is
+  // populated for all i once `ready` resolves.
+  //
+  // Lazy: only current + N preload-window neighbours are loaded. URL
+  // pages pass through to runner (fetch + decode + upload via texture
+  // cache + LRU eviction). Non-URL DOM pages are always considered ready.
+
+  /**
+   * What `runner.render()` consumes for page index `i`. Eager → the
+   * pre-decoded image/canvas. Lazy → the original source (URL string
+   * or DOM element); URLs must have been preloaded via `loadWindowAround`.
+   */
+  function renderSource(i: number): RenderPage | undefined {
+    if (!lazy) return resolvedPages[i];
+    return options.pages[i];
+  }
+
+  function isLoaded(i: number): boolean {
+    if (!lazy) return resolvedPages[i] !== undefined;
+    const src = options.pages[i];
+    if (typeof src !== "string") return true;
+    return loadedLazy.has(i);
+  }
+
+  const loadedLazy = new Set<number>();
+  const pendingLazyLoads = new Map<number, Promise<void>>();
+
+  function loadIndexLazy(i: number): Promise<void> {
+    if (!lazy || loadedLazy.has(i)) return Promise.resolve();
+    const src = options.pages[i];
+    if (typeof src !== "string") {
+      loadedLazy.add(i);
+      return Promise.resolve();
+    }
+    const pending = pendingLazyLoads.get(i);
+    if (pending) return pending;
+    const p = runner
+      .preload([src])
+      .then(() => {
+        loadedLazy.add(i);
+        pendingLazyLoads.delete(i);
+      })
+      .catch((err) => {
+        pendingLazyLoads.delete(i);
+        throw err;
+      });
+    pendingLazyLoads.set(i, p);
+    return p;
+  }
+
+  async function loadWindowAround(i: number): Promise<void> {
+    if (!lazy) return;
+    await loadIndexLazy(i);
+    for (let offset = 1; offset <= preloadWindow; offset++) {
+      const ahead = wrapIndex(i + offset);
+      const behind = wrapIndex(i - offset);
+      if (ahead !== null) void loadIndexLazy(ahead);
+      if (behind !== null) void loadIndexLazy(behind);
+    }
+  }
+
+  function wrapIndex(i: number): number | null {
+    if (pageCount === 0) return null;
+    if (loop) {
+      return ((i % pageCount) + pageCount) % pageCount;
+    }
+    if (i < 0 || i >= pageCount) return null;
+    return i;
+  }
+
+  const ready = lazy
+    ? loadWindowAround(current).then(() => {
+        if (!destroyed) renderIdle();
+      })
+    : resolveAll(options.pages).then((resolved) => {
+        resolvedPages = resolved;
+        if (!destroyed) renderIdle();
+      });
 
   // --- Rendering --------------------------------------------------------
 
   function renderIdle(): void {
-    const page = resolvedPages[current];
-    if (!page || destroyed) return;
+    if (destroyed) return;
+    const page = renderSource(current);
+    if (!page || !isLoaded(current)) return;
     runner.render(pageCurl, {
       from: page,
       to: page,
@@ -163,9 +255,10 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
     // it disappeared into during the forward flip, unrolling backward.
     const earlier = direction === "forward" ? fromIdx : toIdx;
     const later = direction === "forward" ? toIdx : fromIdx;
-    const earlierPage = resolvedPages[earlier];
-    const laterPage = resolvedPages[later];
+    const earlierPage = renderSource(earlier);
+    const laterPage = renderSource(later);
     if (!earlierPage || !laterPage || destroyed) return;
+    if (!isLoaded(earlier) || !isLoaded(later)) return;
     const forwardProgress =
       direction === "forward" ? internalProgress : 1 - internalProgress;
     runner.render(pageCurl, {
@@ -179,13 +272,12 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
   // --- Navigation -------------------------------------------------------
 
   function targetFor(direction: Direction): number | null {
-    const length = resolvedPages.length || options.pages.length;
     if (direction === "forward") {
-      if (current + 1 < length) return current + 1;
+      if (current + 1 < pageCount) return current + 1;
       return loop ? 0 : null;
     }
     if (current - 1 >= 0) return current - 1;
-    return loop ? length - 1 : null;
+    return loop ? pageCount - 1 : null;
   }
 
   async function playFlip(
@@ -196,6 +288,10 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
   ): Promise<void> {
     if (destroyed) return;
     if (isFlipping) return;
+    // Lazy mode: ensure target page is loaded before we start flipping
+    // (renderFlip would otherwise silently no-op for an un-preloaded URL).
+    // Pulls neighbours into the window for the next flip too.
+    if (lazy) await loadWindowAround(toIdx);
     isFlipping = true;
     if (startProgress <= 0) emit("flipstart", fromIdx, toIdx);
 
@@ -223,7 +319,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
     current = toIdx;
     isFlipping = false;
     renderIdle();
-    status.textContent = `Page ${current + 1} of ${resolvedPages.length}`;
+    status.textContent = `Page ${current + 1} of ${pageCount}`;
     emit("change", current, previous);
     emit("flipend", fromIdx, toIdx);
   }
@@ -277,14 +373,14 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
 
   async function goTo(index: number, opts: FlipOptions = {}): Promise<void> {
     if (destroyed || dragState !== "idle") return;
-    const length = resolvedPages.length || options.pages.length;
-    const target = clampIndex(index, length);
+    const target = clampIndex(index, pageCount);
     if (target === current && !isFlipping) return;
     if (opts.instant) {
+      if (lazy) await loadWindowAround(target);
       const previous = current;
       current = target;
       renderIdle();
-      status.textContent = `Page ${current + 1} of ${resolvedPages.length}`;
+      status.textContent = `Page ${current + 1} of ${pageCount}`;
       emit("change", current, previous);
       return;
     }
@@ -450,7 +546,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
         void goTo(0);
         break;
       case "End":
-        void goTo(resolvedPages.length - 1);
+        void goTo(pageCount - 1);
         break;
       default:
         handled = false;
@@ -489,7 +585,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
   void ready.then(() => {
     if (!destroyed) {
       renderIdle();
-      status.textContent = `Page ${current + 1} of ${resolvedPages.length}`;
+      status.textContent = `Page ${current + 1} of ${pageCount}`;
     }
   });
 
@@ -535,7 +631,7 @@ export function createFlipbook(options: FlipbookOptions): FlipbookHandle {
       isSeeking = false;
       seekTarget = null;
       renderIdle();
-      status.textContent = `Page ${current + 1} of ${resolvedPages.length}`;
+      status.textContent = `Page ${current + 1} of ${pageCount}`;
       emit("change", current, previous);
       return;
     }

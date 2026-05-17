@@ -27,6 +27,9 @@ import type {
   TransitionSelector,
 } from "./types.js";
 
+/** What can be passed to `runner.render()` after resolution. */
+type RenderSlide = string | HTMLImageElement | HTMLCanvasElement;
+
 type EventMap = {
   change: (current: number, previous: number) => void;
   transitionstart: (from: number, to: number) => void;
@@ -73,6 +76,8 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   const pauseOnHidden = options.pauseOnHidden ?? true;
   const pauseOnHover = options.pauseOnHover ?? false;
   const ariaLabel = options.ariaLabel ?? "Slideshow";
+  const lazy = options.lazy === true;
+  const preloadWindow = Math.max(0, Math.floor(options.preloadWindow ?? 1));
 
   const arrowsOpts = asObject<ArrowsOptions>(options.arrows, {});
   const dotsOpts = asObject<DotsOptions>(options.dots, {});
@@ -99,7 +104,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   // its original visual progress before kicking off the next one.
   let pendingTransitionState: {
     transition: Transition<UniformParams>;
-    fromSlide: ResolvedSlide;
+    fromSlide: RenderSlide;
     toIndex: number;
   } | null = null;
   let resolvedSlides: ResolvedSlide[] = [];
@@ -188,14 +193,122 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
 
   syncCanvasSize();
 
-  const runner = new Runner({ canvas });
+  // In lazy mode, bound the runner's URL-keyed texture cache to roughly
+  // the size of our preload window so old slides are GC'd from the GPU
+  // as we navigate. +2 cushion: covers the "transitioning to a fresh
+  // edge of the window" moment where both the new neighbour AND the
+  // pre-existing edge are temporarily resident.
+  const runner = new Runner({
+    canvas,
+    ...(lazy
+      ? { textureCache: { maxUrlEntries: 2 * preloadWindow + 1 + 2 } }
+      : {}),
+  });
 
   // --- Slide loading ----------------------------------------------------
+  //
+  // Eager mode (default): decode every slide into a DOM image up front;
+  // `resolvedSlides[i]` is set for every i once `ready` resolves.
+  //
+  // Lazy mode: only the current slide + N preload-window neighbours are
+  // loaded at any time. URL slides pass straight through to the runner
+  // (which handles fetch + decode + upload via its texture cache + LRU
+  // eviction). Non-URL DOM-source slides are always considered loaded
+  // (they're already in memory by definition).
 
-  const ready = resolveAll(options.slides).then((resolved) => {
-    resolvedSlides = resolved;
-    if (!destroyed) renderIdle();
-  });
+  const slideCount = options.slides.length;
+
+  /**
+   * What `runner.render()` consumes for slide index `i`. In eager mode,
+   * the pre-decoded image / canvas from `resolveAll`. In lazy mode, the
+   * original source (URL string or DOM element) — URLs require having
+   * been preloaded into the runner first; `loadWindowAround()` handles that.
+   */
+  function renderSource(i: number): RenderSlide | undefined {
+    if (!lazy) return resolvedSlides[i];
+    const src = options.slides[i];
+    return src;
+  }
+
+  /**
+   * Whether slide `i` is ready to render. DOM-source slides are always
+   * ready. URL slides are ready iff `runner.preload([url])` has resolved
+   * (we track this via `loadedLazy`).
+   */
+  function isLoaded(i: number): boolean {
+    if (!lazy) return resolvedSlides[i] !== undefined;
+    const src = options.slides[i];
+    if (typeof src !== "string") return true;
+    return loadedLazy.has(i);
+  }
+
+  // Indices whose URL has been preloaded (lazy mode only). Strings still
+  // hold strong refs in `options.slides`, but we don't claim a slide is
+  // ready until the underlying GPU texture exists.
+  const loadedLazy = new Set<number>();
+
+  // Indices for which preload() is currently in flight, so concurrent
+  // `loadWindowAround()` calls don't fire duplicate awaits.
+  const pendingLazyLoads = new Map<number, Promise<void>>();
+
+  function loadIndexLazy(i: number): Promise<void> {
+    if (!lazy || loadedLazy.has(i)) return Promise.resolve();
+    const src = options.slides[i];
+    if (typeof src !== "string") {
+      loadedLazy.add(i);
+      return Promise.resolve();
+    }
+    const pending = pendingLazyLoads.get(i);
+    if (pending) return pending;
+    const p = runner
+      .preload([src])
+      .then(() => {
+        loadedLazy.add(i);
+        pendingLazyLoads.delete(i);
+      })
+      .catch((err) => {
+        pendingLazyLoads.delete(i);
+        throw err;
+      });
+    pendingLazyLoads.set(i, p);
+    return p;
+  }
+
+  /**
+   * Ensure slide `i` is loaded, then kick off background loads for the
+   * preload-window neighbours (no await). Returns when slide `i` is
+   * GPU-ready and safe to render.
+   */
+  async function loadWindowAround(i: number): Promise<void> {
+    if (!lazy) return;
+    await loadIndexLazy(i);
+    // Fire-and-forget the neighbours so subsequent navigation is fast.
+    for (let offset = 1; offset <= preloadWindow; offset++) {
+      const ahead = wrapIndex(i + offset);
+      const behind = wrapIndex(i - offset);
+      if (ahead !== null) void loadIndexLazy(ahead);
+      if (behind !== null) void loadIndexLazy(behind);
+    }
+  }
+
+  function wrapIndex(i: number): number | null {
+    if (slideCount === 0) return null;
+    if (loop) {
+      const wrapped = ((i % slideCount) + slideCount) % slideCount;
+      return wrapped;
+    }
+    if (i < 0 || i >= slideCount) return null;
+    return i;
+  }
+
+  const ready = lazy
+    ? loadWindowAround(current).then(() => {
+        if (!destroyed) renderIdle();
+      })
+    : resolveAll(options.slides).then((resolved) => {
+        resolvedSlides = resolved;
+        if (!destroyed) renderIdle();
+      });
 
   // --- Rendering --------------------------------------------------------
 
@@ -206,8 +319,10 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   }
 
   function renderIdle(): void {
-    const slide = resolvedSlides[current];
-    if (!slide || destroyed) return;
+    if (destroyed) return;
+    const slide = renderSource(current);
+    if (!slide) return;
+    if (!isLoaded(current)) return;
     runner.render(dissolve, {
       from: slide,
       to: slide,
@@ -234,7 +349,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
         fromSlide: inflightFromSlide,
         toIndex: inflightTo,
       } = pendingTransitionState;
-      const inflightToSlide = resolvedSlides[inflightTo];
+      const inflightToSlide = renderSource(inflightTo);
 
       // stop() rejects the old finished promise (so the previous
       // playTransition awaiter unwinds cleanly) and synchronously
@@ -278,9 +393,9 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
       isTransitioning = false;
       pendingTo = null;
       pendingTransitionState = null;
-      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+      status.textContent = `Slide ${current + 1} of ${slideCount}`;
       dotsMount?.update(current);
-      counterMount?.update(current, resolvedSlides.length);
+      counterMount?.update(current, slideCount);
       captionsMount?.update(current);
       emit("change", current, previous);
       emit("transitionend", from, inflightTo);
@@ -294,8 +409,12 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     }
 
     const fromIdx = current;
-    const fromSlide = resolvedSlides[fromIdx];
-    const toSlide = resolvedSlides[to];
+    // In lazy mode the target might not be loaded yet — await before
+    // we kick off the transition so render() never sees an un-preloaded
+    // URL. Also pulls neighbours into the window for the *next* nav.
+    if (lazy) await loadWindowAround(to);
+    const fromSlide = renderSource(fromIdx);
+    const toSlide = renderSource(to);
     if (!fromSlide || !toSlide) return;
 
     isTransitioning = true;
@@ -336,9 +455,9 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
     const previous = current;
     current = to;
     isTransitioning = false;
-    status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+    status.textContent = `Slide ${current + 1} of ${slideCount}`;
     dotsMount?.update(current);
-    counterMount?.update(current, resolvedSlides.length);
+    counterMount?.update(current, slideCount);
     captionsMount?.update(current);
     emit("change", current, previous);
     emit("transitionend", fromIdx, to);
@@ -347,18 +466,16 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
 
   async function go(index: number, opts: GoOptions = {}): Promise<void> {
     if (destroyed) return;
-    const target = clampIndex(
-      index,
-      resolvedSlides.length || options.slides.length,
-    );
+    const target = clampIndex(index, slideCount);
     if (target === current && !isTransitioning) return;
     if (opts.instant) {
+      if (lazy) await loadWindowAround(target);
       const previous = current;
       current = target;
       renderIdle();
-      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+      status.textContent = `Slide ${current + 1} of ${slideCount}`;
       dotsMount?.update(current);
-      counterMount?.update(current, resolvedSlides.length);
+      counterMount?.update(current, slideCount);
       captionsMount?.update(current);
       emit("change", current, previous);
       return;
@@ -374,9 +491,8 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   }
 
   function next(): Promise<void> {
-    const length = resolvedSlides.length || options.slides.length;
     const target = navBase() + 1;
-    if (target >= length) {
+    if (target >= slideCount) {
       if (!loop) return Promise.resolve();
       return go(0);
     }
@@ -384,11 +500,10 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   }
 
   function prev(): Promise<void> {
-    const length = resolvedSlides.length || options.slides.length;
     const target = navBase() - 1;
     if (target < 0) {
       if (!loop) return Promise.resolve();
-      return go(length - 1);
+      return go(slideCount - 1);
     }
     return go(target);
   }
@@ -479,7 +594,7 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
         void go(0);
         break;
       case "End":
-        void go(resolvedSlides.length - 1);
+        void go(slideCount - 1);
         break;
       case " ":
       case "Spacebar":
@@ -593,9 +708,9 @@ export function createSlideshow(options: SlideshowOptions): SlideshowHandle {
   void ready.then(() => {
     if (!destroyed) {
       renderIdle();
-      status.textContent = `Slide ${current + 1} of ${resolvedSlides.length}`;
+      status.textContent = `Slide ${current + 1} of ${slideCount}`;
       dotsMount?.update(current);
-      counterMount?.update(current, resolvedSlides.length);
+      counterMount?.update(current, slideCount);
       captionsMount?.update(current);
       if (isPlaying) scheduleAutoplay();
     }

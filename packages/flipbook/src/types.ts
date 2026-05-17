@@ -72,6 +72,28 @@ export interface FlipbookOptions {
   autoplay?: boolean | { intervalMs: number };
   /** Accessible label exposed via `aria-label`. Default `"Flipbook"`. */
   ariaLabel?: string;
+  /**
+   * Lazy-load mode. When `true`, only the current page and its
+   * neighbours (see `preloadWindow`) are fetched + uploaded to the GPU;
+   * out-of-window pages are evicted from the texture cache via the
+   * runner's LRU policy. Default `false` — all pages eagerly resolved
+   * (preserves v0.1 behavior).
+   *
+   * Worth turning on for long flipbooks (>10–20 pages) or when driving
+   * the flipbook from a Next.js page where the homepage shouldn't block
+   * on dozens of image decodes. Works with URL string sources;
+   * `HTMLImageElement` / `HTMLCanvasElement` sources passed in still
+   * load up front (they're already in memory).
+   */
+  lazy?: boolean;
+  /**
+   * In `lazy: true` mode, how many pages on each side of the current
+   * index to keep resident on the GPU. Default 1 — current page plus
+   * immediate prev/next are always loaded ahead of user navigation.
+   * Higher values trade GPU memory for fewer load stalls on rapid
+   * flips. Ignored when `lazy` is false.
+   */
+  preloadWindow?: number;
 }
 
 export interface FlipOptions {
