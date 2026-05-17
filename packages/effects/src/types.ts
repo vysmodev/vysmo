@@ -28,6 +28,14 @@ export interface Effect<P extends UniformParams = UniformParams> {
 }
 
 export interface RenderArgs<P extends UniformParams> {
-  source: TextureSource;
+  /**
+   * Image to apply the effect to. Accepts any `TextureSource`
+   * (`HTMLImageElement`, `HTMLCanvasElement`, `HTMLVideoElement`,
+   * `ImageBitmap`, `OffscreenCanvas`, raw `WebGLTexture`) **or** a URL
+   * string. URL inputs must be pre-loaded via `runner.preload([url])`
+   * before `render()` is called — `render()` itself is synchronous and
+   * will throw if asked to draw an un-preloaded URL.
+   */
+  source: TextureSource | string;
   params?: Partial<P>;
 }

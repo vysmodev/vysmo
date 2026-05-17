@@ -1,4 +1,5 @@
 import { FramebufferPool, TextureCache } from "@vysmo/gl-core";
+import type { TextureSource } from "@vysmo/gl-core";
 import type {
   RenderArgs,
   Transition,
@@ -214,6 +215,63 @@ export class Runner {
    * @throws Error if the runner is disposed or the WebGL context is lost.
    * @throws Error if shader compilation or program linking fails.
    */
+  /**
+   * Pre-load URL string sources so that subsequent synchronous
+   * `render()` calls can reference them without throwing. DOM-source
+   * inputs (`HTMLImageElement`, canvas, video, etc.) are ignored — they
+   * carry their own pixel data and don't need to be fetched.
+   *
+   * Typical use:
+   *
+   *     const fromUrl = "/photo-a.jpg";
+   *     const toUrl = "/photo-b.jpg";
+   *     await runner.preload([fromUrl, toUrl]);
+   *     animate({
+   *       ...,
+   *       onUpdate: (p) => runner.render(crossZoom, {
+   *         from: fromUrl, to: toUrl, progress: p,
+   *       }),
+   *     });
+   *
+   * Resolves once every URL has been fetched, decoded, and uploaded.
+   * Calls for the same URL are deduplicated (concurrent and repeat
+   * calls share one in-flight load).
+   *
+   * @throws Error if any source fails to fetch / decode (rejected
+   *               promise from the underlying `TextureCache.resolveAsync`).
+   */
+  async preload(sources: ReadonlyArray<TextureSource | string>): Promise<void> {
+    await Promise.all(
+      sources
+        .filter((s): s is string => typeof s === "string")
+        .map((url) => this.textures.resolveAsync(url)),
+    );
+  }
+
+  /**
+   * Internal: resolve a single render-args source to its GL texture.
+   * Strings go through the synchronous URL cache; if the URL hasn't
+   * been pre-loaded via `preload()`, throws with a clear pointer at
+   * the fix.
+   */
+  private resolveForRender(
+    source: TextureSource | string,
+    role: string,
+  ): WebGLTexture {
+    if (typeof source !== "string") {
+      return this.textures.resolve(source);
+    }
+    const cached = this.textures.getUrlTexture(source);
+    if (!cached) {
+      throw new Error(
+        `Runner.render(): "${role}" URL is not loaded: ${source}. ` +
+          `Call runner.preload(["${source}"]) before render() (URL inputs must be ` +
+          `fetched + decoded + uploaded before render(), which is synchronous).`,
+      );
+    }
+    return cached;
+  }
+
   render<P extends UniformParams>(
     transition: Transition<P>,
     args: RenderArgs<P>,
@@ -246,13 +304,13 @@ export class Runner {
     // gl.bindTexture() against whichever unit is currently active (to
     // upload pixels), so if we interleave resolves with activeTexture()
     // calls, each resolve clobbers the most recently bound unit.
-    const fromTex = this.textures.resolve(args.from);
-    const toTex = this.textures.resolve(args.to);
+    const fromTex = this.resolveForRender(args.from, "from");
+    const toTex = this.resolveForRender(args.to, "to");
     const displacementTex = args.displacement
-      ? this.textures.resolve(args.displacement)
+      ? this.resolveForRender(args.displacement, "displacement")
       : this.defaultDisplacement;
     const environmentTex = args.environment
-      ? this.textures.resolve(args.environment)
+      ? this.resolveForRender(args.environment, "environment")
       : this.defaultEnvironment;
 
     gl.activeTexture(gl.TEXTURE0);

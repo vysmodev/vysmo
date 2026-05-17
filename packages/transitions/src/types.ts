@@ -62,8 +62,17 @@ export interface Transition<P extends UniformParams = UniformParams> {
 }
 
 export interface RenderArgs<P extends UniformParams> {
-  from: TextureSource;
-  to: TextureSource;
+  /**
+   * Source image. Accepts any `TextureSource` (`HTMLImageElement`,
+   * `HTMLCanvasElement`, `HTMLVideoElement`, `ImageBitmap`,
+   * `OffscreenCanvas`, raw `WebGLTexture`) **or** a URL string. URL
+   * inputs must be pre-loaded via `runner.preload([url])` before
+   * `render()` is called — `render()` itself is synchronous and will
+   * throw if asked to draw an un-preloaded URL.
+   */
+  from: TextureSource | string;
+  /** Target image. Same input types as `from`; see `from` for URL pre-loading rules. */
+  to: TextureSource | string;
   progress: number;
   params?: Partial<P>;
   /**
@@ -74,14 +83,18 @@ export interface RenderArgs<P extends UniformParams> {
    * negatively. If omitted, the runner binds a default 1×1 mid-gray
    * texture so displacement-using transitions degrade to no-op rather
    * than failing.
+   *
+   * Accepts URL strings on the same pre-load contract as `from` / `to`.
    */
-  displacement?: TextureSource;
+  displacement?: TextureSource | string;
   /**
    * Optional environment-map texture. Transitions that read it via the
    * getEnvironment(uv) shader helper (e.g. liquid-chrome with reflection
    * enabled) use it to fake reflections off metallic / glass surfaces.
    * If omitted, the runner binds a default 1×1 mid-gray texture so
    * environment-using transitions degrade to a neutral no-op.
+   *
+   * Accepts URL strings on the same pre-load contract as `from` / `to`.
    */
-  environment?: TextureSource;
+  environment?: TextureSource | string;
 }

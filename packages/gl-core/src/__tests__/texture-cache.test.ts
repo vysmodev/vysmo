@@ -131,3 +131,169 @@ describe("TextureCache", () => {
     );
   });
 });
+
+// Real blob URLs generated from canvases — more reliable than
+// hand-rolled data URLs (no chance of malformed base64) and they give
+// us distinct URLs without needing distinct image content.
+async function makeBlobUrl(color: string): Promise<string> {
+  const c = makeSourceCanvas(4, color);
+  const blob: Blob = await new Promise((resolve, reject) => {
+    c.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))));
+  });
+  return URL.createObjectURL(blob);
+}
+
+let RED_URL: string;
+let GREEN_URL: string;
+let BLUE_URL: string;
+
+beforeEach(async () => {
+  RED_URL = await makeBlobUrl("#ff0000");
+  GREEN_URL = await makeBlobUrl("#00ff00");
+  BLUE_URL = await makeBlobUrl("#0000ff");
+});
+
+describe("TextureCache.resolveAsync", () => {
+  it("resolves a URL string to a WebGLTexture", async () => {
+    const cache = new TextureCache(gl);
+    const tex = await cache.resolveAsync(RED_URL);
+    expect(tex).toBeInstanceOf(WebGLTexture);
+  });
+
+  it("returns the same WebGLTexture for the same URL on repeated calls", async () => {
+    const cache = new TextureCache(gl);
+    const a = await cache.resolveAsync(RED_URL);
+    const b = await cache.resolveAsync(RED_URL);
+    expect(a).toBe(b);
+  });
+
+  it("deduplicates concurrent loads of the same URL", async () => {
+    // Two awaits started before the first one resolves should share the
+    // same in-flight promise — only one fetch should fire.
+    const cache = new TextureCache(gl);
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    const [a, b] = await Promise.all([
+      cache.resolveAsync(GREEN_URL),
+      cache.resolveAsync(GREEN_URL),
+    ]);
+    expect(a).toBe(b);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    fetchSpy.mockRestore();
+  });
+
+  it("delegates to sync resolve() for non-string sources", async () => {
+    const cache = new TextureCache(gl);
+    const source = makeSourceCanvas();
+    const syncTex = cache.resolve(source);
+    const asyncTex = await cache.resolveAsync(source);
+    expect(asyncTex).toBe(syncTex);
+  });
+
+  it("allocates distinct textures for distinct URLs", async () => {
+    const cache = new TextureCache(gl);
+    const a = await cache.resolveAsync(RED_URL);
+    const b = await cache.resolveAsync(GREEN_URL);
+    expect(a).not.toBe(b);
+  });
+
+  it("removes the entry on fetch failure so retry can succeed", async () => {
+    // First call rejects (bad URL). The next call to the same URL
+    // should be a fresh attempt, not a re-yield of the rejected promise.
+    const cache = new TextureCache(gl);
+    const badUrl = "data:application/octet-stream;base64,***not-valid***";
+    await expect(cache.resolveAsync(badUrl)).rejects.toThrow();
+    // A second call should also error (still bad URL) but importantly
+    // it should be a *new* error from a fresh attempt — not a reuse of
+    // the cached rejected promise. Verified by checking the cache has
+    // dropped the entry between attempts (release returns false).
+    expect(cache.release(badUrl)).toBe(false);
+  });
+});
+
+describe("TextureCache.release", () => {
+  it("evicts a URL-keyed entry and frees its texture", async () => {
+    const cache = new TextureCache(gl);
+    const tex = await cache.resolveAsync(RED_URL);
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    expect(cache.release(RED_URL)).toBe(true);
+    expect(deleteSpy).toHaveBeenCalledWith(tex);
+    // After release, a fresh resolveAsync allocates a new texture.
+    const reloaded = await cache.resolveAsync(RED_URL);
+    expect(reloaded).not.toBe(tex);
+    deleteSpy.mockRestore();
+  });
+
+  it("evicts a DOM-source entry and frees its texture", () => {
+    const cache = new TextureCache(gl);
+    const source = makeSourceCanvas();
+    const tex = cache.resolve(source);
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    expect(cache.release(source)).toBe(true);
+    expect(deleteSpy).toHaveBeenCalledWith(tex);
+    deleteSpy.mockRestore();
+  });
+
+  it("returns false for sources/URLs that were never cached", () => {
+    const cache = new TextureCache(gl);
+    expect(cache.release(RED_URL)).toBe(false);
+    expect(cache.release(makeSourceCanvas())).toBe(false);
+  });
+
+  it("returns false for raw WebGLTexture sources (caller owns them)", () => {
+    const cache = new TextureCache(gl);
+    const raw = gl.createTexture()!;
+    expect(cache.release(raw)).toBe(false);
+    gl.deleteTexture(raw);
+  });
+});
+
+describe("TextureCache LRU eviction (maxUrlEntries)", () => {
+  // WebGLTexture instances are opaque host objects with no enumerable
+  // own properties, so vitest's `toHaveBeenCalledWith` uses deep-equality
+  // that can't distinguish between them. We assert on the raw mock call
+  // args via Array.prototype.includes (SameValueZero === for objects)
+  // to get true reference equality.
+  function deletedTextures(spy: ReturnType<typeof vi.spyOn>): WebGLTexture[] {
+    return spy.mock.calls.map((call) => call[0] as WebGLTexture);
+  }
+
+  it("evicts least-recently-used URL entry when limit exceeded", async () => {
+    const cache = new TextureCache(gl, { maxUrlEntries: 2 });
+    const a = await cache.resolveAsync(RED_URL);
+    await cache.resolveAsync(GREEN_URL);
+    // Third entry pushes us over the limit; A is the LRU and should evict.
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    await cache.resolveAsync(BLUE_URL);
+    expect(deletedTextures(deleteSpy)).toContain(a);
+    // Re-resolving A allocates a fresh texture (cache miss).
+    const aReloaded = await cache.resolveAsync(RED_URL);
+    expect(aReloaded).not.toBe(a);
+    deleteSpy.mockRestore();
+  });
+
+  it("re-accessing an entry moves it to most-recently-used", async () => {
+    const cache = new TextureCache(gl, { maxUrlEntries: 2 });
+    const a = await cache.resolveAsync(RED_URL);
+    const b = await cache.resolveAsync(GREEN_URL);
+    // Re-touch A so B becomes LRU.
+    await cache.resolveAsync(RED_URL);
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    await cache.resolveAsync(BLUE_URL);
+    // B should be evicted, not A.
+    const deleted = deletedTextures(deleteSpy);
+    expect(deleted).toContain(b);
+    expect(deleted).not.toContain(a);
+    deleteSpy.mockRestore();
+  });
+
+  it("no eviction when maxUrlEntries is unset (default Infinity)", async () => {
+    const cache = new TextureCache(gl);
+    await cache.resolveAsync(RED_URL);
+    await cache.resolveAsync(GREEN_URL);
+    await cache.resolveAsync(BLUE_URL);
+    // All three should still be cached. Re-resolving any returns same.
+    const a = await cache.resolveAsync(RED_URL);
+    const a2 = await cache.resolveAsync(RED_URL);
+    expect(a).toBe(a2);
+  });
+});

@@ -4,6 +4,7 @@ import {
   buildProgram,
   paramKeyToUniformName,
   setUniform,
+  type TextureSource,
   type UniformParams,
   type UniformValue,
 } from "@vysmo/gl-core";
@@ -140,6 +141,53 @@ export class Runner {
    * @throws Error if the runner is disposed or the WebGL context is lost.
    * @throws Error if shader compilation or program linking fails.
    */
+  /**
+   * Pre-load URL string sources so that subsequent synchronous
+   * `render()` calls can reference them without throwing. DOM-source
+   * inputs (`HTMLImageElement`, canvas, video, etc.) are ignored — they
+   * carry their own pixel data and don't need to be fetched.
+   *
+   * Typical use:
+   *
+   *     const sourceUrl = "/photo.jpg";
+   *     await runner.preload([sourceUrl]);
+   *     runner.render(blur, { source: sourceUrl, params: { radius: 8 } });
+   *
+   * Resolves once every URL has been fetched, decoded, and uploaded.
+   * Calls for the same URL are deduplicated (concurrent and repeat
+   * calls share one in-flight load).
+   *
+   * @throws Error if any source fails to fetch / decode (rejected
+   *               promise from the underlying `TextureCache.resolveAsync`).
+   */
+  async preload(sources: ReadonlyArray<TextureSource | string>): Promise<void> {
+    await Promise.all(
+      sources
+        .filter((s): s is string => typeof s === "string")
+        .map((url) => this.textures.resolveAsync(url)),
+    );
+  }
+
+  /**
+   * Internal: resolve a render-args source to its GL texture. Strings
+   * go through the synchronous URL cache; if the URL hasn't been
+   * pre-loaded via `preload()`, throws with a clear pointer at the fix.
+   */
+  private resolveForRender(source: TextureSource | string): WebGLTexture {
+    if (typeof source !== "string") {
+      return this.textures.resolve(source);
+    }
+    const cached = this.textures.getUrlTexture(source);
+    if (!cached) {
+      throw new Error(
+        `Runner.render(): "source" URL is not loaded: ${source}. ` +
+          `Call runner.preload(["${source}"]) before render() (URL inputs must be ` +
+          `fetched + decoded + uploaded before render(), which is synchronous).`,
+      );
+    }
+    return cached;
+  }
+
   render<P extends UniformParams>(
     effect: Effect<P>,
     args: RenderArgs<P>,
@@ -170,7 +218,7 @@ export class Runner {
 
     gl.useProgram(compiled.program);
 
-    const sourceTex = this.textures.resolve(args.source);
+    const sourceTex = this.resolveForRender(args.source);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, sourceTex);

@@ -22,6 +22,21 @@ export interface TextureCacheOptions {
   flipY?: boolean;
   /** UNPACK_PREMULTIPLY_ALPHA_WEBGL. Defaults to false. */
   premultiplyAlpha?: boolean;
+  /**
+   * Maximum number of URL-keyed entries (from `resolveAsync(url)`) to
+   * retain. When exceeded, least-recently-used entries are evicted: the
+   * GL texture is deleted and the cache entry dropped. Defaults to
+   * `Infinity` (no eviction — preserves prior behavior).
+   *
+   * Only applies to URL inputs. DOM-source entries
+   * (`HTMLImageElement`, `HTMLCanvasElement`, etc.) are not subject to
+   * LRU eviction — they're cleaned up naturally when the source object
+   * is garbage collected (entries are stored in a WeakMap).
+   *
+   * Typical use: lazy-loading slideshows / flipbooks that page through
+   * many images and only need a small window resident on the GPU.
+   */
+  maxUrlEntries?: number;
 }
 
 interface CachedTexture {
@@ -29,6 +44,20 @@ interface CachedTexture {
   owned: boolean;
   /** True once the source's pixels have been uploaded at least once. */
   uploaded: boolean;
+}
+
+interface UrlCacheEntry {
+  /**
+   * Resolves to the GL texture once the URL has been fetched + decoded
+   * + uploaded. Concurrent callers for the same URL await the same
+   * promise (request deduplication).
+   */
+  promise: Promise<WebGLTexture>;
+  /**
+   * Set once the promise fulfills. Used by `release()` and eviction to
+   * free the GL-side resource without having to await the promise.
+   */
+  texture: WebGLTexture | null;
 }
 
 function isWebGLTexture(source: TextureSource): source is WebGLTexture {
@@ -80,6 +109,12 @@ function isImmutableSource(source: TextureSource): boolean {
  */
 export class TextureCache {
   private cache = new WeakMap<object, CachedTexture>();
+  /**
+   * URL-keyed cache. `Map` insertion order doubles as LRU order: every
+   * cache hit re-inserts the entry at the end so `entries().next()`
+   * yields the least-recently-used when we need to evict.
+   */
+  private urlCache = new Map<string, UrlCacheEntry>();
   /** Strong refs to every owned texture so `dispose()` can free them. */
   private owned = new Set<WebGLTexture>();
   private gl: WebGL2RenderingContext;
@@ -90,6 +125,7 @@ export class TextureCache {
   private generateMipmaps: boolean;
   private flipY: boolean;
   private premultiplyAlpha: boolean;
+  private maxUrlEntries: number;
 
   /**
    * @param gl       Owning WebGL2 context.
@@ -109,6 +145,7 @@ export class TextureCache {
     this.wrapT = options.wrapT ?? gl.CLAMP_TO_EDGE;
     this.flipY = options.flipY ?? true;
     this.premultiplyAlpha = options.premultiplyAlpha ?? false;
+    this.maxUrlEntries = options.maxUrlEntries ?? Infinity;
   }
 
   /**
@@ -168,6 +205,199 @@ export class TextureCache {
   }
 
   /**
+   * Async sibling of `resolve()`. Accepts either an existing
+   * `TextureSource` (synchronous fast path — delegates to `resolve()`
+   * and wraps in `Promise.resolve`) **or** a URL string, which fetches +
+   * decodes + uploads on first call and caches by URL on subsequent
+   * calls.
+   *
+   * URL inputs:
+   * - Resolved via `fetch()` + `createImageBitmap()`, then uploaded.
+   * - Cached by URL string. Concurrent calls with the same URL share
+   *   one in-flight promise (request deduplication).
+   * - Subject to LRU eviction if `maxUrlEntries` was set on construction.
+   * - Cross-origin URLs require correct CORS headers (`Access-Control-
+   *   Allow-Origin`) — same as any other WebGL texture source. Document
+   *   this in your library's README / Next.js guide.
+   * - If the fetch fails or decode throws, the cache entry is removed
+   *   so a subsequent `resolveAsync(url)` call retries cleanly.
+   *
+   * **Binding side effect:** same as `resolve()` — the returned texture
+   * is bound to `gl.TEXTURE_2D` on the active unit. Resolve all sources
+   * before any `activeTexture` + `bindTexture` calls.
+   */
+  async resolveAsync(
+    source: TextureSource | string,
+  ): Promise<WebGLTexture> {
+    if (typeof source !== "string") {
+      return this.resolve(source);
+    }
+
+    const url = source;
+    const existing = this.urlCache.get(url);
+    if (existing) {
+      // Touch LRU: re-insert at end of insertion order so this becomes
+      // the most-recently-used entry.
+      this.urlCache.delete(url);
+      this.urlCache.set(url, existing);
+      return existing.promise;
+    }
+
+    const entry: UrlCacheEntry = { promise: null!, texture: null };
+    entry.promise = this.loadUrlAsTexture(url).then(
+      (tex) => {
+        entry.texture = tex;
+        return tex;
+      },
+      (err) => {
+        // Failed loads shouldn't poison the cache — drop the entry so
+        // a retry can try again from scratch.
+        this.urlCache.delete(url);
+        throw err;
+      },
+    );
+    this.urlCache.set(url, entry);
+    this.evictIfOverLimit();
+    return entry.promise;
+  }
+
+  /**
+   * Synchronous lookup of a URL-keyed texture. Returns the cached
+   * `WebGLTexture` if the URL has been fully resolved by a prior
+   * `resolveAsync(url)` call, otherwise `undefined`.
+   *
+   * Designed for per-frame render loops where the caller has already
+   * pre-loaded URLs via `resolveAsync(url)` (or a wrapper's `preload()`
+   * helper) and wants synchronous access without re-awaiting promises.
+   *
+   * Returns `undefined` for in-flight loads (promise still pending)
+   * AND for never-requested URLs. Distinguish via the cache's external
+   * loading state if you need to.
+   *
+   * Touches LRU order so the entry stays warm in lazy-loading scenarios.
+   */
+  getUrlTexture(url: string): WebGLTexture | undefined {
+    const entry = this.urlCache.get(url);
+    if (!entry || !entry.texture) return undefined;
+    // Touch LRU: this URL was just accessed, so it shouldn't be evicted
+    // first under memory pressure.
+    this.urlCache.delete(url);
+    this.urlCache.set(url, entry);
+    return entry.texture;
+  }
+
+  /**
+   * Manually evict a single cache entry. Returns true if anything was
+   * released, false if the source/URL wasn't cached.
+   *
+   * - URL string: removes the URL entry and deletes the GL texture (if
+   *   already loaded; pending loads are dropped from the index but the
+   *   promise still resolves for any in-flight callers).
+   * - DOM source: removes the WeakMap entry and deletes the GL texture.
+   * - Raw `WebGLTexture`: never cached, returns false. Caller owns it.
+   *
+   * Used by lazy-loading slideshows / flipbooks to release textures
+   * that have scrolled out of the preload window.
+   */
+  release(source: TextureSource | string): boolean {
+    const gl = this.gl;
+    if (typeof source === "string") {
+      const entry = this.urlCache.get(source);
+      if (!entry) return false;
+      if (entry.texture) {
+        gl.deleteTexture(entry.texture);
+        this.owned.delete(entry.texture);
+      }
+      this.urlCache.delete(source);
+      return true;
+    }
+    if (isWebGLTexture(source)) return false;
+    const entry = this.cache.get(source);
+    if (!entry) return false;
+    gl.deleteTexture(entry.texture);
+    this.owned.delete(entry.texture);
+    this.cache.delete(source);
+    return true;
+  }
+
+  /**
+   * Fetch + decode + upload a URL to a fresh GL texture. The returned
+   * texture is owned by the cache (tracked in `this.owned`, freed on
+   * `dispose()`).
+   */
+  private async loadUrlAsTexture(url: string): Promise<WebGLTexture> {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(
+        `TextureCache: failed to fetch ${url}: ${response.status} ${response.statusText}`,
+      );
+    }
+    const blob = await response.blob();
+    const bitmap = await createImageBitmap(blob);
+    try {
+      return this.uploadAsNewTexture(bitmap);
+    } finally {
+      // ImageBitmap holds decoded pixels in memory; once they're on the
+      // GPU we don't need the CPU-side copy.
+      bitmap.close?.();
+    }
+  }
+
+  /**
+   * Create a new GL texture, configure its sampler state, and upload
+   * the source's pixels. The texture is added to `this.owned` so
+   * `dispose()` can free it. Does NOT touch any cache — caller is
+   * responsible for storing the returned texture wherever it tracks
+   * its entries.
+   *
+   * Same binding side effect as `resolve()`: the new texture is bound
+   * to `gl.TEXTURE_2D` on the active unit.
+   */
+  private uploadAsNewTexture(source: TexImageSource): WebGLTexture {
+    const gl = this.gl;
+    const texture = gl.createTexture();
+    if (!texture) throw new Error("gl.createTexture returned null");
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.wrapT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.minFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this.magFilter);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      source,
+    );
+    if (this.generateMipmaps) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+    }
+    this.owned.add(texture);
+    return texture;
+  }
+
+  /**
+   * Drop oldest URL entries until we're at or below `maxUrlEntries`.
+   * Eviction order is insertion order in `this.urlCache` (which we
+   * keep aligned with LRU order by re-inserting on every hit).
+   */
+  private evictIfOverLimit(): void {
+    if (this.urlCache.size <= this.maxUrlEntries) return;
+    const gl = this.gl;
+    for (const [url, entry] of this.urlCache) {
+      if (this.urlCache.size <= this.maxUrlEntries) break;
+      if (entry.texture) {
+        gl.deleteTexture(entry.texture);
+        this.owned.delete(entry.texture);
+      }
+      this.urlCache.delete(url);
+    }
+  }
+
+  /**
    * Free every texture this cache has uploaded. Call at teardown when
    * you want pixels freed *before* the GL context goes away (e.g.
    * tearing down a long-lived editor surface). After dispose(),
@@ -175,11 +405,13 @@ export class TextureCache {
    *
    * The source-keyed `WeakMap` itself is dropped — entries for sources
    * that are still GC-reachable will be re-uploaded on next `resolve()`.
+   * URL cache is also fully cleared.
    */
   dispose(): void {
     const gl = this.gl;
     for (const tex of this.owned) gl.deleteTexture(tex);
     this.owned.clear();
     this.cache = new WeakMap();
+    this.urlCache.clear();
   }
 }
