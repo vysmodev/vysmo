@@ -39,6 +39,15 @@ export interface FlipbookProps {
   autoplay?: boolean | { intervalMs: number };
   /** Accessible label. Default `"Flipbook"`. */
   ariaLabel?: string;
+  /**
+   * Lazy-load mode — only the current page + N preload-window neighbours
+   * are loaded onto the GPU at a time. Default `false`. Turn on for long
+   * flipbooks (>10–20 pages) where you don't want to decode every image
+   * on page load.
+   */
+  lazy?: boolean;
+  /** Per-side preload window for lazy mode. Default `1`. Ignored when `lazy` is false. */
+  preloadWindow?: number;
   /** Fires when the active page changes. */
   onChange?: (current: number, previous: number) => void;
   /** Fires when a flip animation begins. */
@@ -74,6 +83,8 @@ export function Flipbook({
   keyboardNavigation,
   autoplay,
   ariaLabel,
+  lazy,
+  preloadWindow,
   onChange,
   onFlipStart,
   onFlipEnd,
@@ -109,6 +120,8 @@ export function Flipbook({
     if (keyboardNavigation !== undefined) opts.keyboardNavigation = keyboardNavigation;
     if (autoplay !== undefined) opts.autoplay = autoplay;
     if (ariaLabel !== undefined) opts.ariaLabel = ariaLabel;
+    if (lazy !== undefined) opts.lazy = lazy;
+    if (preloadWindow !== undefined) opts.preloadWindow = preloadWindow;
 
     const handle = createFlipbook(opts);
     handleRef.current = handle;
@@ -139,6 +152,8 @@ export function Flipbook({
     keyboardNavigation,
     autoplay,
     ariaLabel,
+    lazy,
+    preloadWindow,
   ]);
 
   return <div ref={containerRef} className={className} style={style} />;

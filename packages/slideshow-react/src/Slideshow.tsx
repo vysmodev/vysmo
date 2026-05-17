@@ -54,6 +54,19 @@ export interface SlideshowProps {
   captions?: false | CaptionsOptions;
   /** Accessible label. Default `"Slideshow"`. */
   ariaLabel?: string;
+  /**
+   * Lazy-load mode — only the current slide + N preload-window
+   * neighbours are loaded onto the GPU at a time. Default `false`
+   * (loads every slide upfront, matching v0.1 behavior). Turn on for
+   * galleries with many URL-sourced slides where you don't want to
+   * decode all images on page load. See `preloadWindow` to tune.
+   */
+  lazy?: boolean;
+  /**
+   * Per-side preload window for lazy mode. Default `1` (current ±1).
+   * Ignored when `lazy` is false.
+   */
+  preloadWindow?: number;
   /** Fires when the active slide changes. */
   onChange?: (current: number, previous: number) => void;
   /** Fires when a transition begins. */
@@ -94,6 +107,8 @@ export function Slideshow({
   progress,
   captions,
   ariaLabel,
+  lazy,
+  preloadWindow,
   onChange,
   onTransitionStart,
   onTransitionEnd,
@@ -134,6 +149,8 @@ export function Slideshow({
     if (progress !== undefined) opts.progress = progress;
     if (captions !== undefined) opts.captions = captions;
     if (ariaLabel !== undefined) opts.ariaLabel = ariaLabel;
+    if (lazy !== undefined) opts.lazy = lazy;
+    if (preloadWindow !== undefined) opts.preloadWindow = preloadWindow;
 
     const handle = createSlideshow(opts);
     handleRef.current = handle;
@@ -173,6 +190,8 @@ export function Slideshow({
     progress,
     captions,
     ariaLabel,
+    lazy,
+    preloadWindow,
   ]);
 
   return <div ref={containerRef} className={className} style={style} />;
