@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/easings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Curated easing catalog (40+ named curves) + parametric builders (spring, bezier, wiggle, rough, anticipate) + composition modifiers (chain, reverse, mirror, yoyo, blend, slice). Pure math, zero deps. CSS export via toCSSLinear / toCSSBezier; reduced-motion helpers; GSAP-style string parser.",
   "license": "MIT",
   "keywords": [

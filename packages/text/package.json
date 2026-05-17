@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/text",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Multi-property choreographed text animation with a 300+ preset catalog. Grapheme-safe splitting via Intl.Segmenter; per-slice stagger / jitter / range; serializable preset format (string easings, normalized origins) so the same data drives DOM today and canvas tomorrow.",
   "license": "MIT",
   "keywords": [

@@ -66,6 +66,26 @@ new Runner({ canvas }).render(tint, { source: image });
 
 `runner.render()` is one draw call (or one pass per multi-pass effect like bloom). Re-render with new params or sources whenever you want a new frame.
 
+### With URL strings
+
+`Runner.render()` is synchronous. URL inputs go through
+`runner.preload([…urls])` first; the fetch + decode + upload happens
+once per URL and is cached on the GPU.
+
+```ts
+import { Runner, blur } from "@vysmo/effects";
+
+const runner = new Runner({ canvas });
+
+const sourceUrl = "/photo.jpg";
+await runner.preload([sourceUrl]);
+
+runner.render(blur, {
+  source: sourceUrl,
+  params: { radius: 12 },
+});
+```
+
 ## Tree-shake by what you import
 
 Every effect is its own module. Import only the ones you ship:

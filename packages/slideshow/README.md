@@ -31,6 +31,38 @@ show.on("change", (current) => {
 });
 ```
 
+## Lazy mode for big galleries
+
+`createSlideshow` eagerly decodes every slide by default, which is fine
+for a handful of images but blocks the homepage on the full image list
+for galleries with dozens-to-hundreds of slides. Set `lazy: true` and
+the slideshow only loads the current slide + `preloadWindow` neighbours
+on each side; the underlying runner LRU-evicts URL textures outside the
+window so GPU memory stays bounded regardless of slide count.
+
+```ts
+import { createSlideshow } from "@vysmo/slideshow";
+import { paintBleed } from "@vysmo/transitions";
+
+// Any length — only ~3 textures held on the GPU at a time.
+const slides = Array.from({ length: 100 }, (_, i) => `/photos/${i}.jpg`);
+
+createSlideshow({
+  container: document.querySelector("#stage")!,
+  slides,
+  transition: paintBleed,
+  lazy: true,
+  preloadWindow: 1,         // current + N each side; default 1
+});
+```
+
+DOM-source slides (`HTMLImageElement`, `HTMLCanvasElement`) mixed in a
+lazy `slides` array are treated as always-loaded — they're already in
+memory by definition. Only URL strings go through the lazy load path.
+
+For Next.js — pass `next/image` optimizer URLs straight into `slides`.
+See the [Vysmo + Next.js guide](https://vysmo.com/guides/nextjs).
+
 ## Mixing transitions per slide
 
 ```ts

@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/transitions-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React bindings for @vysmo/transitions — a <Transition> component that renders any of the 60 WebGL transition shaders between two images, with controlled progress or self-driving autoplay.",
   "license": "MIT",
   "keywords": [

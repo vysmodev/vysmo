@@ -46,6 +46,40 @@ animate({
 
 `runner.render()` is one draw call per frame, regardless of the transition.
 
+### With URL strings (no DOM Image needed)
+
+`Runner.render()` is synchronous (frame-rate friendly), so URL inputs need
+a one-time pre-load up front. `runner.preload([…urls])` fetches + decodes
++ uploads each URL exactly once; subsequent renders use the cached GPU
+texture. Concurrent / repeat `preload` calls dedupe.
+
+```ts
+import { Runner, paintBleed } from "@vysmo/transitions";
+import { animate } from "@vysmo/animations";
+
+const canvas = document.querySelector<HTMLCanvasElement>("canvas")!;
+const runner = new Runner({ canvas });
+
+const fromUrl = "/photo-a.jpg";
+const toUrl = "/photo-b.jpg";
+await runner.preload([fromUrl, toUrl]);
+
+animate({
+  from: 0,
+  to: 1,
+  duration: 1200,
+  onUpdate: (p) => runner.render(paintBleed, {
+    from: fromUrl,
+    to: toUrl,
+    progress: p,
+  }),
+});
+```
+
+Cross-origin URLs need the right CORS headers (same as any WebGL texture
+source). For Next.js apps, see the
+[Vysmo + Next.js guide](https://vysmo.com/guides/nextjs).
+
 ## Tree-shake by what you import
 
 Every transition is its own module. Import only the ones you ship:

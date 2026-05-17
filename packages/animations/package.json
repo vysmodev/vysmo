@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/animations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Value-based tweening primitives — animate(), spring(), timeline(), interpolate(). DOM-agnostic core that drives anything a number can change: CSS transforms, WebGL uniforms, canvas draws, audio params.",
   "license": "MIT",
   "keywords": [

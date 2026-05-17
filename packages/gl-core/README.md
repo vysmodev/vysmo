@@ -26,7 +26,7 @@ pnpm add @vysmo/gl-core
 | `linkProgram(gl, vs, fs)` | Link a vertex + fragment pair into a `WebGLProgram`. Throws with link log on failure. |
 | `buildProgram(gl, fragmentSource, vertexSource?)` | One-shot compile + link + cleanup. Vertex defaults to `FULLSCREEN_VERTEX_SHADER`. |
 | `FULLSCREEN_VERTEX_SHADER` | GLSL ES 3.0 vertex shader that draws a single screen-covering triangle without any attribute buffers. The starting point for any fragment-only pass. |
-| `TextureCache` | Lazy GPU texture uploader keyed on source identity. Static images upload once; videos / canvases re-upload per call. |
+| `TextureCache` | Lazy GPU texture uploader keyed on source identity (DOM sources, WeakMap) or URL string (Map with optional LRU). Static images upload once; videos / canvases re-upload per call. `resolveAsync(url)` fetches + decodes + uploads URL inputs with request dedup; `release(srcOrUrl)` evicts a single entry; `maxUrlEntries` enables LRU eviction for lazy-loading consumers. |
 | `FramebufferPool` | Reusable ping-pong FBO allocator. LDR (`RGBA8`) by default, opt-in HDR (`RGBA16F`) for multi-pass effects that need values outside `[0, 1]`. |
 | `setUniform(gl, loc, value)` | Type-dispatched uniform upload — handles scalars, bool, and 2/3/4-component vectors. |
 | `paramKeyToUniformName(key)` | Convention helper: `"softness"` → `"uSoftness"`. Pairs with the runner's preset → uniform binding. |

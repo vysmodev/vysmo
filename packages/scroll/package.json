@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/scroll",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scroll-driven primitives that compose with the ecosystem: bind scroll progress to any @vysmo/transitions or @vysmo/effects render. Shared rAF-throttled observer, headless.",
   "license": "MIT",
   "keywords": [

@@ -35,6 +35,34 @@ flip.prev();
 flip.goTo(2);
 ```
 
+## Lazy mode for long books
+
+`createFlipbook` eagerly decodes every page by default. For books with
+many pages, set `lazy: true` and only the current page + `preloadWindow`
+neighbours on each side are loaded onto the GPU at a time. The runner's
+LRU evicts URL textures outside the window automatically.
+
+```ts
+import { createFlipbook } from "@vysmo/flipbook";
+
+// Any length — only ~3 textures held on the GPU at a time.
+const pages = Array.from({ length: 80 }, (_, i) => `/pages/${i}.jpg`);
+
+createFlipbook({
+  container: document.querySelector("#book")!,
+  pages,
+  lazy: true,
+  preloadWindow: 1,         // current + N each side; default 1
+});
+```
+
+DOM-source pages (`HTMLImageElement`, `HTMLCanvasElement`) mixed in a
+lazy `pages` array are always considered loaded — they're in memory by
+definition. Only URL strings go through the lazy load path.
+
+For Next.js — pass `next/image` optimizer URLs straight into `pages`.
+See the [Vysmo + Next.js guide](https://vysmo.com/guides/nextjs).
+
 ## Pages
 
 `pages` accepts:

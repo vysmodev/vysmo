@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/effects",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "WebGL2 visual filter primitives: blur, bloom, glow, vignette, grain, chromatic aberration, color grading, pixelate. One-input, composable, zero runtime deps.",
   "license": "MIT",
   "keywords": [
