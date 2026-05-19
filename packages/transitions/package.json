@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/transitions",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "60 WebGL2 transition shaders, defined as plain data. Mesh-based, tree-shakable to the byte, endpoint-correct by construction. Drives canvas, image, and video sources via one Runner.",
   "license": "MIT",
   "keywords": [
@@ -25,7 +25,8 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./src/index.ts"
+      "import": "./src/index.ts",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -35,7 +36,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && esbuild src/index.ts --bundle --format=cjs --platform=neutral --outfile=dist/index.cjs --external:@vysmo/* --external:react --external:react-dom --external:react/jsx-runtime",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "test": "vitest run && vitest run --config vitest.ssr.config.ts",
     "test:browser": "vitest run",
@@ -59,7 +60,8 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
       }
     }
   }

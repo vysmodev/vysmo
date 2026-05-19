@@ -122,6 +122,9 @@ importers:
       '@vysmo/flipbook':
         specifier: workspace:*
         version: link:../flipbook
+      esbuild:
+        specifier: ^0.28.0
+        version: 0.28.0
       playwright:
         specifier: ^1.59.1
         version: 1.59.1
@@ -226,6 +229,9 @@ importers:
       '@vysmo/transitions':
         specifier: workspace:*
         version: link:../transitions
+      esbuild:
+        specifier: ^0.28.0
+        version: 0.28.0
       playwright:
         specifier: ^1.59.1
         version: 1.59.1
@@ -281,6 +287,9 @@ importers:
       '@vysmo/text':
         specifier: workspace:*
         version: link:../text
+      esbuild:
+        specifier: ^0.28.0
+        version: 0.28.0
       playwright:
         specifier: ^1.59.1
         version: 1.59.1
@@ -333,6 +342,9 @@ importers:
       '@vysmo/transitions':
         specifier: workspace:*
         version: link:../transitions
+      esbuild:
+        specifier: ^0.28.0
+        version: 0.28.0
       playwright:
         specifier: ^1.59.1
         version: 1.59.1

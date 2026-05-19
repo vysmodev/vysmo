@@ -1,6 +1,12 @@
 import type { TextureSource, UniformParams } from "@vysmo/gl-core";
 
-export type { TextureSource, UniformValue, UniformParams, Widen } from "@vysmo/gl-core";
+export type {
+  RawPixels,
+  TextureSource,
+  UniformParams,
+  UniformValue,
+  Widen,
+} from "@vysmo/gl-core";
 
 export interface EffectShader {
   glsl: string;
@@ -31,10 +37,11 @@ export interface RenderArgs<P extends UniformParams> {
   /**
    * Image to apply the effect to. Accepts any `TextureSource`
    * (`HTMLImageElement`, `HTMLCanvasElement`, `HTMLVideoElement`,
-   * `ImageBitmap`, `OffscreenCanvas`, raw `WebGLTexture`) **or** a URL
-   * string. URL inputs must be pre-loaded via `runner.preload([url])`
-   * before `render()` is called — `render()` itself is synchronous and
-   * will throw if asked to draw an un-preloaded URL.
+   * `ImageBitmap`, `OffscreenCanvas`, raw `WebGLTexture`,
+   * `RawPixels` for ArrayBufferView uploads) **or** a URL string. URL
+   * inputs must be pre-loaded via `runner.preload([url])` before
+   * `render()` is called — `render()` itself is synchronous and will
+   * throw if asked to draw an un-preloaded URL.
    */
   source: TextureSource | string;
   params?: Partial<P>;

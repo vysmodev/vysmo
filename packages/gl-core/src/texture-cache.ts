@@ -1,4 +1,4 @@
-import type { TextureSource } from "./types.js";
+import type { RawPixels, TextureSource } from "./types.js";
 
 export interface TextureCacheOptions {
   /**
@@ -67,6 +67,28 @@ function isWebGLTexture(source: TextureSource): source is WebGLTexture {
 }
 
 /**
+ * Structural detection for the `RawPixels` variant of TextureSource.
+ * A plain object with `pixels` (a TypedArray), `width` and `height` —
+ * none of the other source variants have a `pixels` field, so this key
+ * is unambiguous. We check `ArrayBuffer.isView(pixels)` defensively so
+ * that a stray `{ pixels: "abc", width: 1, height: 1 }` doesn't slip
+ * past structural narrowing at runtime.
+ */
+function isRawPixels(source: TextureSource): source is RawPixels {
+  if (typeof source !== "object" || source === null) return false;
+  if (typeof WebGLTexture !== "undefined" && source instanceof WebGLTexture) {
+    return false;
+  }
+  const candidate = source as Partial<RawPixels>;
+  return (
+    "pixels" in candidate &&
+    typeof candidate.width === "number" &&
+    typeof candidate.height === "number" &&
+    ArrayBuffer.isView(candidate.pixels as ArrayBufferView)
+  );
+}
+
+/**
  * Returns true if the source's pixels can never change after construction —
  * so we can upload to the GPU once and skip re-uploads on subsequent
  * `resolve()` calls. This is a major win for static-image transitions,
@@ -93,13 +115,15 @@ function isImmutableSource(source: TextureSource): boolean {
 
 /**
  * Lazy GPU texture uploader keyed on source identity (WeakMap). Mutable
- * sources (video, canvas, OffscreenCanvas, ImageData) re-upload on every
+ * sources (video, canvas, OffscreenCanvas, RawPixels) re-upload on every
  * `resolve()` because their pixels change frame-to-frame. Immutable
  * sources (HTMLImageElement, ImageBitmap) upload once and reuse the
  * cached upload.
  *
  * Raw `WebGLTexture` sources bypass the cache entirely — the caller
- * already owns the GPU-side data.
+ * already owns the GPU-side data. `RawPixels` (`{ pixels, width,
+ * height }`) sources are keyed by the wrapper object's identity:
+ * reuse the wrapper across frames to reuse the underlying GL texture.
  *
  * **Binding side effect:** `resolve()` binds the resulting texture to
  * `gl.TEXTURE_2D` on the currently-active texture unit. When juggling
@@ -156,8 +180,9 @@ export class TextureCache {
    *
    * - `WebGLTexture` source → returned as-is (caller already owns GPU
    *   data; no upload).
-   * - Mutable source (`HTMLVideoElement`, `<canvas>`, `OffscreenCanvas`)
-   *   → re-uploaded every call so animated sources stay current.
+   * - Mutable source (`HTMLVideoElement`, `<canvas>`, `OffscreenCanvas`,
+   *   `RawPixels`) → re-uploaded every call so animated sources stay
+   *   current.
    * - Immutable source (`HTMLImageElement`, `ImageBitmap`) → uploaded
    *   once on first call; subsequent calls only rebind.
    */
@@ -165,10 +190,12 @@ export class TextureCache {
     if (isWebGLTexture(source)) return source;
 
     const gl = this.gl;
+    const raw = isRawPixels(source);
     let entry = this.cache.get(source);
-    const immutable = isImmutableSource(source);
+    const immutable = !raw && isImmutableSource(source);
 
     if (!entry) {
+      if (raw) this.validateRawPixels(source);
       const texture = gl.createTexture();
       if (!texture) throw new Error("gl.createTexture returned null");
       gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -188,20 +215,60 @@ export class TextureCache {
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      source as TexImageSource,
-    );
+    if (raw) {
+      // UNPACK_FLIP_Y_WEBGL is honoured for ArrayBufferView uploads in
+      // modern browsers (verified in Chromium), so we rely on the GL
+      // flag set just above rather than flipping rows in JS — same
+      // orientation behaviour as DOM sources, no CPU cost.
+      const { pixels, width, height } = source;
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        width,
+        height,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        pixels,
+      );
+    } else {
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        source as TexImageSource,
+      );
+    }
     if (this.generateMipmaps) {
       gl.generateMipmap(gl.TEXTURE_2D);
     }
     entry.uploaded = true;
 
     return entry.texture;
+  }
+
+  /**
+   * Sanity-check a RawPixels wrapper on first sight so callers see a
+   * clear error instead of a downstream `INVALID_OPERATION` from WebGL
+   * when the buffer is too small for the declared dimensions.
+   */
+  private validateRawPixels(source: RawPixels): void {
+    const { pixels, width, height } = source;
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+      throw new Error(
+        `TextureCache: RawPixels width/height must be positive numbers (got ${width}×${height}).`,
+      );
+    }
+    const expected = width * height * 4;
+    if (pixels.length < expected) {
+      throw new Error(
+        `TextureCache: RawPixels buffer is too small for ${width}×${height} RGBA8 ` +
+          `(need ${expected} bytes, got ${pixels.length}).`,
+      );
+    }
   }
 
   /**

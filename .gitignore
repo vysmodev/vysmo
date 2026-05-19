@@ -26,6 +26,7 @@ coverage
 .env
 .env.local
 .env.*.local
+.npmrc
 
 # Editor / OS
 .DS_Store

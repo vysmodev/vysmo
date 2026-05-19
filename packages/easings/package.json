@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/easings",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Curated easing catalog (40+ named curves) + parametric builders (spring, bezier, wiggle, rough, anticipate) + composition modifiers (chain, reverse, mirror, yoyo, blend, slice). Pure math, zero deps. CSS export via toCSSLinear / toCSSBezier; reduced-motion helpers; GSAP-style string parser.",
   "license": "MIT",
   "keywords": [
@@ -24,19 +24,23 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./src/index.ts"
+      "import": "./src/index.ts",
+      "require": "./dist/index.cjs"
     },
     "./css": {
       "types": "./src/css.ts",
-      "import": "./src/css.ts"
+      "import": "./src/css.ts",
+      "require": "./dist/css.cjs"
     },
     "./parse": {
       "types": "./src/parse.ts",
-      "import": "./src/parse.ts"
+      "import": "./src/parse.ts",
+      "require": "./dist/parse.cjs"
     },
     "./reduced-motion": {
       "types": "./src/reduced-motion.ts",
-      "import": "./src/reduced-motion.ts"
+      "import": "./src/reduced-motion.ts",
+      "require": "./dist/reduced-motion.cjs"
     }
   },
   "files": [
@@ -46,7 +50,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && esbuild src/index.ts src/css.ts src/parse.ts src/reduced-motion.ts --bundle --format=cjs --platform=neutral --outdir=dist --out-extension:.js=.cjs --external:@vysmo/* --external:react --external:react-dom --external:react/jsx-runtime",
     "typecheck": "tsc -p tsconfig.typecheck.json",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -66,19 +70,23 @@
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
       },
       "./css": {
         "types": "./dist/css.d.ts",
-        "import": "./dist/css.js"
+        "import": "./dist/css.js",
+        "require": "./dist/css.cjs"
       },
       "./parse": {
         "types": "./dist/parse.d.ts",
-        "import": "./dist/parse.js"
+        "import": "./dist/parse.js",
+        "require": "./dist/parse.cjs"
       },
       "./reduced-motion": {
         "types": "./dist/reduced-motion.d.ts",
-        "import": "./dist/reduced-motion.js"
+        "import": "./dist/reduced-motion.js",
+        "require": "./dist/reduced-motion.cjs"
       }
     }
   }

@@ -247,6 +247,177 @@ describe("TextureCache.release", () => {
   });
 });
 
+describe("TextureCache RawPixels source", () => {
+  function makeRgba(
+    width: number,
+    height: number,
+    fill: [number, number, number, number] = [255, 0, 0, 255],
+  ): Uint8Array {
+    const buf = new Uint8Array(width * height * 4);
+    for (let i = 0; i < buf.length; i += 4) {
+      buf[i] = fill[0];
+      buf[i + 1] = fill[1];
+      buf[i + 2] = fill[2];
+      buf[i + 3] = fill[3];
+    }
+    return buf;
+  }
+
+  it("uploads a Uint8Array wrapper to a new WebGLTexture", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: makeRgba(4, 4), width: 4, height: 4 };
+    const tex = cache.resolve(source);
+    expect(tex).toBeInstanceOf(WebGLTexture);
+  });
+
+  it("accepts Uint8ClampedArray (zero-copy with browser ImageData buffers)", () => {
+    const cache = new TextureCache(gl);
+    const source = {
+      pixels: new Uint8ClampedArray(makeRgba(4, 4)),
+      width: 4,
+      height: 4,
+    };
+    const tex = cache.resolve(source);
+    expect(tex).toBeInstanceOf(WebGLTexture);
+  });
+
+  it("returns the same WebGLTexture for the same wrapper across calls", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: makeRgba(4, 4), width: 4, height: 4 };
+    const a = cache.resolve(source);
+    const b = cache.resolve(source);
+    expect(a).toBe(b);
+  });
+
+  it("allocates distinct textures for distinct wrappers (even with same buffer)", () => {
+    const cache = new TextureCache(gl);
+    const pixels = makeRgba(4, 4);
+    const a = cache.resolve({ pixels, width: 4, height: 4 });
+    const b = cache.resolve({ pixels, width: 4, height: 4 });
+    expect(a).not.toBe(b);
+  });
+
+  it("re-uploads pixels on every resolve (mutable semantics)", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: makeRgba(4, 4), width: 4, height: 4 };
+    const spy = vi.spyOn(gl, "texImage2D");
+    cache.resolve(source);
+    cache.resolve(source);
+    cache.resolve(source);
+    expect(spy).toHaveBeenCalledTimes(3);
+    spy.mockRestore();
+  });
+
+  it("validates buffer size against width × height × 4 on first call", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: new Uint8Array(8), width: 4, height: 4 };
+    expect(() => cache.resolve(source)).toThrow(/RawPixels buffer is too small/);
+  });
+
+  it("validates positive width/height on first call", () => {
+    const cache = new TextureCache(gl);
+    const zero = { pixels: makeRgba(4, 4), width: 0, height: 4 };
+    expect(() => cache.resolve(zero)).toThrow(/width\/height must be positive/);
+    const neg = { pixels: makeRgba(4, 4), width: 4, height: -1 };
+    expect(() => cache.resolve(neg)).toThrow(/width\/height must be positive/);
+  });
+
+  it("accepts a buffer larger than width × height × 4 (padding allowed)", () => {
+    // Some callers might back the wrapper with a larger arena and only
+    // use the first width*height*4 bytes — that's fine, we read no further.
+    const cache = new TextureCache(gl);
+    const source = { pixels: new Uint8Array(256), width: 4, height: 4 };
+    expect(() => cache.resolve(source)).not.toThrow();
+  });
+
+  it("sets UNPACK_FLIP_Y_WEBGL=true before upload when flipY is true (default)", () => {
+    // Modern browsers honour UNPACK_FLIP_Y_WEBGL for ArrayBufferView
+    // uploads (verified in Chromium), so we rely on the GL flag rather
+    // than flipping rows in JS. Verify the pixelStorei call happens
+    // before texImage2D and that bytes are uploaded as-is.
+    const cache = new TextureCache(gl, { generateMipmaps: false });
+    const pixels = new Uint8Array([
+      255, 0, 0, 255,
+      0, 255, 0, 255,
+    ]);
+    const storeSpy = vi.spyOn(gl, "pixelStorei");
+    const texSpy = vi.spyOn(gl, "texImage2D");
+    cache.resolve({ pixels, width: 1, height: 2 });
+
+    // The pixelStorei(UNPACK_FLIP_Y_WEBGL, true) call must come before
+    // the explicit-dimension texImage2D call.
+    const storeIdx = storeSpy.mock.invocationCallOrder.findIndex(
+      (_, i) =>
+        storeSpy.mock.calls[i]?.[0] === gl.UNPACK_FLIP_Y_WEBGL &&
+        storeSpy.mock.calls[i]?.[1] === true,
+    );
+    const texIdx = texSpy.mock.calls.findIndex(
+      (c) => typeof c[3] === "number" && ArrayBuffer.isView(c[8] as ArrayBufferView),
+    );
+    expect(storeIdx).toBeGreaterThanOrEqual(0);
+    expect(texIdx).toBeGreaterThanOrEqual(0);
+    expect(
+      storeSpy.mock.invocationCallOrder[storeIdx]!,
+    ).toBeLessThan(texSpy.mock.invocationCallOrder[texIdx]!);
+    // Bytes should be uploaded as-is — GL handles the flip.
+    const uploaded = texSpy.mock.calls[texIdx]![8] as Uint8Array;
+    expect(Array.from(uploaded)).toEqual(Array.from(pixels));
+    storeSpy.mockRestore();
+    texSpy.mockRestore();
+  });
+
+  it("sets UNPACK_FLIP_Y_WEBGL=false before upload when flipY is false", () => {
+    const cache = new TextureCache(gl, {
+      generateMipmaps: false,
+      flipY: false,
+    });
+    const pixels = new Uint8Array([
+      255, 0, 0, 255,
+      0, 255, 0, 255,
+    ]);
+    const storeSpy = vi.spyOn(gl, "pixelStorei");
+    const texSpy = vi.spyOn(gl, "texImage2D");
+    cache.resolve({ pixels, width: 1, height: 2 });
+
+    const storeIdx = storeSpy.mock.invocationCallOrder.findIndex(
+      (_, i) =>
+        storeSpy.mock.calls[i]?.[0] === gl.UNPACK_FLIP_Y_WEBGL &&
+        storeSpy.mock.calls[i]?.[1] === false,
+    );
+    expect(storeIdx).toBeGreaterThanOrEqual(0);
+    const texIdx = texSpy.mock.calls.findIndex(
+      (c) => typeof c[3] === "number" && ArrayBuffer.isView(c[8] as ArrayBufferView),
+    );
+    const uploaded = texSpy.mock.calls[texIdx]![8] as Uint8Array;
+    expect(Array.from(uploaded)).toEqual(Array.from(pixels));
+    storeSpy.mockRestore();
+    texSpy.mockRestore();
+  });
+
+  it("release() evicts the cached texture for a RawPixels wrapper", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: makeRgba(4, 4), width: 4, height: 4 };
+    const tex = cache.resolve(source);
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    expect(cache.release(source)).toBe(true);
+    expect(deleteSpy).toHaveBeenCalledWith(tex);
+    // Subsequent resolve reallocates.
+    const reuploaded = cache.resolve(source);
+    expect(reuploaded).not.toBe(tex);
+    deleteSpy.mockRestore();
+  });
+
+  it("dispose() frees RawPixels textures alongside everything else", () => {
+    const cache = new TextureCache(gl);
+    const source = { pixels: makeRgba(4, 4), width: 4, height: 4 };
+    const tex = cache.resolve(source);
+    const deleteSpy = vi.spyOn(gl, "deleteTexture");
+    cache.dispose();
+    expect(deleteSpy.mock.calls.map((c) => c[0])).toContain(tex);
+    deleteSpy.mockRestore();
+  });
+});
+
 describe("TextureCache LRU eviction (maxUrlEntries)", () => {
   // WebGLTexture instances are opaque host objects with no enumerable
   // own properties, so vitest's `toHaveBeenCalledWith` uses deep-equality

@@ -2,6 +2,7 @@ import {
   FramebufferPool,
   TextureCache,
   buildProgram,
+  flipRgba8RowsInPlace,
   paramKeyToUniformName,
   setUniform,
   type TextureCacheOptions,
@@ -74,6 +75,7 @@ export class Runner {
   private canvas: HTMLCanvasElement | OffscreenCanvas;
   private textures: TextureCache;
   private readonly textureCacheOptions: TextureCacheOptions;
+  private readonly flipY: boolean;
   private programs = new WeakMap<Effect<UniformParams>, CompiledEffect>();
   private vao: WebGLVertexArrayObject;
   private defaultPrevious: WebGLTexture;
@@ -124,6 +126,7 @@ export class Runner {
       generateMipmaps: false,
       ...options.textureCache,
     };
+    this.flipY = this.textureCacheOptions.flipY ?? true;
     this.textures = new TextureCache(gl, this.textureCacheOptions);
     this.fbPool = new FramebufferPool(gl);
 
@@ -287,6 +290,50 @@ export class Runner {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindVertexArray(null);
+  }
+
+  /**
+   * Apply `effect` and read the result back into the caller-owned `dst`
+   * buffer as tightly-packed RGBA8 bytes. Sibling of `render()` for
+   * hosts that aren't displaying the runner's canvas directly — e.g.
+   * bridging into another renderer (Skia / CanvasKit / a parent WebGL
+   * context). Skips the `<canvas>` → `Image` → upload round-trip those
+   * bridges otherwise need.
+   *
+   * `dst` is caller-owned: pass the same buffer every frame to avoid
+   * per-frame GC churn. Must be at least `canvas.width * canvas.height
+   * * 4` bytes; oversize buffers are fine (the rest is left untouched).
+   *
+   * Orientation matches `render()` + the runner's `TextureCache.flipY`
+   * option: by default (`flipY: true`) the output is top-down — row 0 =
+   * top of frame — matching how `HTMLImageElement` / canvas sources are
+   * uploaded. Combined with the `RawPixels` upload variant, this gives
+   * symmetric "top-down in, top-down out" semantics.
+   *
+   * @throws Error if `dst` is too small for the canvas dimensions.
+   * @throws Error if the runner is disposed or the WebGL context is lost.
+   */
+  renderToPixels<P extends UniformParams>(
+    effect: Effect<P>,
+    args: RenderArgs<P> & { dst: Uint8Array | Uint8ClampedArray },
+  ): void {
+    const { dst, ...renderArgs } = args;
+    const width = this.canvas.width;
+    const height = this.canvas.height;
+    const required = width * height * 4;
+    if (dst.length < required) {
+      throw new Error(
+        `Runner.renderToPixels(): dst buffer is too small (${dst.length} bytes, ` +
+          `need at least ${required} for ${width}×${height} RGBA8).`,
+      );
+    }
+    this.render(effect, renderArgs as RenderArgs<P>);
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, dst);
+    if (this.flipY) {
+      flipRgba8RowsInPlace(dst, width, height);
+    }
   }
 
   /**

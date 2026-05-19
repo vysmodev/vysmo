@@ -1,4 +1,5 @@
 import type {
+  RawPixels,
   TextureSource,
   UniformValue,
   UniformParams,
@@ -22,11 +23,27 @@ const _off: TextureSource = offscreen;
 const _bmp: TextureSource = bitmap;
 const _tex: TextureSource = rawTexture;
 
+const _raw: TextureSource = {
+  pixels: new Uint8Array(16),
+  width: 2,
+  height: 2,
+};
+const _rawClamped: TextureSource = {
+  pixels: new Uint8ClampedArray(16),
+  width: 2,
+  height: 2,
+};
+const _rawTyped: RawPixels = {
+  pixels: new Uint8Array(64),
+  width: 4,
+  height: 4,
+};
+
 // WebGLTexture is an empty interface in lib.dom, so structural typing
 // makes primitives-vs-TextureSource assertions noisy. Skip the negative
 // check here; the positive assertions above are what actually matter.
 
-void [_img, _vid, _cnv, _off, _bmp, _tex];
+void [_img, _vid, _cnv, _off, _bmp, _tex, _raw, _rawClamped, _rawTyped];
 
 // --- UniformValue covers scalars and 2/3/4-vectors ------------------------
 

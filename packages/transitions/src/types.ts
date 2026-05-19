@@ -1,11 +1,12 @@
 import type {
+  RawPixels,
   TextureSource,
   UniformValue,
   UniformParams,
   Widen,
 } from "@vysmo/gl-core";
 
-export type { TextureSource, UniformValue, UniformParams, Widen };
+export type { RawPixels, TextureSource, UniformValue, UniformParams, Widen };
 
 export interface TransitionShader {
   glsl: string;
@@ -65,10 +66,11 @@ export interface RenderArgs<P extends UniformParams> {
   /**
    * Source image. Accepts any `TextureSource` (`HTMLImageElement`,
    * `HTMLCanvasElement`, `HTMLVideoElement`, `ImageBitmap`,
-   * `OffscreenCanvas`, raw `WebGLTexture`) **or** a URL string. URL
-   * inputs must be pre-loaded via `runner.preload([url])` before
-   * `render()` is called — `render()` itself is synchronous and will
-   * throw if asked to draw an un-preloaded URL.
+   * `OffscreenCanvas`, raw `WebGLTexture`, `RawPixels` for
+   * ArrayBufferView uploads) **or** a URL string. URL inputs must be
+   * pre-loaded via `runner.preload([url])` before `render()` is
+   * called — `render()` itself is synchronous and will throw if asked
+   * to draw an un-preloaded URL.
    */
   from: TextureSource | string;
   /** Target image. Same input types as `from`; see `from` for URL pre-loading rules. */
