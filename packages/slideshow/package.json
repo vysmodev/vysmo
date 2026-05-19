@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/slideshow",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Drop-in image slideshow driven by any of the 60 @vysmo/transitions. Opt-in chrome (arrows, dots, counter, progress, captions) themeable via CSS custom properties. Click halves, keyboard nav, swipe, autoplay with pause-on-hover. Set every chrome option to false for headless mode.",
   "license": "MIT",
   "keywords": [

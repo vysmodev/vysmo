@@ -247,6 +247,44 @@ describe("TextureCache.release", () => {
   });
 });
 
+describe("TextureCache SizedTexture source", () => {
+  it("returns the inner WebGLTexture verbatim, no caching overhead", () => {
+    const cache = new TextureCache(gl);
+    const raw = gl.createTexture()!;
+    const resolved = cache.resolve({ texture: raw, width: 16, height: 16 });
+    expect(resolved).toBe(raw);
+    gl.deleteTexture(raw);
+  });
+
+  it("returns false from release() (caller owns the inner texture)", () => {
+    const cache = new TextureCache(gl);
+    const raw = gl.createTexture()!;
+    const wrapper = { texture: raw, width: 16, height: 16 };
+    cache.resolve(wrapper);
+    expect(cache.release(wrapper)).toBe(false);
+    gl.bindTexture(gl.TEXTURE_2D, raw);
+    expect(gl.getError()).toBe(gl.NO_ERROR);
+    gl.deleteTexture(raw);
+  });
+
+  it("structurally distinguishes SizedTexture from RawPixels and bare WebGLTexture", () => {
+    const cache = new TextureCache(gl);
+    const raw = gl.createTexture()!;
+    const sized = cache.resolve({ texture: raw, width: 4, height: 4 });
+    expect(sized).toBe(raw);
+
+    const rawPixelsResolved = cache.resolve({
+      pixels: new Uint8Array(16),
+      width: 2,
+      height: 2,
+    });
+    expect(rawPixelsResolved).toBeInstanceOf(WebGLTexture);
+    expect(rawPixelsResolved).not.toBe(raw);
+
+    gl.deleteTexture(raw);
+  });
+});
+
 describe("TextureCache RawPixels source", () => {
   function makeRgba(
     width: number,

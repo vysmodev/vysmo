@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/gl-core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Minimal WebGL2 plumbing — shader compile / link, uniform dispatch, texture cache, ping-pong framebuffer pool. Internal infra under @vysmo/transitions and @vysmo/effects.",
   "license": "MIT",
   "keywords": [

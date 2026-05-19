@@ -19,12 +19,43 @@ interface CompiledEffect {
 }
 
 export interface RunnerOptions {
-  /** Render target. `OffscreenCanvas` works in workers; `HTMLCanvasElement` on the main thread. */
-  canvas: HTMLCanvasElement | OffscreenCanvas;
+  /**
+   * Render target. `OffscreenCanvas` works in workers; `HTMLCanvasElement`
+   * on the main thread. Optional when `gl` is provided (the canvas is
+   * derived from `gl.canvas`); required otherwise.
+   */
+  canvas?: HTMLCanvasElement | OffscreenCanvas;
+  /**
+   * **Advanced — shared-context mode.** Existing `WebGL2RenderingContext`
+   * to render into instead of creating a new one. Use this to integrate
+   * with another GL-based renderer (Skia / CanvasKit, Three.js, etc.)
+   * in the same browser context: when you and the upstream renderer
+   * share a context, you can pass `WebGLTexture` or `SizedTexture`
+   * handles as `source` with zero CPU↔GPU readback.
+   *
+   * **Ownership semantics when `gl` is provided:**
+   * - The Runner does **not** own the context. `dispose()` cleans up
+   *   Runner-allocated GL resources (VAO, compiled programs, internal
+   *   default texture, framebuffers) but does **not** delete the
+   *   context itself.
+   * - The Runner does **not** attach `webglcontextlost` /
+   *   `webglcontextrestored` listeners. You manage context lifecycle.
+   * - `contextAttributes` is ignored (the context already exists).
+   *
+   * **State the Runner DOES reset at end of `render()`**: `useProgram`,
+   * `bindVertexArray`, `bindFramebuffer`, touched texture units
+   * unbound, and pixelStorei flags reset to defaults.
+   *
+   * **GPU pipeline ordering:** if the upstream renderer wrote to a
+   * texture you're about to pass as `source`, call its `flush()`
+   * before `runner.render()` so the GPU commands are ordered correctly.
+   */
+  gl?: WebGL2RenderingContext;
   /**
    * Forwarded to `canvas.getContext("webgl2", …)`. Defaults are
    * `{ alpha: true, antialias: false, premultipliedAlpha: false,
    * preserveDrawingBuffer: false }` — overrideable via this field.
+   * Ignored when `gl` is provided (the context already exists).
    */
   contextAttributes?: WebGLContextAttributes;
   /**
@@ -82,6 +113,13 @@ export class Runner {
   private fbPool: FramebufferPool;
   private disposed = false;
   private contextLost = false;
+  /**
+   * True when the Runner created its own WebGL2 context. False in
+   * shared-context mode (`new Runner({ gl })`), where the consumer
+   * owns the context: we skip context-loss listeners and leave the
+   * context alive on `dispose()`.
+   */
+  private readonly ownsContext: boolean;
   private readonly onContextLost: (() => void) | undefined;
   private readonly onContextRestored: (() => void) | undefined;
   private readonly handleContextLost = (e: Event): void => {
@@ -101,23 +139,47 @@ export class Runner {
   };
 
   constructor(options: RunnerOptions) {
-    this.canvas = options.canvas;
     this.onContextLost = options.onContextLost;
     this.onContextRestored = options.onContextRestored;
+    this.ownsContext = options.gl === undefined;
 
-    const gl = options.canvas.getContext("webgl2", {
-      alpha: true,
-      antialias: false,
-      premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
-      ...options.contextAttributes,
-    }) as WebGL2RenderingContext | null;
+    let gl: WebGL2RenderingContext | null;
+    let canvas: HTMLCanvasElement | OffscreenCanvas;
+
+    if (options.gl) {
+      gl = options.gl;
+      const inferred = options.canvas ?? (gl.canvas as HTMLCanvasElement | OffscreenCanvas);
+      if (!inferred) {
+        throw new Error(
+          "Runner: when constructing with `gl`, either pass `canvas` or " +
+            "ensure `gl.canvas` is set (it normally is — this should not " +
+            "happen in practice).",
+        );
+      }
+      canvas = inferred;
+    } else {
+      if (!options.canvas) {
+        throw new Error(
+          "Runner: must pass either `canvas` (Runner creates a WebGL2 " +
+            "context) or `gl` (Runner shares an existing context).",
+        );
+      }
+      canvas = options.canvas;
+      gl = options.canvas.getContext("webgl2", {
+        alpha: true,
+        antialias: false,
+        premultipliedAlpha: false,
+        preserveDrawingBuffer: false,
+        ...options.contextAttributes,
+      }) as WebGL2RenderingContext | null;
+    }
 
     if (!gl) {
       throw new Error(
         "WebGL2 is not available. This environment does not support the effects library.",
       );
     }
+    this.canvas = canvas;
     this.gl = gl;
     // Effects default to LINEAR + no mipmaps (effects sample neighbours,
     // not LOD); merge any caller-provided options on top.
@@ -136,9 +198,13 @@ export class Runner {
 
     this.defaultPrevious = createSolidTexture(gl, 0, 0, 0);
 
-    if (typeof EventTarget !== "undefined" && options.canvas instanceof EventTarget) {
-      options.canvas.addEventListener("webglcontextlost", this.handleContextLost);
-      options.canvas.addEventListener("webglcontextrestored", this.handleContextRestored);
+    if (
+      this.ownsContext &&
+      typeof EventTarget !== "undefined" &&
+      canvas instanceof EventTarget
+    ) {
+      canvas.addEventListener("webglcontextlost", this.handleContextLost);
+      canvas.addEventListener("webglcontextrestored", this.handleContextRestored);
     }
   }
 
@@ -290,6 +356,17 @@ export class Runner {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindVertexArray(null);
+
+    // Restore GL state so we don't leak into an upstream renderer in
+    // shared-context mode. Cheap (~4 calls) and protective even for the
+    // owned-context case. pixelStorei flags are reset inside
+    // TextureCache after every upload.
+    gl.useProgram(null);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.activeTexture(gl.TEXTURE0);
   }
 
   /**
@@ -353,11 +430,19 @@ export class Runner {
    * freed by the canvas, but disposing here releases the in-process
    * bookkeeping early and removes the canvas listeners so the runner
    * can be GC'd.
+   *
+   * In shared-context mode (`new Runner({ gl })`), the context itself
+   * is left alive — the consumer owns it and may still be using it for
+   * the upstream renderer.
    */
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
-    if (typeof EventTarget !== "undefined" && this.canvas instanceof EventTarget) {
+    if (
+      this.ownsContext &&
+      typeof EventTarget !== "undefined" &&
+      this.canvas instanceof EventTarget
+    ) {
       this.canvas.removeEventListener("webglcontextlost", this.handleContextLost);
       this.canvas.removeEventListener(
         "webglcontextrestored",

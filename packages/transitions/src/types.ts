@@ -1,12 +1,20 @@
 import type {
   RawPixels,
+  SizedTexture,
   TextureSource,
   UniformValue,
   UniformParams,
   Widen,
 } from "@vysmo/gl-core";
 
-export type { RawPixels, TextureSource, UniformValue, UniformParams, Widen };
+export type {
+  RawPixels,
+  SizedTexture,
+  TextureSource,
+  UniformValue,
+  UniformParams,
+  Widen,
+};
 
 export interface TransitionShader {
   glsl: string;

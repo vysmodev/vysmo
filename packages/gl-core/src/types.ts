@@ -31,6 +31,26 @@ export interface RawPixels {
   height: number;
 }
 
+/**
+ * A `WebGLTexture` paired with its dimensions. Useful when bridging
+ * from another renderer that already has GPU-resident content (Skia /
+ * CanvasKit, Three.js, a parent WebGL context) — pass the wrapper
+ * instead of a bare `WebGLTexture` to document the source's size
+ * explicitly and stay symmetric with `RawPixels`.
+ *
+ * The cache returns the inner texture as-is (zero upload, zero copy);
+ * the `width` / `height` fields are forward-compat for future
+ * source-aspect-aware features and serve as documentation today.
+ *
+ * Requires a shared WebGL2 context with whatever renderer owns the
+ * texture — see `RunnerOptions.gl` for the integration pattern.
+ */
+export interface SizedTexture {
+  texture: WebGLTexture;
+  width: number;
+  height: number;
+}
+
 export type TextureSource =
   | HTMLCanvasElement
   | HTMLImageElement
@@ -38,7 +58,8 @@ export type TextureSource =
   | ImageBitmap
   | OffscreenCanvas
   | WebGLTexture
-  | RawPixels;
+  | RawPixels
+  | SizedTexture;
 
 export type UniformValue =
   | number

@@ -1,5 +1,6 @@
 export type {
   RawPixels,
+  SizedTexture,
   TextureSource,
   UniformParams,
   UniformValue,

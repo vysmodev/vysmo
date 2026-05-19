@@ -5,7 +5,9 @@ export type { DefineEffectSpec } from "./define.js";
 export type {
   Effect,
   EffectShader,
+  RawPixels,
   RenderArgs,
+  SizedTexture,
   TextureSource,
   UniformParams,
   UniformValue,

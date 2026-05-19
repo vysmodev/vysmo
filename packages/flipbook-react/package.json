@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/flipbook-react",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "React bindings for @vysmo/flipbook — a <Flipbook> component that mounts a real WebGL flipbook with drag-scrub, keyboard nav, and autoplay; useFlipbook hook for imperative control (next/prev/goTo/seek).",
   "license": "MIT",
   "keywords": [

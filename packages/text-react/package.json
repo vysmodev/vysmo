@@ -1,6 +1,6 @@
 {
   "name": "@vysmo/text-react",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "React bindings for @vysmo/text — an <AnimateText> component that drives splitText + animateText with declarative props (preset, split, stagger, repeat, etc.) and a hook for advanced cases.",
   "license": "MIT",
   "keywords": [

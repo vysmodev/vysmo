@@ -1,4 +1,4 @@
-import type { RawPixels, TextureSource } from "./types.js";
+import type { RawPixels, SizedTexture, TextureSource } from "./types.js";
 
 export interface TextureCacheOptions {
   /**
@@ -63,6 +63,27 @@ interface UrlCacheEntry {
 function isWebGLTexture(source: TextureSource): source is WebGLTexture {
   return (
     typeof WebGLTexture !== "undefined" && source instanceof WebGLTexture
+  );
+}
+
+/**
+ * Structural detection for the `SizedTexture` variant — a wrapper that
+ * pairs an existing `WebGLTexture` with its dimensions. We dispatch on
+ * the `texture` field being a `WebGLTexture` instance to avoid mistaking
+ * other plain objects (e.g. `RawPixels`, which has `pixels` instead).
+ */
+function isSizedTexture(source: TextureSource): source is SizedTexture {
+  if (typeof source !== "object" || source === null) return false;
+  if (typeof WebGLTexture !== "undefined" && source instanceof WebGLTexture) {
+    return false;
+  }
+  const candidate = source as Partial<SizedTexture>;
+  return (
+    "texture" in candidate &&
+    typeof WebGLTexture !== "undefined" &&
+    candidate.texture instanceof WebGLTexture &&
+    typeof candidate.width === "number" &&
+    typeof candidate.height === "number"
   );
 }
 
@@ -180,6 +201,8 @@ export class TextureCache {
    *
    * - `WebGLTexture` source → returned as-is (caller already owns GPU
    *   data; no upload).
+   * - `SizedTexture` source (`{ texture, width, height }`) → inner
+   *   texture returned as-is, dimensions are forward-compat metadata.
    * - Mutable source (`HTMLVideoElement`, `<canvas>`, `OffscreenCanvas`,
    *   `RawPixels`) → re-uploaded every call so animated sources stay
    *   current.
@@ -187,6 +210,12 @@ export class TextureCache {
    *   once on first call; subsequent calls only rebind.
    */
   resolve(source: TextureSource): WebGLTexture {
+    // Check SizedTexture before WebGLTexture: WebGLTexture is an empty
+    // interface in lib.dom, so narrowing it out first would erase the
+    // SizedTexture branch from TS's view (every variant is structurally
+    // assignable to `{}`). With this order, SizedTexture narrows cleanly
+    // from the full union.
+    if (isSizedTexture(source)) return source.texture;
     if (isWebGLTexture(source)) return source;
 
     const gl = this.gl;
@@ -245,6 +274,13 @@ export class TextureCache {
     if (this.generateMipmaps) {
       gl.generateMipmap(gl.TEXTURE_2D);
     }
+    // Reset pixel-storage state to GL defaults so we don't poison an
+    // outer renderer's expectations. WebGL specifies these as `false`
+    // at context creation; leaving our overrides set would silently
+    // flip / premultiply textures uploaded by a shared-context
+    // consumer's later code (Skia/CanvasKit etc.).
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     entry.uploaded = true;
 
     return entry.texture;
@@ -361,7 +397,8 @@ export class TextureCache {
    *   already loaded; pending loads are dropped from the index but the
    *   promise still resolves for any in-flight callers).
    * - DOM source: removes the WeakMap entry and deletes the GL texture.
-   * - Raw `WebGLTexture`: never cached, returns false. Caller owns it.
+   * - Raw `WebGLTexture` / `SizedTexture`: never cached, returns false.
+   *   Caller owns the underlying GL texture.
    *
    * Used by lazy-loading slideshows / flipbooks to release textures
    * that have scrolled out of the preload window.
@@ -379,6 +416,7 @@ export class TextureCache {
       return true;
     }
     if (isWebGLTexture(source)) return false;
+    if (isSizedTexture(source)) return false;
     const entry = this.cache.get(source);
     if (!entry) return false;
     gl.deleteTexture(entry.texture);
