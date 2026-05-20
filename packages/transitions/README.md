@@ -631,13 +631,117 @@ Every built-in transition clears five non-negotiable invariants. Custom transiti
 
 `from` / `to` accept any `TextureSource`:
 
-- `HTMLImageElement` (uploaded once — cached)
+- `HTMLImageElement` (uploaded once — cached by image identity)
 - `HTMLVideoElement` (re-uploaded each render — animated source)
 - `HTMLCanvasElement` / `OffscreenCanvas` (re-uploaded each render)
 - `ImageBitmap` (uploaded once — cached)
-- `WebGLTexture` (used as-is — bring-your-own GPU data)
+- `WebGLTexture` (used as-is — bring-your-own GPU data; pairs with shared-context mode below)
+- `SizedTexture` (`{ texture, width, height }`) — `WebGLTexture` + its dims, symmetric with `RawPixels`
+- `RawPixels` (`{ pixels, width, height }`) — tightly-packed RGBA8 `Uint8Array` / `Uint8ClampedArray` direct upload, no `<canvas>` round-trip
+
+URL strings are also accepted as sugar — see [With URL strings](#with-url-strings-no-dom-image-needed) above.
 
 Mix freely. Page-curl an image to a video. Crossfade two canvases. Transition between a static logo and a live camera feed.
+
+## Bridging with other GL-based renderers
+
+If you're embedding Vysmo inside another renderer — Skia / CanvasKit, Three.js, a parent WebGL2 app, a native desktop video engine, anything that owns its own GPU pipeline — there's a four-step ladder you can climb. Each rung removes a CPU↔GPU round-trip; the top rung is **true zero-copy** in both directions.
+
+### Rung 1 — pixel handoff (`RawPixels` + `renderToPixels`)
+
+When the upstream renderer produces pixels in CPU memory (or you're rendering Vysmo from a worker into a native consumer), bridge bytes-to-bytes:
+
+```ts
+// @no-check
+// Source: bytes from anywhere — Skia surface readback, native frame
+// buffer, generated procedurally, etc.
+const sourceBytes: RawPixels = { pixels, width, height };
+
+// Allocate dst once, reuse every frame (no GC churn).
+const dst = new Uint8Array(canvas.width * canvas.height * 4);
+
+runner.renderToPixels(crossZoom, {
+  from: sourceBytes,
+  to: nextSourceBytes,
+  progress: 0.4,
+  dst,
+});
+// `dst` now contains the rendered RGBA8. Upload it wherever you need.
+```
+
+`RawPixels` skips the `<canvas>` → `ImageData` → `texImage2D` round-trip; `renderToPixels` skips the `<canvas>` → `Image` → upload round-trip on the way out. Suitable when you can't share a WebGL context with the upstream renderer (different process, different stack).
+
+### Rung 2 — shared context with `WebGLTexture` inputs
+
+When your upstream renderer runs in the same browser tab as Vysmo (Skia/CanvasKit in the same page, Three.js scene, parent WebGL2 app), share one WebGL2 context:
+
+```ts
+// @no-check
+// Hand Vysmo your existing context — it won't create its own.
+const runner = new Runner({ gl: yourExistingContext });
+
+// Now `from` / `to` accept bare GPU textures from your renderer.
+// Zero upload — Vysmo samples your texture directly.
+runner.render(crossZoom, {
+  from: skiaSurfaceTexture,        // WebGLTexture from CanvasKit
+  to: threeRenderTarget.texture,   // WebGLTexture from Three.js
+  progress: 0.4,
+});
+```
+
+Pass `SizedTexture` (`{ texture, width, height }`) instead of a bare `WebGLTexture` when you want to document dims at the call site — symmetric with `RawPixels`.
+
+In shared-context mode the Runner does **not** own the context: `dispose()` leaves it alive, context-loss listeners aren't attached, `contextAttributes` is ignored. The Runner also restores enough GL state at the end of each `render()` (program / VAO / framebuffer / texture units / pixelStorei flags) to stay safe in a shared pipeline. Depth-test and blend enable are explicitly left in the caller's hands (mesh path manages them internally for its draw and disables them before returning).
+
+**GPU pipeline ordering.** If the upstream renderer wrote to a texture you're about to pass as `from` / `to`, call its `flush()` (e.g. `skSurface.flush()`) before `runner.render()` so the GPU commands are ordered correctly.
+
+### Rung 3 — `outputFramebuffer` for zero-copy output
+
+The last round-trip is the readback on the output side. Pass `outputFramebuffer` and Vysmo writes the final pass straight into a texture-backed FBO you own:
+
+```ts
+// @no-check
+const target = makeYourHostFBO(gl, width, height);
+
+runner.render(
+  crossZoom,
+  { from: skiaTexture, to: threeTexture, progress: 0.4 },
+  { outputFramebuffer: target.fb },
+);
+// `target.tex` now contains the rendered frame. Sample it from your host
+// renderer's next draw. Runner leaves `target.fb` bound — rebind
+// whatever you need before your follow-on work.
+```
+
+Combined with rung 2 (`WebGLTexture` inputs in shared-context mode), this is the **true zero-copy bridge**: GPU-resident input → Vysmo → GPU-resident output, no `readPixels`, no upload, no `<canvas>` in the loop. Eliminates ~9 MB / 1080p frame or ~36 MB / 4K frame per Runner invocation vs the rung 1 path.
+
+The same `RenderOptions` shape works on `renderToPixels()`: when both `outputFramebuffer` and `dst` are passed, Vysmo writes to the FBO *and* reads back from it in the same call.
+
+### Rung 4 — sub-region rendering with `viewport`
+
+For per-element transitions on a shared host canvas (a UI surface composing many elements, a video timeline rendering element-by-element into a frame FBO), pass `viewport: [x, y, width, height]` to clip Vysmo's output into a region of the bound framebuffer:
+
+```ts
+// @no-check
+// Render the transition into the bottom-right 480×270 region of a
+// 1920×1080 host FBO. The rest of the FBO is untouched.
+runner.render(
+  crossZoom,
+  { from, to, progress: 0.4 },
+  {
+    outputFramebuffer: hostFb,
+    viewport: [1440, 0, 480, 270],
+  },
+);
+```
+
+When `viewport` is set, `uResolution` follows the viewport dimensions (correctness, not perf — pixel-space math like `1.0 / uResolution` sample steps would otherwise be wrong-scaled). Intermediate ping-pong FBOs for multi-pass transitions also follow viewport dims, saving memory and avoiding oversampling. GL viewport `y` is bottom-up, like `glViewport` — `[1440, 0, 480, 270]` is bottom-right, not top-right.
+
+### Notes on the bridge
+
+- **Mesh transitions need a depth attachment.** Mesh-based transitions (`pageCurl`, `polygonFlip`, anything with `Transition.mesh`) enable depth-test and clear depth before drawing. If your `outputFramebuffer` has no depth attachment, overlapping mesh triangles will z-fight. Attach a `DEPTH24` or `DEPTH16` renderbuffer. The other ~55 single-pass shader transitions are unaffected.
+- **Vysmo is a frame producer, not a compositor.** Each render clears the bound FBO to `(0, 0, 0, 0)` before drawing. To composite onto existing FBO contents, render Vysmo into a separate FBO and blend in your own pass.
+- **Many distinct viewport sizes per frame.** The internal ping-pong framebuffer pool keeps an LRU of `(width, height, hdr)` slots — default capacity 4. Per-element transitions across many heterogeneously-sized elements stay O(1) as long as you cluster within the cap; raise `new Runner({ gl, framebufferPoolSize: N })` if you routinely render at more than 4 distinct sizes per frame.
 
 ## Characteristics
 

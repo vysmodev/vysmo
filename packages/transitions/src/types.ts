@@ -1,5 +1,6 @@
 import type {
   RawPixels,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   UniformValue,
@@ -9,6 +10,7 @@ import type {
 
 export type {
   RawPixels,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   UniformValue,

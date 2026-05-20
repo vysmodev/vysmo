@@ -1,11 +1,13 @@
 import type {
   RawPixels,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   UniformValue,
   UniformParams,
   Widen,
   TextureCacheOptions,
+  FramebufferPoolOptions,
 } from "../index.js";
 
 // --- TextureSource accepts the documented DOM types -----------------------
@@ -108,3 +110,31 @@ void opts;
 // @ts-expect-error — generateMipmaps is a boolean, not a number
 const _badOpts: TextureCacheOptions = { generateMipmaps: 1 };
 void _badOpts;
+
+// --- RenderOptions — both fields are optional and independent ------------
+
+declare const fakeFb: WebGLFramebuffer;
+
+const _emptyOpts: RenderOptions = {};
+const _fboOpts: RenderOptions = { outputFramebuffer: fakeFb };
+const _fboNullOpts: RenderOptions = { outputFramebuffer: null };
+const _viewportOpts: RenderOptions = { viewport: [0, 0, 512, 512] };
+const _bothOpts: RenderOptions = {
+  outputFramebuffer: fakeFb,
+  viewport: [16, 16, 64, 64],
+};
+void [_emptyOpts, _fboOpts, _fboNullOpts, _viewportOpts, _bothOpts];
+
+// @ts-expect-error — viewport is a 4-tuple, not 3
+const _badViewport: RenderOptions = { viewport: [0, 0, 100] };
+void _badViewport;
+
+// WebGLFramebuffer is an empty interface in lib.dom (same trap as
+// WebGLTexture above) — structural typing makes negative assertions on
+// outputFramebuffer noisy. Positive assertions above carry the load.
+
+// --- FramebufferPoolOptions ---------------------------------------------
+
+const _poolOpts: FramebufferPoolOptions = { capacity: 8 };
+const _emptyPoolOpts: FramebufferPoolOptions = {};
+void [_poolOpts, _emptyPoolOpts];

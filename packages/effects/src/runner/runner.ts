@@ -5,6 +5,7 @@ import {
   flipRgba8RowsInPlace,
   paramKeyToUniformName,
   setUniform,
+  type RenderOptions,
   type TextureCacheOptions,
   type TextureSource,
   type UniformParams,
@@ -78,6 +79,24 @@ export interface RunnerOptions {
    * URL-keyed GPU texture memory under lazy-loading consumers.
    */
   textureCache?: TextureCacheOptions;
+  /**
+   * Maximum number of distinct `(width, height, hdr)` slots the
+   * internal ping-pong framebuffer pool holds at once. Defaults to
+   * `4`, which covers the common case where most content clusters
+   * into a handful of sizes (full-frame backgrounds, fit-to-canvas
+   * media, captions at a couple of sizes).
+   *
+   * Only relevant when consumers pass `RenderOptions.viewport` with
+   * varying dimensions across `render()` calls — without `viewport`,
+   * every call uses canvas dims and only one slot is ever needed.
+   *
+   * Set to `1` to preserve pre-0.5.0 behaviour: a single slot that
+   * reallocates on any dimension change. Raise above 4 if you
+   * routinely render per-element effects at more than 4 distinct
+   * sizes per frame; cost is roughly `2 × (capacity - 4)` additional
+   * GL textures held resident.
+   */
+  framebufferPoolSize?: number;
 }
 
 /**
@@ -190,7 +209,12 @@ export class Runner {
     };
     this.flipY = this.textureCacheOptions.flipY ?? true;
     this.textures = new TextureCache(gl, this.textureCacheOptions);
-    this.fbPool = new FramebufferPool(gl);
+    this.fbPool = new FramebufferPool(
+      gl,
+      options.framebufferPoolSize !== undefined
+        ? { capacity: options.framebufferPoolSize }
+        : {},
+    );
 
     const vao = gl.createVertexArray();
     if (!vao) throw new Error("gl.createVertexArray returned null");
@@ -271,6 +295,7 @@ export class Runner {
   render<P extends UniformParams>(
     effect: Effect<P>,
     args: RenderArgs<P>,
+    opts?: RenderOptions,
   ): void {
     if (this.disposed) {
       throw new Error("Runner has been disposed. Create a new Runner to render.");
@@ -286,14 +311,23 @@ export class Runner {
     const passes = Math.max(1, Math.floor(effect.passes ?? 1));
     const wantsHdr = effect.hdr === true;
 
+    // Resolve the output target up-front: where the final pass writes,
+    // what viewport applies, and what `uResolution` reports.
+    const outputFb = opts?.outputFramebuffer ?? null;
+    const vp = opts?.viewport;
+    const passWidth = vp ? vp[2] : this.canvas.width;
+    const passHeight = vp ? vp[3] : this.canvas.height;
+    const vpX = vp ? vp[0] : 0;
+    const vpY = vp ? vp[1] : 0;
+
     // Allocate/resize framebuffers BEFORE any source texture binding. FBO
     // texture creation binds `gl.TEXTURE_2D` to whichever unit is active,
     // which would otherwise clobber the source unit on the first render.
+    // Intermediate FBOs follow viewport dims when set — saves memory and
+    // matches the actual sampling rate of the final output.
     const pingPong =
       passes > 1
-        ? this.fbPool.ensure(2, this.canvas.width, this.canvas.height, {
-            hdr: wantsHdr,
-          })
+        ? this.fbPool.ensure(2, passWidth, passHeight, { hdr: wantsHdr })
         : undefined;
 
     gl.useProgram(compiled.program);
@@ -304,10 +338,14 @@ export class Runner {
     gl.bindTexture(gl.TEXTURE_2D, sourceTex);
     gl.uniform1i(this.uniformLoc(compiled, "uSource"), 0);
 
+    // uResolution follows the active viewport (correctness, not perf):
+    // multi-tap effects (blur, bloom, glow) compute sample steps as
+    // `1.0/uResolution`; if the shader's "screen size" disagrees with
+    // the actual draw size, the effect comes out the wrong scale.
     gl.uniform2f(
       this.uniformLoc(compiled, "uResolution"),
-      this.canvas.width,
-      this.canvas.height,
+      passWidth,
+      passHeight,
     );
 
     const passCountLoc = this.uniformLoc(compiled, "uPassCount");
@@ -331,8 +369,11 @@ export class Runner {
     for (let i = 0; i < passes; i++) {
       const isFinal = i === passes - 1;
 
+      // Destination: final pass renders to the caller's FBO (or the
+      // default framebuffer); intermediate passes ping-pong between
+      // pool slots 0 and 1.
       if (isFinal || !pingPong) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, outputFb);
       } else {
         gl.bindFramebuffer(gl.FRAMEBUFFER, pingPong[i % 2]!.fb);
       }
@@ -348,13 +389,21 @@ export class Runner {
       if (previousLoc) gl.uniform1i(previousLoc, 1);
       if (passLoc) gl.uniform1i(passLoc, i);
 
-      gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+      // Intermediate passes always write the full pool-FBO; only the
+      // final pass honours the caller's viewport offset.
+      if (isFinal) {
+        gl.viewport(vpX, vpY, passWidth, passHeight);
+      } else {
+        gl.viewport(0, 0, passWidth, passHeight);
+      }
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    // Cleanup: when the caller supplied an FBO, leave it bound — they
+    // own follow-on draws. Otherwise restore the default framebuffer.
+    if (!outputFb) gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindVertexArray(null);
 
     // Restore GL state so we don't leak into an upstream renderer in
@@ -393,10 +442,18 @@ export class Runner {
   renderToPixels<P extends UniformParams>(
     effect: Effect<P>,
     args: RenderArgs<P> & { dst: Uint8Array | Uint8ClampedArray },
+    opts?: RenderOptions,
   ): void {
     const { dst, ...renderArgs } = args;
-    const width = this.canvas.width;
-    const height = this.canvas.height;
+    // The read region matches the draw region: caller-supplied viewport
+    // when set, full canvas otherwise. `dst` is sized against the same
+    // region so a viewport-bounded render doesn't require a canvas-sized
+    // buffer.
+    const vp = opts?.viewport;
+    const readX = vp ? vp[0] : 0;
+    const readY = vp ? vp[1] : 0;
+    const width = vp ? vp[2] : this.canvas.width;
+    const height = vp ? vp[3] : this.canvas.height;
     const required = width * height * 4;
     if (dst.length < required) {
       throw new Error(
@@ -404,10 +461,13 @@ export class Runner {
           `need at least ${required} for ${width}×${height} RGBA8).`,
       );
     }
-    this.render(effect, renderArgs as RenderArgs<P>);
+    this.render(effect, renderArgs as RenderArgs<P>, opts);
     const gl = this.gl;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, dst);
+    // render() left the right framebuffer bound: the caller's
+    // `outputFramebuffer` when set (so readPixels reads back out of the
+    // caller's texture), or the default framebuffer otherwise. No
+    // re-bind needed.
+    gl.readPixels(readX, readY, width, height, gl.RGBA, gl.UNSIGNED_BYTE, dst);
     if (this.flipY) {
       flipRgba8RowsInPlace(dst, width, height);
     }

@@ -37,25 +37,79 @@ describe("FramebufferPool", () => {
     expect(second[1]).toBe(firstB);
   });
 
-  it("reallocates when width changes", () => {
+  it("creates a separate slot when width changes (LRU)", () => {
     const first = pool.ensure(2, 64, 64);
     const firstFb = first[0]!.fb;
     const second = pool.ensure(2, 128, 64);
     expect(second[0]!.fb).not.toBe(firstFb);
     expect(second[0]!.width).toBe(128);
+    // Old slot persists under the default capacity (4); count is the
+    // sum across both slots.
+    expect(pool.count).toBe(4);
+    // Re-requesting the original size returns the original FBOs (no
+    // reallocation).
+    const firstAgain = pool.ensure(2, 64, 64);
+    expect(firstAgain[0]!.fb).toBe(firstFb);
   });
 
-  it("reallocates when height changes", () => {
+  it("creates a separate slot when height changes (LRU)", () => {
     pool.ensure(2, 64, 64);
     const second = pool.ensure(2, 64, 128);
     expect(second[0]!.height).toBe(128);
+    expect(pool.count).toBe(4);
   });
 
-  it("reallocates when the count grows", () => {
-    pool.ensure(2, 64, 64);
+  it("reallocates the matching slot when count grows", () => {
+    const first = pool.ensure(2, 64, 64);
+    const firstFb = first[0]!.fb;
     const second = pool.ensure(3, 64, 64);
-    expect(pool.count).toBe(3);
     expect(second).toHaveLength(3);
+    // The slot itself was rebuilt; the old FBO handle is gone.
+    expect(second[0]!.fb).not.toBe(firstFb);
+    // Only one slot at this (w,h,hdr) — total count reflects only the
+    // realloc'd slot.
+    expect(pool.count).toBe(3);
+  });
+
+  it("returns a smaller slice without reallocating when count shrinks", () => {
+    const big = pool.ensure(3, 64, 64);
+    const bigFb0 = big[0]!.fb;
+    const small = pool.ensure(2, 64, 64);
+    expect(small).toHaveLength(2);
+    expect(small[0]!.fb).toBe(bigFb0);
+    expect(pool.count).toBe(3); // slot still holds 3 FBOs
+  });
+
+  it("evicts the least-recently-used slot when capacity is exceeded", () => {
+    const small = new FramebufferPool(gl, { capacity: 2 });
+    const a = small.ensure(1, 16, 16);
+    small.ensure(1, 32, 32);
+    // Promote A back to MRU.
+    small.ensure(1, 16, 16);
+    // C should evict the LRU slot (32×32), keeping A and C.
+    small.ensure(1, 48, 48);
+    expect(small.count).toBe(2);
+    // A is still cached (same FBO handle).
+    const aAgain = small.ensure(1, 16, 16);
+    expect(aAgain[0]!.fb).toBe(a[0]!.fb);
+    // 32×32 was evicted — re-requesting it allocates a new slot.
+    small.ensure(1, 32, 32);
+    expect(small.count).toBe(2); // evicted 48×48 to make room
+    small.dispose();
+  });
+
+  it("capacity: 1 collapses to pre-0.5.0 dispose-on-change behavior", () => {
+    const legacy = new FramebufferPool(gl, { capacity: 1 });
+    const first = legacy.ensure(2, 64, 64);
+    const firstFb = first[0]!.fb;
+    // Any dim change at capacity 1 must evict the existing slot.
+    const second = legacy.ensure(2, 128, 64);
+    expect(second[0]!.fb).not.toBe(firstFb);
+    expect(legacy.count).toBe(2); // only the new slot lives
+    // Re-requesting the old size also reallocates (slot was evicted).
+    const firstReallocated = legacy.ensure(2, 64, 64);
+    expect(firstReallocated[0]!.fb).not.toBe(firstFb);
+    legacy.dispose();
   });
 
   it("produces framebuffer-complete attachments", () => {
@@ -89,18 +143,19 @@ describe("FramebufferPool", () => {
     expect(typeof isHdr).toBe("boolean");
   });
 
-  it("reallocates when hdr toggles", () => {
+  it("keeps LDR and HDR slots separate (LRU)", () => {
     const ldr = pool.ensure(2, 64, 64, { hdr: false });
     const ldrFb = ldr[0]!.fb;
-    // Request HDR — if the extension is unavailable this becomes a no-op
-    // because `hdr` resolves to false again; check the bookkeeping.
     pool.ensure(2, 64, 64, { hdr: true });
     if (pool.isHdrActive) {
-      // Extension available: FBOs should have been recreated with HDR format.
+      // Extension available: HDR allocates a separate slot. LDR slot
+      // still lives under the default LRU capacity.
       const hdr = pool.ensure(2, 64, 64, { hdr: true });
       expect(hdr[0]!.fb).not.toBe(ldrFb);
+      const ldrAgain = pool.ensure(2, 64, 64, { hdr: false });
+      expect(ldrAgain[0]!.fb).toBe(ldrFb);
     } else {
-      // Extension unavailable: the LDR FBOs should still be reused.
+      // Extension unavailable: HDR fell back to LDR, hit the same slot.
       const again = pool.ensure(2, 64, 64, { hdr: true });
       expect(again[0]!.fb).toBe(ldrFb);
     }

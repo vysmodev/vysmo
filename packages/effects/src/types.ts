@@ -2,6 +2,7 @@ import type { TextureSource, UniformParams } from "@vysmo/gl-core";
 
 export type {
   RawPixels,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   UniformParams,

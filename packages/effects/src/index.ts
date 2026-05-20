@@ -7,6 +7,7 @@ export type {
   EffectShader,
   RawPixels,
   RenderArgs,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   UniformParams,

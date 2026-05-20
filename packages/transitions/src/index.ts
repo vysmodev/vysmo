@@ -68,6 +68,7 @@ export type { DefineTransitionSpec } from "./transitions/index.js";
 export type {
   RawPixels,
   RenderArgs,
+  RenderOptions,
   SizedTexture,
   TextureSource,
   Transition,
